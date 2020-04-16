@@ -28,6 +28,11 @@ async function getEntries(){
   return entries
 }
 
+async function getEntry(id){
+  const store = db.transaction('entries').store
+  return store.get(id)
+}
+
 // insert new entry
 async function addEntry(entry){
   entry.id = uuidv4()
@@ -41,6 +46,7 @@ async function updateEntry(entry){
 export const repo = {
   open: open,
   getEntries: getEntries,
+  getEntry: getEntry,
   addEntry: addEntry,
   updateEntry: updateEntry
 }

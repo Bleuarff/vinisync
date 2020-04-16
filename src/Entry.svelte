@@ -3,16 +3,36 @@ import { onMount } from 'svelte'
 import { repo } from './storage.js'
 
 export let params
-let entry = {}
+let entry = {
+  wine: {
+    appellation: '',
+    producer: '',
+    name: '',
+    year: '',
+    country: 'France',
+    apogeeStart: null,
+    apogeeEnd: null,
+    cepages: [],
+    containing: '0.75',
+    color: '',
+    sweet: false,
+    sparkling: false
+  },
+  count: 6,
+  location: '',
+}
 
 let edit = false
 let saved = false
 
+$: serialized = JSON.stringify(entry)
+
 onMount(async () => {
   await repo.open()
+
   edit = !params.id
   if (params.id)
-    entry = await repo.getOne(params.id)
+    entry = await repo.getEntry(params.id)
 })
 
 async function save(){
@@ -23,16 +43,26 @@ async function save(){
 
 </script>
 
+<!-- <p>{serialized}</p> -->
 <a href="/wines">back to list</a>
 <h1>Entry</h1>
 
 {#if entry}
-  <label>Cuvée</label><input bind:value={entry.name} type="text">
-  <label>Producteur</label> <input type="text" bind:value={entry.producer}>
+  <label>Cuvée</label><input bind:value={entry.wine.name} type="text">
+  <label>Producteur</label> <input type="text" bind:value={entry.wine.producer}>
+  <label>Appellation</label><input type="text" bind:value={entry.wine.appellation}>
+  <label>Millésime</label><input type="text" bind:value={entry.wine.year}>
+  <label>Pays</label><input type="text" bind:value={entry.wine.country}>
 
-  <!-- <p>{serialized}</p> -->
+  <label>Apogée</label>
+  de <input type="text" bind:value={entry.wine.apogeeStart}> à
+  <input type="text" bind:value={entry.wine.apogeeEnd}>
+  <label>Bouteilles</label><input type="number" bind:value={entry.count}>
+
   {#if edit}
-    <button on:click="{save}">Save</button>
+    <div>
+      <button on:click="{save}">Save</button>
+    </div>
   {/if}
 {:else}
   <p>Cannot retrieve entry {params.id}</p>
@@ -46,5 +76,9 @@ async function save(){
   #toast{
     color: white;
     background: #00771a;
+  }
+
+  label{
+    display: inline;
   }
 </style>

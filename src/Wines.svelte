@@ -1,22 +1,30 @@
 <script>
 import { onMount } from 'svelte'
 import {repo } from './storage.js'
-let entries = []
-
 export let params = {}
 
+let entries = []
+
 onMount(async () => {
-  entries = await repo.getAll()
+  await repo.open()
+  entries = await repo.getEntries()
 })
 
 </script>
 
-<h2>Wines</h2>
-<ul>
-  {#each entries as entry}
-    <li><a href="/entry/{entry.id}">{entry.producer} - {entry.year}</a></li>
-  {/each}
-</ul>
+{#if entries.length > 0}
+
+  <h2>Wines</h2>
+  <p>Votre cave contient {entries.length} references.</p>
+  <ul>
+    {#each entries as entry}
+      <li><a href="/entry/{entry.id}">{entry.producer} - {entry.year}</a></li>
+    {/each}
+  </ul>
+
+{:else}
+  <p>Votre cave est vide.</p>
+{/if}
 
 <a href="/entry">Ajouter un vin</a>
 

@@ -8,16 +8,15 @@ let entry = {}
 let edit = false
 let saved = false
 
-// $: serialized = JSON.stringify(entry)
-
 onMount(async () => {
+  await repo.open()
   edit = !params.id
   if (params.id)
     entry = await repo.getOne(params.id)
 })
 
 async function save(){
-  await repo.insert(entry)
+  await repo.addEntry(entry)
   saved = true
 }
 

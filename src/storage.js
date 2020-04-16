@@ -1,52 +1,46 @@
 import { v4 as uuidv4} from 'uuid'
+import { openDB, deleteDB, wrap, unwrap } from 'idb'
 
-class Entries{
-  constructor(){
-    this.entries = [{
-      id: '1',
-      name: 'Cuvée du Potier',
-      appellation: 'St Jo',
-      producer: 'Domaine de la Ville Rouge',
-      year: 2016,
-      color: 'red'
-    }, {
-      id: '2',
-      appellation: 'Pomerol',
-      producer: 'Petrus',
-      year: 1999,
-      color: 'red'
-    },{
-      id: '3',
-      name: 'Pouet',
-      appellation: 'Sancerre',
-      producer: 'Vincent Pinard',
-      year: 2017,
-      color: 'white'
-    }]
-  }
+const DB_VERSION = 6,
+      DB_NAME = 'vinisync'
 
-  async getAll(){
-    return this.entries
-  }
+let db
 
-  async getOne(id){
-    return this.entries.find(x => x.id === id)
-  }
+async function open(){
+  if (db) return
 
-  async insert(entry){
-    entry.id = uuidv4()
-    this.entries = [...this.entries, entry]
-    return Promise.resolve()
-  }
-
-  createId(len = 4){
-    let id = ''
-    do{
-      id += Math.random().toString(36).substring(2)
+  db = await openDB(DB_NAME, DB_VERSION, {
+    upgrade(db, oldVersion, newVersion, transation){
+      console.debug(`Upgrade needed, version ${DB_VERSION}`)
+      const store = db.createObjectStore('entries', {keyPath: 'id', autoIncrement: false})
     }
-    while(id.length < len)
-    return id.substring(0, len)
-  }
+  })
 }
 
-export const repo = new Entries()
+// retrieve list of entries
+async function getEntries(){
+  const entries = []
+  let cursor = await db.transaction('entries').store.openCursor();
+  while (cursor){
+    entries.push(cursor.value)
+    cursor = await cursor.continue();
+  }
+  return entries
+}
+
+// insert new entry
+async function addEntry(entry){
+  entry.id = uuidv4()
+  await db.add('entries', entry)
+}
+
+async function updateEntry(entry){
+  return
+}
+
+export const repo = {
+  open: open,
+  getEntries: getEntries,
+  addEntry: addEntry,
+  updateEntry: updateEntry
+}

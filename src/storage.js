@@ -1,7 +1,7 @@
 import { v4 as uuidv4} from 'uuid'
 import { openDB, deleteDB, wrap, unwrap } from 'idb'
 
-const DB_VERSION = 6,
+const DB_VERSION = 1,
       DB_NAME = 'vinisync'
 
 let db
@@ -12,7 +12,12 @@ async function open(){
   db = await openDB(DB_NAME, DB_VERSION, {
     upgrade(db, oldVersion, newVersion, transation){
       console.debug(`Upgrade needed, version ${DB_VERSION}`)
-      const store = db.createObjectStore('entries', {keyPath: 'id', autoIncrement: false})
+
+      if (oldVersion < 1){
+        const store = db.createObjectStore('entries', {keyPath: 'id', autoIncrement: false})
+        store.createIndex('creationDate', 'creationDate', {unique: false})
+        store.createIndex('lastUpdateDate', 'lastUpdateDate', {unique: false})
+      }
     }
   })
 }

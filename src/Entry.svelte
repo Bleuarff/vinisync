@@ -20,6 +20,8 @@ let entry = {
   },
   count: 6,
   location: '',
+  creationDate: '',
+  lastUpdateDate: ''
 }
 
 let edit = false
@@ -58,6 +60,10 @@ function sanitizeEntry(){
   entry.wine.cepages = cepageText.split(',').filter(c => !!c).map(c => c.trim())
 
   // TODO: check for mandatory fields
+
+  entry.lastUpdateDate = (new Date()).toISOString()
+  if (!params.id)
+    entry.creationDate = (new Date()).toISOString()
 }
 
 </script>
@@ -127,6 +133,10 @@ function sanitizeEntry(){
   <div id="toast">Entry saved</div>
 {/if}
 
+{#if params.id}
+  <p class="timestamps">creation {entry.creationDate.substring(0, 16)} - MaJ {entry.lastUpdateDate.substring(0, 16)}</p>
+{/if}
+
 <style>
   #toast{
     color: white;
@@ -135,5 +145,9 @@ function sanitizeEntry(){
 
   label{
     display: inline;
+  }
+
+  .timestamps{
+    font-size: .8em;
   }
 </style>

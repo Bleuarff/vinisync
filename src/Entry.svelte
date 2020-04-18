@@ -25,7 +25,7 @@ let entry = {
 }
 
 let edit = false
-let saved = false
+let showSave = false
 
 let cepageText = entry.wine.cepages.join(', ') //intermediate for cepage text input values
 $: serialized = JSON.stringify(entry)
@@ -48,9 +48,12 @@ async function save(){
     else //save
       await repo.addEntry(entry)
 
-    saved = true
+    showSave = true
+    setTimeout(() => { showSave = false}, 2500)
+    console.debug(`${entry.id || 'new entry'} saved`)
   }
   catch(ex){
+    console.error(`${entry.id || 'new entry'} save error`)
     // TODO show error
   }
 
@@ -64,6 +67,18 @@ function sanitizeEntry(){
   entry.lastUpdateDate = (new Date()).toISOString()
   if (!params.id)
     entry.creationDate = (new Date()).toISOString()
+}
+
+function makeEditable(){
+  edit = true
+}
+async function increment(){
+  entry.count = entry.count + 1
+  await save()
+}
+async function decrement(){
+  entry.count = Math.max(0, entry.count - 1)
+  await save()
 }
 
 </script>
@@ -95,7 +110,7 @@ function sanitizeEntry(){
 
   <label>Contenance</label>
   {#if edit}
-    <input type="text" v:bind={entry.wine.containing} placeholder="0.75">
+    <input type="text" v:bind="{entry.wine.containing}" placeholder="0.52">
   {:else}
     <span>{entry.wine.containing}</span>
   {/if}
@@ -119,17 +134,21 @@ function sanitizeEntry(){
     <span>{entry.location}</span>
   {/if}
 
-
-  {#if edit}
-    <div>
+  <div>
+    {#if edit}
       <button on:click="{save}">Save</button>
-    </div>
-  {/if}
+    {:else}
+      <button on:click="{makeEditable}">Edit</button>
+      <button on:click="{increment}">+1</button>
+      <button on:click="{decrement}">-1</button>
+    {/if}
+  </div>
+
 {:else}
   <p>Cannot retrieve entry {params.id}</p>
 {/if}
 
-{#if saved}
+{#if showSave}
   <div id="toast">Entry saved</div>
 {/if}
 

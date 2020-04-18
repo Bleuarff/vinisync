@@ -11,9 +11,9 @@ async function open(){
 
   db = await openDB(DB_NAME, DB_VERSION, {
     upgrade(db, oldVersion, newVersion, transation){
-      console.debug(`Upgrade needed, version ${DB_VERSION}`)
+      console.debug(`Upgrade needed, ${oldVersion} → ${newVersion}`)
 
-      if (oldVersion < 1){
+      if (oldVersion <= 1){
         const store = db.createObjectStore('entries', {keyPath: 'id', autoIncrement: false})
         store.createIndex('creationDate', 'creationDate', {unique: false})
         store.createIndex('lastUpdateDate', 'lastUpdateDate', {unique: false})

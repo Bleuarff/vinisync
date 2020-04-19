@@ -8,7 +8,7 @@ let entry = {
     appellation: '',
     producer: '',
     name: '',
-    year: '',
+    year: null,
     country: 'France',
     apogeeStart: null,
     apogeeEnd: null,
@@ -26,6 +26,7 @@ let entry = {
 
 let edit = false
 let showSave = false
+let error = null
 
 let cepageText = entry.wine.cepages.join(', ') //intermediate for cepage text input values
 $: serialized = JSON.stringify(entry)
@@ -41,10 +42,18 @@ onMount(async () => {
 async function save(){
   try{
     sanitizeEntry()
-    if (params.id){
+    error = null
+  }
+  catch(ex){
+    console.log('Validation error: ' + ex.message)
+    error = ex.message
+    return
+  }
+
+  try{
+    if (params.id)
       await repo.updateEntry(entry)
-    }
-    else //save
+    else
       await repo.addEntry(entry)
 
     showSave = true
@@ -53,14 +62,18 @@ async function save(){
   }
   catch(ex){
     console.error(`${entry.id || 'new entry'} save error`)
-    // TODO show error
+    error = 'Save error'
   }
 }
 
 function sanitizeEntry(){
   entry.wine.cepages = cepageText.split(',').filter(c => !!c).map(c => c.trim())
 
-  // TODO: check for mandatory fields
+  if (!entry.wine.name && !entry.wine.producer)
+    throw new Error('Producteur ou cuvée obligatoire')
+
+  if (entry.wine.year && (entry.wine.year < 1700 || entry.wine.year > (new Date()).getFullYear()))
+    throw new Error('Millésime invalide')
 }
 
 function makeEditable(){
@@ -85,7 +98,7 @@ async function decrement(){
   <label>Cuvée</label><input bind:value={entry.wine.name} type="text">
   <label>Producteur</label> <input type="text" bind:value={entry.wine.producer}>
   <label>Appellation</label><input type="text" bind:value={entry.wine.appellation}>
-  <label>Millésime</label><input type="text" bind:value={entry.wine.year}>
+  <label>Millésime</label><input type="number" bind:value={entry.wine.year}>
   <label>Pays</label><input type="text" bind:value={entry.wine.country}>
 
   <label>Apogée</label>
@@ -143,7 +156,11 @@ async function decrement(){
 {/if}
 
 {#if showSave}
-  <div id="toast">Entry saved</div>
+  <div class="toast saved">Entry saved</div>
+{/if}
+
+{#if error}
+  <div class="toast error">{error}</div>
 {/if}
 
 {#if params.id}
@@ -151,9 +168,15 @@ async function decrement(){
 {/if}
 
 <style>
-  #toast{
+  .toast{
     color: white;
+    padding: 4px 1em;
+  }
+  .saved{
     background: #00771a;
+  }
+  .error{
+    background: #ed2c2c;
   }
 
   label{

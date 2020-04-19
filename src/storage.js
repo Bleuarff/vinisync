@@ -44,6 +44,7 @@ async function addEntry(entry){
   entry.lastUpdateDate = entry.creationDate = (new Date()).toISOString()
 
   await db.add('entries', entry)
+  return entry.id
 }
 
 async function updateEntry(entry){
@@ -67,11 +68,16 @@ async function importEntries(entries){
   return Promise.all(proms)
 }
 
+function deleteEntry(id){
+  return db.delete('entries', id)
+}
+
 export const repo = {
   open: open,
   getEntries: getEntries,
   getEntry: getEntry,
   addEntry: addEntry,
   updateEntry: updateEntry,
-  import: importEntries
+  import: importEntries,
+  deleteEntry: deleteEntry
 }

@@ -19,7 +19,7 @@ onMount(async () => {
   <p>Votre cave contient {entries.length} references et {bottleCount} bouteilles.</p>
   <ul>
     {#each entries as entry}
-      <li><a href="/entry/{entry.id}">{entry.wine.producer} - {entry.wine.year}</a></li>
+      <li><a href="/entry/{entry.id}">{entry.wine.name} - {entry.wine.producer} - {entry.wine.year} [{entry.count}]</a></li>
     {/each}
   </ul>
 

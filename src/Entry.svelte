@@ -38,12 +38,11 @@ onMount(async () => {
     entry = await repo.getEntry(params.id)
 })
 
-
 async function save(){
   try{
     sanitizeEntry()
     if (params.id){
-      // TODO update
+      await repo.updateEntry(entry)
     }
     else //save
       await repo.addEntry(entry)
@@ -56,17 +55,12 @@ async function save(){
     console.error(`${entry.id || 'new entry'} save error`)
     // TODO show error
   }
-
 }
 
 function sanitizeEntry(){
   entry.wine.cepages = cepageText.split(',').filter(c => !!c).map(c => c.trim())
 
   // TODO: check for mandatory fields
-
-  entry.lastUpdateDate = (new Date()).toISOString()
-  if (!params.id)
-    entry.creationDate = (new Date()).toISOString()
 }
 
 function makeEditable(){

@@ -41,11 +41,15 @@ async function getEntry(id){
 // insert new entry
 async function addEntry(entry){
   entry.id = uuidv4()
+  entry.lastUpdateDate = entry.creationDate = (new Date()).toISOString()
+
   await db.add('entries', entry)
 }
 
 async function updateEntry(entry){
-  return
+  entry.lastUpdateDate = (new Date()).toISOString()
+
+  await db.put('entries', entry)
 }
 
 export const repo = {

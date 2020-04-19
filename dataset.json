@@ -1,0 +1,108 @@
+[{
+  "wine": {
+    "appellation": "St Joseph",
+    "producer": "Domaine de la Ville Rouge",
+    "name": "Cuvée du Potier",
+    "year": "2016",
+    "country": "France",
+    "apogeeStart": null,
+    "apogeeEnd": null,
+    "cepages": ["syrah"],
+    "containing": "0.75",
+    "color": "red",
+    "sweet": false,
+    "sparkling": false
+  },
+  "count": 6,
+  "location": ""
+},
+{
+  "wine": {
+    "appellation": "Sauternes",
+    "producer": "Château Yquem",
+    "name": "",
+    "year": "2001",
+    "country": "France",
+    "apogeeStart": null,
+    "apogeeEnd": null,
+    "cepages": ["semillon"],
+    "containing": "0.75",
+    "color": "white",
+    "sweet": true,
+    "sparkling": false
+  },
+  "count": 2,
+  "location": ""
+},
+{
+  "wine": {
+    "appellation": "Château-Chalon",
+    "producer": "Domaine Macle",
+    "name": "",
+    "year": "2011",
+    "country": "France",
+    "apogeeStart": null,
+    "apogeeEnd": null,
+    "cepages": ["savagnin"],
+    "containing": "0.52",
+    "color": "white",
+    "sweet": false,
+    "sparkling": false
+  },
+  "count": 2,
+  "location": ""
+},
+{
+  "wine": {
+    "appellation": "Pommard 1er cru",
+    "producer": "Domaine Buffet",
+    "name": "Les Poutures",
+    "year": "2015",
+    "country": "France",
+    "apogeeStart": null,
+    "apogeeEnd": null,
+    "cepages": ["pinot noir"],
+    "containing": "0.75",
+    "color": "red",
+    "sweet": false,
+    "sparkling": false
+  },
+  "count": 6,
+  "location": ""
+},
+{
+  "wine": {
+    "appellation": "Champagne",
+    "producer": "Gosset",
+    "name": "Grande Réserve",
+    "year": "",
+    "country": "France",
+    "apogeeStart": null,
+    "apogeeEnd": null,
+    "cepages": [],
+    "containing": "0.75",
+    "color": "white",
+    "sweet": false,
+    "sparkling": true
+  },
+  "count": 6,
+  "location": ""
+},
+{
+  "wine": {
+    "appellation": "Muscadet",
+    "producer": "Bruno Cormerais",
+    "name": "",
+    "year": "2018",
+    "country": "France",
+    "apogeeStart": null,
+    "apogeeEnd": null,
+    "cepages": [],
+    "containing": "0.75",
+    "color": "white",
+    "sweet": false,
+    "sparkling": false
+  },
+  "count": 6,
+  "location": ""
+}]

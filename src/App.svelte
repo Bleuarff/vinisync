@@ -2,6 +2,7 @@
 	import router from 'page'
 	import Wines from './Wines.svelte'
 	import Entry from './Entry.svelte'
+	import Import from './Import.svelte'
 
 	let page
 	let params
@@ -12,6 +13,7 @@
 		params = ctx.params
 		next()
 	}, () => {page = Entry})
+	router('/import', () => page = Import)
 	router.start()
 
 </script>

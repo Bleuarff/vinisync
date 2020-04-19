@@ -52,10 +52,26 @@ async function updateEntry(entry){
   await db.put('entries', entry)
 }
 
+// delete all existing entries and create from provided list
+async function importEntries(entries){
+  const ids = await db.getAllKeys('entries')
+  const proms = []
+
+  ids.forEach(id => {
+      proms.push(db.delete('entries', id))
+  })
+
+  entries.forEach(entry => {
+    proms.push(addEntry(entry))
+  })
+  return Promise.all(proms)
+}
+
 export const repo = {
   open: open,
   getEntries: getEntries,
   getEntry: getEntry,
   addEntry: addEntry,
-  updateEntry: updateEntry
+  updateEntry: updateEntry,
+  import: importEntries
 }

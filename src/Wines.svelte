@@ -4,6 +4,7 @@ import {repo } from './storage.js'
 export let params = {}
 
 let entries = []
+$: bottleCount = entries.reduce((cur, e)=> {return cur + e.count}, 0)
 
 onMount(async () => {
   await repo.open()
@@ -15,7 +16,7 @@ onMount(async () => {
 {#if entries.length > 0}
 
   <h2>Wines</h2>
-  <p>Votre cave contient {entries.length} references.</p>
+  <p>Votre cave contient {entries.length} references et {bottleCount} bouteilles.</p>
   <ul>
     {#each entries as entry}
       <li><a href="/entry/{entry.id}">{entry.wine.producer} - {entry.wine.year}</a></li>
@@ -27,6 +28,9 @@ onMount(async () => {
 {/if}
 
 <a href="/entry">Ajouter un vin</a>
+<div>
+  <a href="/import">Importer</a>
+</div>
 
 <style>
 ul{

@@ -30,7 +30,8 @@
 <style>
 	main {
 		padding: 1em;
-		max-width: 240px;
+		width: 100%;
+		max-width: 700px;
 		margin: 0 auto;
 	}
 
@@ -40,6 +41,7 @@
 		font-size: 4em;
 		font-weight: 100;
 		text-align: center;
+		margin-top: 0;
 	}
 
 	h1 a {
@@ -47,9 +49,4 @@
 		color: unset;
 	}
 
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
-	}
 </style>

@@ -104,7 +104,7 @@ async function deleteEntry(){
 
 </script>
 
-<a href="/wines">&#129154; liste</a>
+<a href="/wines">&#x2190; liste</a>
 <h1>Entry</h1>
 
 <div id="entry">

@@ -28,11 +28,14 @@
 </main>
 
 <style>
+	@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap&subset=latin-ext');
+
 	main {
 		padding: 1em;
 		width: 100%;
 		max-width: 700px;
 		margin: 0 auto;
+		font-family: 'Roboto', sans-serif;
 	}
 
 	h1 {

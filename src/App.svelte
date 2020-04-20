@@ -31,7 +31,7 @@
 	@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap&subset=latin-ext');
 
 	main {
-		padding: 1em;
+		padding: 0 1em 1em 1em;
 		width: 100%;
 		max-width: 700px;
 		margin: 0 auto;
@@ -41,10 +41,11 @@
 	h1 {
 		color: #ff3e00;
 		text-transform: uppercase;
-		font-size: 4em;
+		font-size: 2em;
 		font-weight: 100;
-		text-align: center;
+		text-align: left;
 		margin-top: 0;
+		margin-bottom: 2em;
 	}
 
 	h1 a {

@@ -111,21 +111,21 @@ async function deleteEntry(){
 <!-- <p>{serialized}</p> -->
 
 {#if entry}
-    <label>Cuvée</label><input bind:value={entry.wine.name} type="text">
-    <label>Producteur</label> <input type="text" bind:value={entry.wine.producer}>
-    <label>Appellation</label><input type="text" bind:value={entry.wine.appellation}>
-    <label>Millésime</label><input type="number" bind:value={entry.wine.year}>
-    <label>Pays</label><input type="text" bind:value={entry.wine.country}>
+    {#if edit || entry.wine.name}<label>Cuvée</label><input bind:value={entry.wine.name} type="text" disabled={!edit}>{/if}
+    {#if edit || entry.wine.producer}<label>Producteur</label> <input type="text" bind:value={entry.wine.producer} disabled={!edit}>{/if}
+    {#if edit || entry.wine.appellation}<label>Appellation</label><input type="text" bind:value={entry.wine.appellation} disabled={!edit}>{/if}
+    {#if edit || entry.wine.year}<label>Millésime</label><input type="number" bind:value={entry.wine.year} disabled={!edit}>{/if}
+    {#if edit || entry.wine.country}<label>Pays</label><input type="text" bind:value={entry.wine.country} disabled={!edit}>{/if}
 
     <label>Apogée</label>
     <div class="apogee">
       <span>de</span>
-      <input type="number" bind:value={entry.wine.apogeeStart}>
+      <input type="number" bind:value={entry.wine.apogeeStart} disabled={!edit}>
       <span>à</span>
-      <input type="number" bind:value={entry.wine.apogeeEnd}>
+      <input type="number" bind:value={entry.wine.apogeeEnd} disabled={!edit}>
     </div>
 
-    <label>Bouteilles</label><input type="number" bind:value={entry.count}>
+    <label>Bouteilles</label><input type="number" bind:value={entry.count} disabled={!edit}>
 
     <label>Cepages</label>
       {#if edit}
@@ -188,24 +188,39 @@ async function deleteEntry(){
   {/if}
 
   {#if params.id}
-    <p class="timestamps">creation {entry.creationDate.substring(0, 16)} - MaJ {entry.lastUpdateDate.substring(0, 16)}</p>
+    <div class="timestamps">creation {entry.creationDate.substring(0, 16)} - MaJ {entry.lastUpdateDate.substring(0, 16)}</div>
   {/if}
 </div>
 
 <style>
   #entry{
     width: 100%;
+    position: relative;
+    padding-bottom: 2em;
   }
 
   label{
     display: block;
     font-size: .8em;
+    user-select: none;
   }
 
   input{
-    border:none;
-    border-bottom: 1px solid var(--main-color);
-    padding-top: 0;
+    border: none;
+    border-bottom: 1px solid var(--main-color-light);
+    border-radius: 0;
+    padding-top: 1px;
+    padding-bottom: 3px;
+  }
+
+  input[type="text"]:focus{
+    border-color: #bb072d;
+  }
+
+  input[disabled]{
+    background: white;
+    color: #333;
+    border-bottom-color: transparent;
   }
 
   .apogee{
@@ -214,10 +229,17 @@ async function deleteEntry(){
     justify-content: flex-start;
   }
 
-  .apogee > * {
-    flex: 1 1 30%;
-    min-width: 1em;
-    max-width: 50%;
+  .apogee > span {
+    flex: 0 1 auto;
+    /* min-width: 1em;
+    max-width: 50%; */
+  }
+  .apogee > input {
+    flex: 1 0 auto;
+    max-width: 7em;
+    text-align: center;
+    /* min-width: 1em;
+    max-width: 50%; */
   }
 
   .toast{
@@ -232,6 +254,10 @@ async function deleteEntry(){
   }
 
   .timestamps{
+    position: absolute;
+    width: 100%;
+    bottom: 0;
     font-size: .8em;
+    text-align: center;
   }
 </style>

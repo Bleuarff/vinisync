@@ -104,88 +104,122 @@ async function deleteEntry(){
 
 </script>
 
-<!-- <p>{serialized}</p> -->
-<a href="/wines">back to list</a>
+<a href="/wines">&#129154; liste</a>
 <h1>Entry</h1>
 
+<div id="entry">
+<!-- <p>{serialized}</p> -->
+
 {#if entry}
-  <label>Cuvée</label><input bind:value={entry.wine.name} type="text">
-  <label>Producteur</label> <input type="text" bind:value={entry.wine.producer}>
-  <label>Appellation</label><input type="text" bind:value={entry.wine.appellation}>
-  <label>Millésime</label><input type="number" bind:value={entry.wine.year}>
-  <label>Pays</label><input type="text" bind:value={entry.wine.country}>
+    <label>Cuvée</label><input bind:value={entry.wine.name} type="text">
+    <label>Producteur</label> <input type="text" bind:value={entry.wine.producer}>
+    <label>Appellation</label><input type="text" bind:value={entry.wine.appellation}>
+    <label>Millésime</label><input type="number" bind:value={entry.wine.year}>
+    <label>Pays</label><input type="text" bind:value={entry.wine.country}>
 
-  <label>Apogée</label>
-  de <input type="text" bind:value={entry.wine.apogeeStart}> à
-  <input type="text" bind:value={entry.wine.apogeeEnd}>
-  <label>Bouteilles</label><input type="number" bind:value={entry.count}>
+    <label>Apogée</label>
+    <div class="apogee">
+      <span>de</span>
+      <input type="number" bind:value={entry.wine.apogeeStart}>
+      <span>à</span>
+      <input type="number" bind:value={entry.wine.apogeeEnd}>
+    </div>
 
-  <label>Cepages</label>
-    {#if edit}
-      <input type="text" bind:value={cepageText} placeholder="muscat, sauvignon, malbec">
-    {:else}
-      {#each entry.wine.cepages as cepage}
-        <span>{cepage}</span>
-      {/each}
-    {/if}
+    <label>Bouteilles</label><input type="number" bind:value={entry.count}>
 
-  <label>Contenance</label>
-  {#if edit}
-    <input type="text" bind:value="{entry.wine.containing}" placeholder="0.75">
-  {:else}
-    <span>{entry.wine.containing}</span>
-  {/if}
-
-  <label>Couleur</label>
-  {#if edit}
-    <input type="text" bind:value={entry.wine.color} placeholder="rouge">
-  {:else}
-    <span>{entry.wine.color}</span>
-  {/if}
-
-  <div id="attrs">
-    <input type="checkbox" bind:value={entry.wine.sweet} id="sweet"><label for="sweet">Moelleux, Liquoreux</label>
-    <input type="checkbox" bind:value={entry.wine.sparkling} name="sparkling"><label for="sparkling">Pétillant</label>
-  </div>
-
-  <label>Emplacement</label>
-  {#if edit}
-    <input type="text" bind:value={entry.location} placeholder="rouge">
-  {:else}
-    <span>{entry.location}</span>
-  {/if}
-
-  <div>
-    {#if edit}
-      <button on:click="{save}">Save</button>
-      {#if params.id}
-      <button on:click="{()=>{ edit = false }}">Annuler</button>
-      <button on:click="{deleteEntry}">Supprimer</button>
+    <label>Cepages</label>
+      {#if edit}
+        <input type="text" bind:value={cepageText} placeholder="muscat, sauvignon, malbec">
+      {:else}
+        {#each entry.wine.cepages as cepage}
+          <span>{cepage}</span>
+        {/each}
       {/if}
+
+    <label>Contenance</label>
+    {#if edit}
+      <input type="text" bind:value="{entry.wine.containing}" placeholder="0.75">
     {:else}
-      <button on:click="{()=>{ edit = true }}">Edit</button>
-      <button on:click="{increment}">+1</button>
-      <button on:click="{decrement}">-1</button>
+      <span>{entry.wine.containing}</span>
     {/if}
-  </div>
 
-{:else}
-  <p>Cannot retrieve entry {params.id}</p>
-{/if}
+    <label>Couleur</label>
+    {#if edit}
+      <input type="text" bind:value={entry.wine.color} placeholder="rouge">
+    {:else}
+      <span>{entry.wine.color}</span>
+    {/if}
 
-{#if showSave}
-  <div class="toast saved">Entry saved</div>
-{/if}
+    <div id="attrs">
+      <input type="checkbox" bind:value={entry.wine.sweet} id="sweet"><label for="sweet">Moelleux, Liquoreux</label>
+      <input type="checkbox" bind:value={entry.wine.sparkling} id="sparkling"><label for="sparkling">Pétillant</label>
+    </div>
 
-{#if error}
-  <div class="toast error">{error}</div>
-{/if}
+    <label>Emplacement</label>
+    {#if edit}
+      <input type="text" bind:value={entry.location} placeholder="rouge">
+    {:else}
+      <span>{entry.location}</span>
+    {/if}
 
-{#if params.id}
-  <p class="timestamps">creation {entry.creationDate.substring(0, 16)} - MaJ {entry.lastUpdateDate.substring(0, 16)}</p>
-{/if}
+    <div>
+      {#if edit}
+        <button on:click="{save}">Save</button>
+        {#if params.id}
+        <button on:click="{()=>{ edit = false }}">Annuler</button>
+        <button on:click="{deleteEntry}">Supprimer</button>
+        {/if}
+      {:else}
+        <button on:click="{()=>{ edit = true }}">Edit</button>
+        <button on:click="{increment}">+1</button>
+        <button on:click="{decrement}">-1</button>
+      {/if}
+    </div>
+  {:else}
+    <p>Cannot retrieve entry {params.id}</p>
+  {/if}
+
+  {#if showSave}
+    <div class="toast saved">Entry saved</div>
+  {/if}
+
+  {#if error}
+    <div class="toast error">{error}</div>
+  {/if}
+
+  {#if params.id}
+    <p class="timestamps">creation {entry.creationDate.substring(0, 16)} - MaJ {entry.lastUpdateDate.substring(0, 16)}</p>
+  {/if}
+</div>
 
 <style>
+  #entry{
+    width: 100%;
+  }
+
+  label{
+    display: block;
+    font-size: .8em;
+  }
+
+  input{
+    border:none;
+    border-bottom: 1px solid var(--main-color);
+    padding-top: 0;
+  }
+
+  .apogee{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+  }
+
+  .apogee > * {
+    flex: 1 1 30%;
+    min-width: 1em;
+    max-width: 50%;
+  }
+
   .toast{
     color: white;
     padding: 4px 1em;
@@ -195,10 +229,6 @@ async function deleteEntry(){
   }
   .error{
     background: #ed2c2c;
-  }
-
-  label{
-    display: inline;
   }
 
   .timestamps{

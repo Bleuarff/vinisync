@@ -52,8 +52,10 @@ async function save(){
   }
 
   try{
-    if (params.id)
+    if (params.id){
       await repo.updateEntry(entry)
+      edit = false
+    }
     else{
       const id = await repo.addEntry(entry)
       return router(`entry/${id}`)

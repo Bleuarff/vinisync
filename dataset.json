@@ -81,7 +81,7 @@
     "apogeeEnd": null,
     "cepages": [],
     "containing": "0.75",
-    "color": "white",
+    "color": "rose",
     "sweet": false,
     "sparkling": true
   },
@@ -93,6 +93,42 @@
     "appellation": "Muscadet",
     "producer": "Bruno Cormerais",
     "name": "",
+    "year": "2018",
+    "country": "France",
+    "apogeeStart": null,
+    "apogeeEnd": null,
+    "cepages": [],
+    "containing": "0.75",
+    "color": "white",
+    "sweet": false,
+    "sparkling": false
+  },
+  "count": 6,
+  "location": ""
+},
+{
+  "wine": {
+    "appellation": "Saint-Emilion Grand Cru",
+    "producer": "Chateau des Contamine-La Poulardière sur Garonne des bois",
+    "name": "Aaah ça fait du bien j'avais soif crénom de bonsoir",
+    "year": "2018",
+    "country": "France",
+    "apogeeStart": null,
+    "apogeeEnd": null,
+    "cepages": [],
+    "containing": "0.75",
+    "color": "white",
+    "sweet": false,
+    "sparkling": false
+  },
+  "count": 6,
+  "location": ""
+},
+{
+  "wine": {
+    "appellation": "",
+    "producer": "Chateau des Contamine-La Poulardière sur Garonne des bois",
+    "name": "Aaah ça fait du bien j'avais soif crénom de bonsoir",
     "year": "2018",
     "country": "France",
     "apogeeStart": null,

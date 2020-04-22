@@ -62,8 +62,7 @@ function sort(){
 #entries{
   display: flex;
   flex-flow: column nowrap;
-  width: 100%;
-  margin-bottom: 1.5em;
+  margin: 0 -.8em 1.5em;
 }
 
 /* .entry > * {

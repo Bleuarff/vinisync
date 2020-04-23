@@ -25,6 +25,10 @@ body {
 	display: none !important;
 }
 
+h2{
+	margin: 0;
+}
+
 a {
 	color: rgb(0,100,200);
 	text-decoration: none;
@@ -36,6 +40,19 @@ a:hover {
 
 a:visited {
 	color: rgb(0,80,160);
+}
+
+a.back{
+	padding: 2px 2em 2px 0;
+	text-decoration: none;
+}
+
+a.back::before{
+	/* content: '\02190\0000a0'; */
+	content: '\025c0\0000a0';
+	font-size: .8em;
+	position: relative;
+	bottom: 1px;
 }
 
 label {

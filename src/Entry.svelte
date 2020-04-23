@@ -104,8 +104,7 @@ async function deleteEntry(){
 
 </script>
 
-<a href="/wines">&#x2190; liste</a>
-<h1>Entry</h1>
+<a href="/wines" class="back">liste</a>
 
 <div id="entry">
 <!-- <p>{serialized}</p> -->
@@ -189,6 +188,7 @@ async function deleteEntry(){
     width: 100%;
     position: relative;
     padding-bottom: 2em;
+    margin-top: 1.2em;
   }
 
   label{

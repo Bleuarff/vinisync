@@ -46,12 +46,11 @@
 		font-weight: 100;
 		text-align: left;
 		margin-top: 0;
-		margin-bottom: 2em;
+		margin-bottom: .5em;
 	}
 
 	h1 a {
 		text-decoration: none;
 		color: unset;
 	}
-
 </style>

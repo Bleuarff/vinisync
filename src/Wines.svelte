@@ -25,13 +25,13 @@ function sort(){
 
 {#if entries.length > 0}
 
-  <h2>Wines</h2>
-  <p>Votre cave contient {entries.length} references et {bottleCount} bouteilles.</p>
+  <h2>Mes vins</h2>
+  <p><span class="bold">{entries.length}</span> references et <span class="bold">{bottleCount}</span> bouteilles en cave.</p>
 
   <div id="entries">
     {#each entries as entry}
       <a href="/entry/{entry.id}" class="entry">
-        <span class="year {entry.wine.color}" >{entry.wine.year}</span>
+        <span class="year {entry.wine.color}" >{entry.wine.year || ''}</span>
         <div class="names">
           {#if entry.wine.name}<div class="name">{entry.wine.name}</div>{/if}
           {#if entry.wine.name && entry.wine.producer}<div class="name-sep"></div>{/if}
@@ -68,6 +68,9 @@ function sort(){
 /* .entry > * {
   background: none !important;
 } */
+.bold{
+  font-weight: bold;
+}
 
 a.entry{
   text-decoration: none;
@@ -80,7 +83,7 @@ a.entry{
   min-height: var(--min-row-height);
   vertical-align: middle;
 }
-.entry:nth-child(2n){
+.entry:nth-child(2n+1){
     background: #eeeeee;
 }
 .entry:hover{
@@ -108,9 +111,7 @@ a.entry{
   background: transparent;
   height: 6px;
 }
-/* .entry:nth-child(2n) .name-sep{
-  background: #a8a5a5;
-} */
+
 .app{
   flex: 0 1 auto;
   /* background: #ddaaff; */

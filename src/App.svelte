@@ -3,9 +3,11 @@
 	import Wines from './Wines.svelte'
 	import Entry from './Entry.svelte'
 	import Import from './Import.svelte'
+	import Notif from './Notif.svelte'
 
 	let page
 	let params
+	let notif // notif child component
 
 	router('/', () => page = Wines)
 	router('/wines', () => page = Wines)
@@ -20,11 +22,10 @@
 
 <main>
 	<h1><a href="/">Vinisync</a></h1>
-	<!-- <h7>Your cellar mgmt app</h7> -->
 
-	<!-- <Wines entries={defaultEntries}></Wines>
-	<Entry></Entry> -->
-	<svelte:component this={page} params={params} />
+	<svelte:component this={page} params={params} on:notif="{e => {notif.show(e.detail)}}"/>
+
+	<Notif bind:this={notif}></Notif>
 </main>
 
 <style>

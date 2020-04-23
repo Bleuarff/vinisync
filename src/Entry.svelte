@@ -2,6 +2,8 @@
 import { onMount } from 'svelte'
 import { repo } from './storage.js'
 import router from 'page'
+import { createEventDispatcher } from 'svelte'
+const dispatch = createEventDispatcher();
 
 export let params
 let entry = {
@@ -26,8 +28,6 @@ let entry = {
 }
 
 let edit = false
-let showSave = false
-let error = null
 
 let cepageText = entry.wine.cepages.join(', ') //intermediate for cepage text input values
 $: serialized = JSON.stringify(entry)
@@ -43,31 +43,29 @@ onMount(async () => {
 async function save(){
   try{
     sanitizeEntry()
-    error = null
   }
   catch(ex){
-    console.log('Validation error: ' + ex.message)
-    error = ex.message
+    dispatch('notif', {text: ex.message, err: true})
     return
   }
 
   try{
+    let msg
     if (params.id){
       await repo.updateEntry(entry)
-      edit = false
+      msg = 'Mise à jour OK'
     }
     else{
       const id = await repo.addEntry(entry)
-      return router(`entry/${id}`)
+      msg = 'Bouteille ajoutée'
+      router(`/entry/${id}`) // soft redirect: address bar updated but
     }
-
-    showSave = true
-    setTimeout(() => { showSave = false}, 2500)
-    console.debug(`${entry.id} saved`)
+    edit = false
+    dispatch('notif', {text: msg})
   }
   catch(ex){
-    console.error(`${entry.id || 'new entry'} save error`)
-    error = 'Save error'
+    console.error(ex)
+    dispatch('notif', {text: 'Echec de save', err: true})
   }
 }
 
@@ -99,7 +97,7 @@ async function deleteEntry(){
     }
     catch(ex){
       console.error(ex)
-      error = 'Error de suppression'
+      dispatch('notif', {text: 'Erreur de suppression', err: true})
     }
   }
 }
@@ -181,14 +179,6 @@ async function deleteEntry(){
     <p>Cannot retrieve entry {params.id}</p>
   {/if}
 
-  {#if showSave}
-    <div class="toast saved">Entry saved</div>
-  {/if}
-
-  {#if error}
-    <div class="toast error">{error}</div>
-  {/if}
-
   {#if params.id}
     <div class="timestamps">creation {entry.creationDate.substring(0, 16)} - MaJ {entry.lastUpdateDate.substring(0, 16)}</div>
   {/if}
@@ -242,17 +232,6 @@ async function deleteEntry(){
     text-align: center;
     /* min-width: 1em;
     max-width: 50%; */
-  }
-
-  .toast{
-    color: white;
-    padding: 4px 1em;
-  }
-  .saved{
-    background: #00771a;
-  }
-  .error{
-    background: #ed2c2c;
   }
 
   .timestamps{

@@ -4,7 +4,7 @@
 	import Entry from './pages/Entry.svelte'
 	import Import from './pages/Import.svelte'
 	import Sync from './pages/Sync.svelte'
-	import Notif from './Notif.svelte'
+	import Notif from './pages/Notif.svelte'
 
 	let page
 	let params

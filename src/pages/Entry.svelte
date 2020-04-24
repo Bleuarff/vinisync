@@ -1,6 +1,6 @@
 <script>
 import { onMount } from 'svelte'
-import { repo } from './storage.js'
+import { repo } from '../storage.js'
 import router from 'page'
 import { createEventDispatcher } from 'svelte'
 const dispatch = createEventDispatcher();

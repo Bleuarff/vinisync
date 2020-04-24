@@ -1,8 +1,8 @@
 <script>
 	import router from 'page'
-	import Wines from './Wines.svelte'
-	import Entry from './Entry.svelte'
-	import Import from './Import.svelte'
+	import Wines from './pages/Wines.svelte'
+	import Entry from './pages/Entry.svelte'
+	import Import from './pages/Import.svelte'
 	import Notif from './Notif.svelte'
 
 	let page

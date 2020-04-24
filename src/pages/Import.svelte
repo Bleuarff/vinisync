@@ -1,5 +1,5 @@
 <script>
-import { repo } from './storage.js'
+import { repo } from '../storage.js'
 import router from 'page'
 export let params
 

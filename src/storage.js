@@ -1,7 +1,7 @@
 import { v4 as uuidv4} from 'uuid'
 import { openDB, deleteDB, wrap, unwrap } from 'idb'
 
-const DB_VERSION = 1,
+const DB_VERSION = 2,
       DB_NAME = 'vinisync'
 
 let db
@@ -18,6 +18,9 @@ async function open(){
         store.createIndex('creationDate', 'creationDate', {unique: false})
         store.createIndex('lastUpdateDate', 'lastUpdateDate', {unique: false})
       }
+      if(oldVersion < 2){
+        const store = db.createObjectStore('config', {keyPath: 'key', autoIncrement: false})
+      }
     }
   })
 }
@@ -33,9 +36,16 @@ async function getEntries(){
   return entries
 }
 
-async function getEntry(id){
-  const store = db.transaction('entries').store
-  return store.get(id)
+async function getOne(table, id){
+  try{
+    // throw new Error('la mouche qui pète !')
+    const store = db.transaction(table).store
+    return store.get(id)
+  }
+  catch(ex){
+    console.error(`get error ${table} / ${id} ` + ex)
+    throw new Error(ex)
+  }
 }
 
 // insert new entry
@@ -72,12 +82,14 @@ function deleteEntry(id){
   return db.delete('entries', id)
 }
 
+
 export const repo = {
   open: open,
   getEntries: getEntries,
-  getEntry: getEntry,
+  // getEntry: getEntry,
   addEntry: addEntry,
   updateEntry: updateEntry,
   import: importEntries,
-  deleteEntry: deleteEntry
+  deleteEntry: deleteEntry,
+  getOne: getOne,
 }

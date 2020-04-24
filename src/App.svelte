@@ -3,6 +3,7 @@
 	import Wines from './pages/Wines.svelte'
 	import Entry from './pages/Entry.svelte'
 	import Import from './pages/Import.svelte'
+	import Sync from './pages/Sync.svelte'
 	import Notif from './Notif.svelte'
 
 	let page
@@ -16,6 +17,7 @@
 		next()
 	}, () => {page = Entry})
 	router('/import', () => page = Import)
+	router('/sync', () => page = Sync)
 	router.start()
 
 </script>

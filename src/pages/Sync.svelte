@@ -7,11 +7,13 @@
 
   let config = {
     enabled: false, // whether sync is activate on this device
-    email: '',
+    email: 'a@a',
     userkey: ''
   }
 
+  let userkey = ''
   let isLink = false // true to sync with existing & future device(s) with same userkey
+  $: hr_key = userkey.substring(0,4) + '-' + userkey.substring(4,8) + '-' + userkey.substring(8,10)
 
   onMount(async () => {
     console.log('mount /sync')
@@ -22,7 +24,6 @@
     catch(ex){
       console.error('Get sync config error')
     }
-    // debugger
   })
 
   // activate sync
@@ -30,8 +31,38 @@
     if (!/.+@.+/.test(config.email))
       dispatch('notif', {text: 'email invalide', err: true})
 
-    if (!/.+/.test(config.userkey))
+    if (config.userkey && !/.+/.test(config.userkey))
       dispatch('notif', {text: 'clef de sync invalide', err: true})
+
+    if (!config.userkey)
+      userkey = createUserKey()
+  }
+
+  // generates a random 4 bytes key + checksum
+  function createUserKey(){
+    let array = new Uint8Array(4);
+    window.crypto.getRandomValues(array);
+    // console.debug(array)
+    let key = ''
+    for (let i = 0; i < 4; i++){
+      key += array[i].toString(16).toUpperCase().padStart(2, '0')
+    }
+    const checksum = getcheckSum(key)
+    return key + checksum
+  }
+
+  // computes a checksum:
+  // takes key chars 2 by 2, get corresponding number and sums them.
+  // we do a modulo 256 to get a uint8 number, returned as hex
+  function getcheckSum(key){
+    let sum = 0
+    for (let i = 0; i < 8; i+=2){
+      const val = parseInt(key.substring(i, i+2), 16)
+      sum += val
+    }
+    const remainder = sum % 256
+    const checksum = remainder.toString(16).toUpperCase().padStart(2, 0)
+    return checksum
   }
 
 </script>
@@ -66,6 +97,8 @@
     <div class="submit-ctnr">
       <button on:click={setSync}>Synchroniser</button>
     </div>
+
+    Votre cle: {hr_key}
   </div>
 {/if}
 

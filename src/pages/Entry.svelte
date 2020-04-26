@@ -38,7 +38,7 @@ onMount(async () => {
 
   edit = !params.id
   if (params.id)
-    entry = await repo.getEntry(params.id)
+    entry = await repo.getOne('entries', params.id)
 })
 
 async function save(){

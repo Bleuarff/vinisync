@@ -2,10 +2,10 @@
 
 const restify = require('restify'),
       db = require('./db.js')
-
 const dbConnectionString = 'mongodb://localhost:27017'
 
-let server
+let server,
+    Sync
 
 void async function(){
   server = restify.createServer({
@@ -24,7 +24,7 @@ void async function(){
   }
 
   /************************ Configure server ***************************/
-  const Sync = require('./sync.js')
+  Sync = require('./sync.js')
 
   server.use(restify.plugins.acceptParser(server.acceptable))
   server.use((req, res, next) => {

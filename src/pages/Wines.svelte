@@ -8,7 +8,7 @@ $: bottleCount = entries.reduce((cur, e)=> {return cur + e.count}, 0)
 
 onMount(async () => {
   await repo.open()
-  entries = await repo.getEntries()
+  entries = await repo.getAll('entries')
   entries = sort()
 })
 

@@ -1,10 +1,10 @@
-// Wrapper around fetch 
+// Wrapper around fetch
 
 const host = '//localhost:5002'
 
 function LogicException(data) {
   this.status = data.status
-  this.message = JSON.stringify(data.data)
+  this.message = data.data.reason
   this.data = data.data
   this.toString = () => { return `[${this.status}] ${this.message}` }
 }

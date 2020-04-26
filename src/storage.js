@@ -25,15 +25,15 @@ async function open(){
   })
 }
 
-// retrieve list of entries
-async function getEntries(){
-  const entries = []
-  let cursor = await db.transaction('entries').store.openCursor();
+// retrieve all documents for given table
+async function getAll(table){
+  const docs = []
+  let cursor = await db.transaction(table).store.openCursor();
   while (cursor){
-    entries.push(cursor.value)
+    docs.push(cursor.value)
     cursor = await cursor.continue();
   }
-  return entries
+  return docs
 }
 
 async function getOne(table, id){
@@ -97,7 +97,7 @@ function deleteEntry(id){
 
 export const repo = {
   open: open,
-  getEntries: getEntries,
+  getAll: getAll,
   // getEntry: getEntry,
   addEntry: addEntry,
   updateEntry: updateEntry,

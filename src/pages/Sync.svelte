@@ -12,19 +12,20 @@
     email: 'a@a',
     userkey: ''
   }
+  let firstSync = false
 
   let isLink = false // true to sync with existing & future device(s) with same userkey
-  let syncConfirmed = false // true when server has aknowledged the sync request
+  let showKey = false // true to show userkey
 
-  $:hr_key = config.userkey ?
-      config.userkey.substring(0,4) + '-' + config.userkey.substring(4,8) + '-' + config.userkey.substring(8,10) : ''
+  // $:hr_key = config.userkey ?
+  //     config.userkey.substring(0,4) + '-' + config.userkey.substring(4,8) + '-' + config.userkey.substring(8,10) : ''
 
 
   onMount(async () => {
     console.log('mount /sync')
     try{
       await repo.open()
-      config = (await repo.getOne('config', 'sync')) || config
+      config = (await repo.getOne('config', config.key)) || config
     }
     catch(ex){
       console.error('Get sync config error')
@@ -48,9 +49,12 @@
       const data = await send('/api/sync', 'POST', config)
       config.enabled = true
       repo.insertOne('config', config)
+      startSync()
     }
     catch(ex){
       let msg
+      if (ex.status === 400)
+        msg = ex.reason
       if (ex.status === 403)
         msg = 'Cet email est enregistré avec une autre clé.'
 
@@ -94,13 +98,32 @@
     return checksum === computedChecksum
   }
 
+  async function startSync(){
+    firstSync = true
+    try{
+      const entries = await repo.getAll('entries')
+    }
+    catch(ex){
+
+    }
+
+  }
 </script>
 
 <h2>Sync</h2>
 
 {#if config.enabled}
   <p>La synchronisation est activée pour cet appareil.</p>
-  <!-- TODO: show sync details -->
+  <p>Email associé: {config.email}</p>
+  <button on:click="{() => {showKey = !showKey}}">{showKey ? 'Masquer' : 'Voir'} la clé</button>
+  {#if showKey}
+    <p>Votre cle: {config.userkey.substring(0, 4)}-{config.userkey.substring(4, 8)}-{config.userkey.substring(8, 10)}</p>
+  {/if}
+  <!-- TODO: show sync details: last sync, # devices, etc. -->
+
+  {#if firstSync}
+  <p>Sychronisation en cours...{syncEntries.progress}/{syncEntries.length}</p>
+  {/if}
 
 {:else}
   <div>
@@ -127,9 +150,6 @@
       <button on:click={setSync}>Synchroniser</button>
     </div>
 
-    {#if syncConfirmed}
-      Votre cle: {hr_key}
-    {/if}
   </div>
 {/if}
 

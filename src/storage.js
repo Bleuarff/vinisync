@@ -1,7 +1,7 @@
 import { v4 as uuidv4} from 'uuid'
 import { openDB, deleteDB, wrap, unwrap } from 'idb'
 
-const DB_VERSION = 2,
+const DB_VERSION = 1,
       DB_NAME = 'vinisync'
 
 let db
@@ -10,16 +10,16 @@ async function open(){
   if (db) return
 
   db = await openDB(DB_NAME, DB_VERSION, {
-    upgrade(db, oldVersion, newVersion, transation){
+    upgrade(db, oldVersion, newVersion, transaction){
       console.debug(`Upgrade needed, ${oldVersion} → ${newVersion}`)
 
       if (oldVersion <= 1){
         const store = db.createObjectStore('entries', {keyPath: 'id', autoIncrement: false})
         store.createIndex('creationDate', 'creationDate', {unique: false})
         store.createIndex('lastUpdateDate', 'lastUpdateDate', {unique: false})
-      }
-      if(oldVersion < 2){
-        const store = db.createObjectStore('config', {keyPath: 'key', autoIncrement: false})
+
+        const config = db.createObjectStore('config', {keyPath: 'key', autoIncrement: false})
+
       }
     }
   })
@@ -45,6 +45,18 @@ async function getOne(table, id){
   catch(ex){
     console.error(`get error ${table} / ${id} ` + ex)
     throw new Error(ex)
+  }
+}
+
+async function insertOne(table, obj){
+  try{
+    obj.lastUpdateDate = obj.creationDate = (new Date()).toISOString()
+    await db.add(table, obj)
+    return obj
+  }
+  catch(ex){
+    console.error(`insert error ${table}: ${JSON.stringify(obj)}`)
+    throw ex
   }
 }
 
@@ -92,4 +104,5 @@ export const repo = {
   import: importEntries,
   deleteEntry: deleteEntry,
   getOne: getOne,
+  insertOne: insertOne
 }

@@ -1,19 +1,24 @@
 <script>
   import { onMount } from 'svelte'
-  import {repo } from '../storage.js'
+  import { repo } from '../storage.js'
+  import { send } from '../fetch.js'
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher();
   export let params = {}
 
   let config = {
+    key: 'sync',
     enabled: false, // whether sync is activate on this device
     email: 'a@a',
     userkey: ''
   }
 
-  let userkey = ''
   let isLink = false // true to sync with existing & future device(s) with same userkey
-  $: hr_key = userkey.substring(0,4) + '-' + userkey.substring(4,8) + '-' + userkey.substring(8,10)
+  let syncConfirmed = false // true when server has aknowledged the sync request
+
+  $:hr_key = config.userkey ?
+      config.userkey.substring(0,4) + '-' + config.userkey.substring(4,8) + '-' + config.userkey.substring(8,10) : ''
+
 
   onMount(async () => {
     console.log('mount /sync')
@@ -27,15 +32,30 @@
   })
 
   // activate sync
-  function setSync(){
+  async function setSync(){
     if (!/.+@.+/.test(config.email))
       dispatch('notif', {text: 'email invalide', err: true})
 
-    if (config.userkey && !/.+/.test(config.userkey))
+    if (config.userkey && !verifyChecksum(config.userkey))
       dispatch('notif', {text: 'clef de sync invalide', err: true})
 
     if (!config.userkey)
-      userkey = createUserKey()
+      config.userkey = createUserKey()
+
+    console.debug(`userkey: ${config.userkey}`)
+
+    try{
+      const data = await send('/api/sync', 'POST', config)
+      config.enabled = true
+      repo.insertOne('config', config)
+    }
+    catch(ex){
+      let msg
+      if (ex.status === 403)
+        msg = 'Cet email est enregistré avec une autre clé.'
+
+      dispatch('notif', {text: msg || ex.message, err: true})
+    }
   }
 
   // generates a random 4 bytes key + checksum
@@ -47,14 +67,14 @@
     for (let i = 0; i < 4; i++){
       key += array[i].toString(16).toUpperCase().padStart(2, '0')
     }
-    const checksum = getcheckSum(key)
+    const checksum = computeChecksum(key)
     return key + checksum
   }
 
   // computes a checksum:
   // takes key chars 2 by 2, get corresponding number and sums them.
   // we do a modulo 256 to get a uint8 number, returned as hex
-  function getcheckSum(key){
+  function computeChecksum(key){
     let sum = 0
     for (let i = 0; i < 8; i+=2){
       const val = parseInt(key.substring(i, i+2), 16)
@@ -63,6 +83,15 @@
     const remainder = sum % 256
     const checksum = remainder.toString(16).toUpperCase().padStart(2, 0)
     return checksum
+  }
+
+  // returns whether the key is valid, i.e. the checksum is valid
+  function verifyChecksum(key){
+    const base = key.substring(0, 8),
+          checksum = key.substring(8, 10)
+
+    const computedChecksum = computeChecksum(base)
+    return checksum === computedChecksum
   }
 
 </script>
@@ -98,7 +127,9 @@
       <button on:click={setSync}>Synchroniser</button>
     </div>
 
-    Votre cle: {hr_key}
+    {#if syncConfirmed}
+      Votre cle: {hr_key}
+    {/if}
   </div>
 {/if}
 

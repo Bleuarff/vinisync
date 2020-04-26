@@ -23,6 +23,7 @@ let entry = {
   },
   count: 6,
   location: '',
+  offeredBy: '',
   creationDate: '',
   lastUpdateDate: ''
 }

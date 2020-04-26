@@ -21,7 +21,7 @@ class DB{
     }
   }
 
-  get db(){
+  static get db(){
     return client.db('vinisync')
   }
 }

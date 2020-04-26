@@ -2,7 +2,6 @@
 
 const restify = require('restify'),
       db = require('./db.js')
-      // Sync = require('./sync.js')
 
 const dbConnectionString = 'mongodb://localhost:27017'
 
@@ -25,6 +24,7 @@ void async function(){
   }
 
   /************************ Configure server ***************************/
+  const Sync = require('./sync.js')
 
   server.use(restify.plugins.acceptParser(server.acceptable))
   server.use((req, res, next) => {
@@ -62,10 +62,7 @@ void async function(){
     return next()
   });
 
-  server.post('/api/sync', (req, res, next) => {
-    res.send({coin: 'pouet'})
-    return next()
-  })
+  server.post('/api/sync', Sync.enableSync)
 
   /************************ end routes ***************************/
 

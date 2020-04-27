@@ -18,7 +18,8 @@ async function open(){
         store.createIndex('creationDate', 'creationDate', {unique: false})
         store.createIndex('lastUpdateDate', 'lastUpdateDate', {unique: false})
 
-        const config = db.createObjectStore('config', {keyPath: 'key', autoIncrement: false})
+        db.createObjectStore('config', {keyPath: 'key', autoIncrement: false})
+        db.createObjectStore('updates', {keyPath: 'id', autoIncrement: false})
 
       }
     }

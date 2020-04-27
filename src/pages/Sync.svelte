@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import { repo } from '../storage.js'
   import { send } from '../fetch.js'
+  import { syncMgr } from '../syncMgr.js'
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher();
   export let params = {}
@@ -49,7 +50,8 @@
       const data = await send('/api/sync', 'POST', config)
       config.enabled = true
       repo.insertOne('config', config)
-      startSync()
+      firstSync = true
+      syncMgr.start()
     }
     catch(ex){
       let msg
@@ -98,22 +100,15 @@
     return checksum === computedChecksum
   }
 
-  async function startSync(){
-    firstSync = true
-    try{
-      const entries = await repo.getAll('entries')
-    }
-    catch(ex){
-
-    }
-
-  }
 </script>
 
 <h2>Sync</h2>
 
 {#if config.enabled}
-  <p>La synchronisation est activée pour cet appareil.</p>
+  <p>
+    La synchronisation est activée pour cet appareil.<br>
+    Pour synchroniser un autre appareil, aller sur la page de synchro et rentrer l'email associé et votre clé.
+  </p>
   <p>Email associé: {config.email}</p>
   <button on:click="{() => {showKey = !showKey}}">{showKey ? 'Masquer' : 'Voir'} la clé</button>
   {#if showKey}

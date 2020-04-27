@@ -26,7 +26,10 @@ export async function send(path, method = 'GET', data = {}){
 
   try{
     const res = await fetch(host + path, options)
-    const data = await res.json()
+    let data = null
+
+    if (res.status !== 204)
+      data = await res.json()
 
     if (res.status > 400)
       throw new LogicException({status: res.status, data: data})

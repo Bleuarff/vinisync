@@ -63,6 +63,7 @@ void async function(){
   });
 
   server.post('/api/sync', Sync.enableSync)
+  server.post('/api/entry', Sync.checkCredentials, Sync.insertUpdate)
 
   /************************ end routes ***************************/
 

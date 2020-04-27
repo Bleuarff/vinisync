@@ -39,6 +39,32 @@ class Sync{
     }
   }
 
+  static async insertUpdate(req, res, next){
+    try{
+      await db.collection('updates').insertOne({
+        _id: req.params.id,
+        changes: req.params.changes,
+        ts: moment(req.params.ts).toDate()
+      })
+      res.send(204)
+      return next()
+    }
+    catch(ex){
+      console.error(ex)
+      res.send(500)
+      return next(false)
+    }
+  }
+
+  static async checkCredentials(req, res, next){
+    const user = await db.collection('users').findOne({email: req.params.email, userkey: req.params.userkey})
+    if (!user){
+      res.send(403, {reason: 'INVALID_CREDENTIALS'})
+      return next(false)
+    }
+    return next()
+  }
+
   // returns whether the key is valid, i.e. the checksum is valid
   static verifyChecksum(key){
     const base = key.substring(0, 8),

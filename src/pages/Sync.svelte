@@ -41,9 +41,21 @@
     if (config.userkey && !verifyChecksum(config.userkey))
       dispatch('notif', {text: 'clef de sync invalide', err: true})
 
-    if (!config.userkey)
-      config.userkey = createUserKey()
+    if (config.userkey)
+      await useSync()
+    else
+      await createSync()
+  }
 
+  async function useSync(){
+    // TODO: supprimer les entrees locales existantes.
+
+    // Sync.checkupdates() // request updates from server
+    // config.enabled = true // TODO: activate sync in the future
+  }
+
+  async function createSync(){
+    config.userkey = createUserKey()
     console.debug(`userkey: ${config.userkey}`)
 
     try{
@@ -139,6 +151,9 @@
     {#if isLink}
       <label for="">Clef</label>
       <input type="text" bind:value={config.userkey}>
+      <p class="warning">&#x26a0; Ceci effacera votre cave actuelle !
+        <!-- TODO: afficher nb ref & bouteilles ? -->
+      </p>
     {/if}
 
     <div class="submit-ctnr">
@@ -163,5 +178,12 @@
 
   .submit-ctnr{
     margin-top: 2em;
+  }
+
+  .warning{
+    background: #d21a30;
+    color: white;
+    padding: 4px 1em;
+    font-size: 1.1em;
   }
 </style>

@@ -37,6 +37,22 @@ class SyncMgr{
       throw ex
     }
   }
+
+  async checkUpdates(){
+    try{
+
+      // get sync info
+      const config = await repo.getOne('config', 'sync')
+
+      // query server for updates
+
+      // merge updates
+      // emit event ?
+    }
+    catch(ex){
+      throw ex
+    }
+  }
 }
 
 const syncMgr = new SyncMgr()

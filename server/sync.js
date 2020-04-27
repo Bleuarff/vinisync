@@ -43,6 +43,7 @@ class Sync{
     try{
       await db.collection('updates').insertOne({
         _id: req.params.id,
+        userkey: req.params.userkey,
         changes: req.params.changes,
         ts: moment(req.params.ts).toDate()
       })
@@ -56,6 +57,7 @@ class Sync{
     }
   }
 
+  // request pre-handler: checks a user (email + userkey) exists already
   static async checkCredentials(req, res, next){
     const user = await db.collection('users').findOne({email: req.params.email, userkey: req.params.userkey})
     if (!user){

@@ -1,6 +1,7 @@
 <script>
 import { onMount } from 'svelte'
 import { repo } from '../storage.js'
+import { v4 as uuid} from 'uuid'
 import router from 'page'
 import { createEventDispatcher } from 'svelte'
 const dispatch = createEventDispatcher();
@@ -53,13 +54,14 @@ async function save(){
   try{
     let msg
     if (params.id){
-      await repo.updateEntry(entry)
+      await repo.updateDoc('entries', entry)
       msg = 'Mise à jour OK'
     }
     else{
-      const id = await repo.addEntry(entry)
+      entry.id = uuid()
+      entry = await repo.insertOne('entries', entry)
       msg = 'Bouteille ajoutée'
-      router(`/entry/${id}`) // soft redirect: address bar updated but
+      router(`/entry/${entry.id}`) // soft redirect: address bar updated but
     }
     edit = false
     dispatch('notif', {text: msg})
@@ -93,7 +95,7 @@ async function deleteEntry(){
   const res = confirm("Supprimer ?")
   if (res){
     try{
-      await repo.deleteEntry(entry.id)
+      await repo.deleteOne('entries', entry.id)
       router('/wines')
     }
     catch(ex){

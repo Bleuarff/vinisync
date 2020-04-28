@@ -1,6 +1,8 @@
 <script>
 import { repo } from '../storage.js'
 import router from 'page'
+import { createEventDispatcher } from 'svelte'
+const dispatch = createEventDispatcher()
 export let params
 
 function importFile(e){
@@ -20,7 +22,7 @@ function importFile(e){
     }
     catch(ex){
       console.error(ex)
-      // TODO: show error in UI
+      dispatch('notif', {text: 'Erreur d\'import', err: true})
     }
   }
   reader.readAsText(file)

@@ -11,7 +11,8 @@
     key: 'sync',
     enabled: false, // whether sync is activate on this device
     email: 'a@a',
-    userkey: ''
+    userkey: '',
+    lastSync: '1970-01-01T00:00:00.000Z' // ts of last sync. Different than ts of last update received.
   }
   let firstSync = false
 
@@ -48,9 +49,11 @@
   }
 
   async function useSync(){
-    // TODO: supprimer les entrees locales existantes.
+    config.enabled = true
+    await repo.insertOne('config', config)
+    await repo.deleteAll('entries') // delete all local entries
 
-    // Sync.checkupdates() // request updates from server
+    syncMgr.checkUpdates() // request updates from server
     // config.enabled = true // TODO: activate sync in the future
   }
 
@@ -61,7 +64,7 @@
     try{
       const data = await send('/api/sync', 'POST', config)
       config.enabled = true
-      repo.insertOne('config', config)
+      await repo.insertOne('config', config)
       firstSync = true
       syncMgr.start()
     }

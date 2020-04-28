@@ -2,6 +2,8 @@
 const db = require('./db.js').db,
       moment = require('moment')
 
+const PAGE_SIZE = 50
+
 class Sync{
   // activate sync for requesting device
   static async enableSync(req, res, next){
@@ -45,9 +47,34 @@ class Sync{
         _id: req.params.id,
         userkey: req.params.userkey,
         changes: req.params.changes,
-        ts: moment(req.params.ts).toDate()
+        ts: moment(req.params.ts).toDate(), // timestamp for when update was performed
+        uploadedDate: moment.utc().toDate()// timestamp of when update is received
       })
       res.send(204)
+      return next()
+    }
+    catch(ex){
+      console.error(ex)
+      res.send(500)
+      return next(false)
+    }
+  }
+
+  static async getUpdates(req, res, next){
+    try{
+      // TODO: handle pagination. use provided ids to exclude docs
+      const query = {
+        userkey: req.params.userkey,
+        uploadedDate : {$gt: moment(req.params.lastSync).toDate()}
+      }
+      const count = await db.collection('updates').countDocuments()
+      const lastSync = moment().utc().toDate()
+      const docs = await db.collection('updates').find(query).sort({ts: 1}).limit(PAGE_SIZE).toArray()
+      res.send(200, {
+        count: count,
+        updates: docs,
+        lastSync: lastSync
+      })
       return next()
     }
     catch(ex){

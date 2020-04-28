@@ -84,6 +84,13 @@ function deleteOne(table, id){
   return db.delete(table, id)
 }
 
+async function deleteAll(table){
+  const ids = await db.getAllKeys(table)
+  const proms = []
+  ids.forEach(id => { proms.push(db.delete(table, id)) })
+  return Promise.all(proms)
+}
+
 
 export const repo = {
   open: open,
@@ -95,8 +102,9 @@ export const repo = {
 
   import: importEntries,
 
-  deleteOne: deleteOne,
 
   insertOne: insertOne,
-  // deleteAll: deleteAll
+
+  deleteOne: deleteOne,
+  deleteAll: deleteAll
 }

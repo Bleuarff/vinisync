@@ -40,11 +40,32 @@ class SyncMgr{
 
   async checkUpdates(){
     try{
-
       // get sync info
       const config = await repo.getOne('config', 'sync')
 
+      // checks config is enabled
+      if (!config.enabled) return
+
+      let updateIds = [] // ids of updates received for this sync cycle
+      let lastSync = config.lastSync
+      let paginated = false
+
       // query server for updates
+      do{
+        const data = await send('/api/updates', 'GET', {
+          lastSync: config.lastSync,
+          ids: updateIds,
+          email: config.email,
+          userkey: config.userkey
+        })
+        updateIds = updateIds.concat(data.updates.map(x => x.id))
+        paginated = data.total > updateIds.length
+        lastSync = data.lastSync
+      }
+      while(paginated)
+
+      config.lastSync = lastSync
+      await repo.updateDoc('config', config)
 
       // merge updates
       // emit event ?

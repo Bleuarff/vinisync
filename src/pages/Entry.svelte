@@ -1,6 +1,7 @@
 <script>
 import { onMount } from 'svelte'
 import { repo } from '../storage.js'
+import { syncMgr } from '../syncMgr.js'
 import { v4 as uuid} from 'uuid'
 import router from 'page'
 import { createEventDispatcher } from 'svelte'
@@ -96,6 +97,7 @@ async function deleteEntry(){
   if (res){
     try{
       await repo.deleteOne('entries', entry.id)
+      // TODO: sync this update
       router('/wines')
     }
     catch(ex){

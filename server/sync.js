@@ -49,6 +49,7 @@ class Sync{
         userkey: req.params.userkey,
         changes: req.params.changes,
         type: req.params.type,
+        devid: req.params.devid,
         ts: moment(req.params.ts).toDate(), // timestamp for when update was performed
         uploadedDate: moment.utc().toDate()// timestamp of when update is received
       })
@@ -68,6 +69,7 @@ class Sync{
       // TODO: handle pagination. use provided ids to exclude docs
       const query = {
         userkey: req.params.userkey,
+        devid: {$ne: req.params.devid}, // ignore updates made by the requesting node itself
         uploadedDate : {$gt: moment(req.params.lastSync).toDate()}
       }
       const count = await db.collection('updates').countDocuments()

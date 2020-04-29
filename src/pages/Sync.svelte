@@ -3,6 +3,7 @@
   import { repo } from '../storage.js'
   import { send } from '../fetch.js'
   import { syncMgr } from '../syncMgr.js'
+  import { v4 as uuid } from 'uuid'
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher();
   export let params = {}
@@ -12,7 +13,8 @@
     enabled: false, // whether sync is activate on this device
     email: 'a@a',
     userkey: '',
-    lastSync: '1970-01-01T00:00:00.000Z' // ts of last sync. Different than ts of last update received.
+    lastSync: '1970-01-01T00:00:00.000Z', // ts of last sync. Different than ts of last update received.
+    devid: '' // unique node id - to filter-out udpdates by self
   }
   let firstSync = false
 
@@ -42,6 +44,9 @@
     if (config.userkey && !verifyChecksum(config.userkey))
       dispatch('notif', {text: 'clef de sync invalide', err: true})
 
+    if (!config.devid)
+      config.devid = uuid()
+
     if (config.userkey)
       await useSync()
     else
@@ -62,7 +67,7 @@
     console.debug(`userkey: ${config.userkey}`)
 
     try{
-      const data = await send('/api/sync', 'POST', config)
+      const data = await send('/api/sync', 'POST', {email: config.email, userkey: config.userkey })
       config.enabled = true
       await repo.insertOne('config', config)
       firstSync = true
@@ -132,7 +137,7 @@
   <!-- TODO: show sync details: last sync, # devices, etc. -->
 
   {#if firstSync}
-  <p>Sychronisation en cours...{syncEntries.progress}/{syncEntries.length}</p>
+  <p>Sychronisation en cours...</p>
   {/if}
 
 {:else}

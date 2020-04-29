@@ -22,7 +22,8 @@ class SyncMgr{
           changes: entry,
           ts: entry.lastUpdateDate,
           email: config.email,
-          userkey: config.userkey
+          userkey: config.userkey,
+          type: 'entry'
         }
 
         try{
@@ -46,32 +47,57 @@ class SyncMgr{
       // checks config is enabled
       if (!config.enabled) return
 
-      let updateIds = [] // ids of updates received for this sync cycle
-      let lastSync = config.lastSync
+      let updates = [] // updates received for this sync request
       let paginated = false
 
       // query server for updates
       do{
         const data = await send('/api/updates', 'GET', {
           lastSync: config.lastSync,
-          ids: updateIds,
+          ids: updates.map(x => x.id),
           email: config.email,
           userkey: config.userkey
         })
-        updateIds = updateIds.concat(data.updates.map(x => x.id))
-        paginated = data.total > updateIds.length
-        lastSync = data.lastSync
+
+        updates = [...updates, ...data.updates]
+        paginated = data.total > updates.length
+        config.lastSync = data.lastSync
       }
       while(paginated)
 
-      config.lastSync = lastSync
-      await repo.updateDoc('config', config)
+      // merge updates. changes are ordered by date
+      updates.forEach(update => {
+        switch(update.type){
+          case 'entry': this.mergeEntry(update)
+            break
+          default:
+            console.error('this type of update is not supported')
+        }
+      })
 
-      // merge updates
+      // await repo.updateDoc('config', config) // save config w/ last sync date after confirmation everything is saved
       // emit event ?
     }
     catch(ex){
       throw ex
+    }
+  }
+
+  async mergeEntry(update){
+    const remoteEntry = update.changes
+    const localEntry = await repo.getOne('entries', remoteEntry.id)
+
+    if (localEntry){
+      if (localEntry.lastUpdateDate > remoteEntry.lastUpdateDate){
+        // Houston, we have a conflict
+        return
+      }
+      //
+    }
+    else{
+      // entry id is unknown on this device, just create it
+      await repo.insertOne('entries', remoteEntry)
+      console.debug(`entry created from update ${update.id}`)
     }
   }
 }

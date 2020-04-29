@@ -43,10 +43,12 @@ class Sync{
 
   static async insertUpdate(req, res, next){
     try{
+      // TODO: validate params
       await db.collection('updates').insertOne({
         _id: req.params.id,
         userkey: req.params.userkey,
         changes: req.params.changes,
+        type: req.params.type,
         ts: moment(req.params.ts).toDate(), // timestamp for when update was performed
         uploadedDate: moment.utc().toDate()// timestamp of when update is received
       })
@@ -60,6 +62,7 @@ class Sync{
     }
   }
 
+  // get all updates for user since given last sync date
   static async getUpdates(req, res, next){
     try{
       // TODO: handle pagination. use provided ids to exclude docs
@@ -69,7 +72,7 @@ class Sync{
       }
       const count = await db.collection('updates').countDocuments()
       const lastSync = moment().utc().toDate()
-      const docs = await db.collection('updates').find(query).sort({ts: 1}).limit(PAGE_SIZE).toArray()
+      const docs = await db.collection('updates').find(query, {userkey: 0}).sort({ts: 1}).limit(PAGE_SIZE).toArray()
       res.send(200, {
         count: count,
         updates: docs,

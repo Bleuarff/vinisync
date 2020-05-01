@@ -2,6 +2,7 @@ import { repo } from './storage.js'
 import { send } from './fetch.js'
 import Utils from './utils.js'
 import { v4 as uuid} from 'uuid'
+import moment from 'moment'
 
 class SyncMgr{
   constructor(){}
@@ -60,10 +61,14 @@ class SyncMgr{
   }
 
   // requests server for updates.
-  async checkUpdates(){
+  async checkUpdates(forced = false){
     try{
       // get sync info
       const config = await this._getConfig()
+
+      // sync only if forced or last sync is at least an hour ago
+      if (!forced && moment().utc().diff(moment(config.lastSync), 'minute') >= 60)
+        return
 
       let updates = [] // updates received for this sync request
       let paginated = false

@@ -1,25 +1,19 @@
 import { repo } from './storage.js'
 import { send } from './fetch.js'
+import Utils from './utils.js'
 import { v4 as uuid} from 'uuid'
 
 class SyncMgr{
   constructor(){}
 
-  async syncNow(entry){
-
-  }
-
-
+  // initiate sync: send all existing local data
   // TODO: how to show progress to sync page?
   async start(){
     try{
-      const config = await repo.getOne('config', 'sync')
-      if (!config)
-        throw new Error('SYNC_NOT_CONFIGURED')
-      if (!config.enabled)
-        throw new Error('SYNC_DISABLED')
+      const config = await this._getConfig()
 
       // get all entries, send each one to server. On failure, save to dedicated table in db
+      // TODO: all entries currently sent in a burst. We should be waiting for each one (+ timeout?) before sending the next one.
       const entries = await repo.getAll('entries')
       entries.forEach(async entry => {
         const data = {
@@ -33,7 +27,7 @@ class SyncMgr{
         }
 
         try{
-          await send('/api/entry', 'POST', data)
+          await send('/api/update', 'POST', data)
         }
         catch(ex){
           await repo.insertOne('updates', data)
@@ -45,13 +39,31 @@ class SyncMgr{
     }
   }
 
+  // generic method to send a diff to server
+  async syncIt(obj, ref, type, table){
+    try{
+      const config = await this._getConfig()
+      let diff
+      if (ref != null){
+        diff = Utils.getDiff(obj, ref)
+      }
+      else{
+        diff = obj // no reference object means new document, send all
+      }
+
+      await this._sendDiff(type, diff, config)
+
+    }
+    catch(ex){
+      throw ex
+    }
+  }
+
+  // requests server for updates.
   async checkUpdates(){
     try{
       // get sync info
-      const config = await repo.getOne('config', 'sync')
-
-      // checks config is enabled
-      if (!config.enabled) return
+      const config = await this._getConfig()
 
       let updates = [] // updates received for this sync request
       let paginated = false
@@ -78,7 +90,7 @@ class SyncMgr{
         await prom
         switch(update.type){
           case 'entry':
-            await this.mergeEntry(update)
+            await this._mergeEntry(update)
             break
           default:
             console.error('"${update.type}" type of update is not supported')
@@ -93,7 +105,17 @@ class SyncMgr{
     }
   }
 
-  async mergeEntry(update){
+  // helper to retrieve config from db
+  async _getConfig(){
+    const config = await repo.getOne('config', 'sync')
+    if (!config)
+      throw new Error('SYNC_NOT_CONFIGURED')
+    if (!config.enabled)
+      throw new Error('SYNC_DISABLED')
+    return config
+  }
+
+  async _mergeEntry(update){
     const remoteEntry = update.changes
     let localEntry = await repo.getOne('entries', remoteEntry.id)
 
@@ -106,7 +128,7 @@ class SyncMgr{
       }
 
       // update is later than last local update, we can apply the change
-      localEntry = this.deepAssign(localEntry, remoteEntry)
+      localEntry = this._deepAssign(localEntry, remoteEntry)
       await repo.updateDoc('entries', localEntry)
     }
     else{
@@ -117,14 +139,40 @@ class SyncMgr{
   }
 
   // like Object.assign but recursive
-  deepAssign(target, changes){
+  _deepAssign(target, changes){
     Object.entries(changes).forEach(([key, value]) => {
       if (typeof value === 'object')
-        target[key] = this.deepAssign(target[key], value)
+        target[key] = this._deepAssign(target[key], value)
       else
         target[key] = value
     })
     return target
+  }
+
+  // returns nothing (empty promise) if server db update goes well
+  async _sendDiff(type, diff, config){
+    const payload = {
+      id: uuid(),
+      changes: diff,
+      ts: diff.lastUpdateDate,
+      email: config.email,
+      userkey: config.userkey,
+      type: type,
+      devid: config.devid
+    }
+
+    try{ // send update to server
+      await send('/api/update', 'POST', payload)
+    }
+    catch(ex){ // on failure, save to db
+      try{
+        await repo.insertOne('updates', payload)
+      }
+      catch(innerex){ // ...all hell broke loose
+        console.error(innerex)
+        throw new Error('UPDATE_SERVER_AND_LOCAL_FAILED')
+      }
+    }
   }
 }
 

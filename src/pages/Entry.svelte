@@ -2,6 +2,7 @@
 import { onMount } from 'svelte'
 import { repo } from '../storage.js'
 import { syncMgr } from '../syncMgr.js'
+import Utils from '../utils.js'
 import { v4 as uuid} from 'uuid'
 import router from 'page'
 import { createEventDispatcher } from 'svelte'
@@ -30,19 +31,27 @@ let entry = {
   lastUpdateDate: ''
 }
 
-let edit = false
+let edit = false,
+    refEntry // clone of the entry fresh out of db, to get diff of modifications
 
-let cepageText = entry.wine.cepages.join(', ') //intermediate for cepage text input values
+let cepageText //intermediate for cepage text input values
 $: serialized = JSON.stringify(entry)
 
 onMount(async () => {
   await repo.open()
 
+  refEntry = null
   edit = !params.id
-  if (params.id)
+  if (params.id){
     entry = await repo.getOne('entries', params.id)
+    if (entry){
+      refEntry = Utils.deepClone(entry)
+      cepageText = entry.wine.cepages.join(', ')
+    }
+  }
 })
 
+// validation, save logic & sync
 async function save(){
   try{
     sanitizeEntry()
@@ -54,17 +63,27 @@ async function save(){
 
   try{
     let msg
-    if (params.id){
+    if (params.id){ // update existing entry
+      // timestamp validation: make sure the reference data before modification
+      //  is the last version (not updated in background during edition process).
+      const dbRef = await repo.getOne('entries', params.id)
+      if (dbRef && (refEntry.lastUpdateDate < dbRef.lastUpdateDate))
+        throw new Error('DB OBJECT EDITED SINCE YOU OPENED IT') // TODO:save for resolution?
       await repo.updateDoc('entries', entry)
       msg = 'Mise à jour OK'
     }
-    else{
+    else{ // create new entry
       entry.id = uuid()
       entry = await repo.insertOne('entries', entry)
       msg = 'Bouteille ajoutée'
       router(`/entry/${entry.id}`) // soft redirect: address bar updated but
     }
+
+    console.log('sync update')
+    syncMgr.syncIt(entry, refEntry, 'entry', 'entries')
+
     edit = false
+    refEntry = Utils.deepClone(entry) // refresh reference object after a save
     dispatch('notif', {text: msg})
   }
   catch(ex){

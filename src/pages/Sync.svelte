@@ -14,7 +14,7 @@
     email: 'a@a',
     userkey: '',
     lastSync: '1970-01-01T00:00:00.000Z', // ts of last sync. Different than ts of last update received.
-    devid: '' // unique node id - to filter-out udpdates by self
+    devid: '' // unique node id - to filter-out updates by self
   }
   let firstSync = false
 

@@ -1,7 +1,7 @@
 // const utils = require('../src/utils.js')
 const assert = require('chai').assert
 
-// does'nt work if using relative path.
+// doesn't work if using relative path.
 import utils from '/home/bleuarff/dev/vinisync/src/utils.js'
 
 
@@ -77,9 +77,9 @@ describe('Diff', () => {
     assert.deepEqual(diff, expected)
   })
   it('null', () => {
-    const ref = {a: 1, w:{c: ['syrah', 'sauvignon']}, b: false},
-          obj = {a: 1, w:{c: ['syrah', 'sauvignon']}, b: true},
-          expected = {b:true}
+    const ref = {a: 1, w:{c: null}},
+          obj = {a: 1, w:{c: null, d: 1}},
+          expected = {w:{d: 1}}
     const diff = utils.getDiff(obj, ref)
     assert.deepEqual(diff, expected)
   })

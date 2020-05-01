@@ -16,7 +16,7 @@ export default class Utils{
 
     // loop modified object's entries to check for addition & modifications
     Object.entries(obj).forEach(([key, value]) => {
-      if (ref[key] == null){ // key is new in obj
+      if (ref[key] == null && value != null){ // key is new in obj
         diff = diff || {}
         diff[key] = value
       }
@@ -35,7 +35,7 @@ export default class Utils{
           }
         }
       }
-      else if (typeof value === 'object'){
+      else if (typeof value === 'object' && value != null){
         const subDiff = Utils.getDiff(value, ref[key])
         if (subDiff){
           diff = diff || {}
@@ -49,5 +49,20 @@ export default class Utils{
     })
 
     return diff
+  }
+
+  static deepClone(obj){
+    if (obj == null) return null
+
+    const cp = {}
+    Object.entries(obj).forEach(([key, value]) => {
+      if (Array.isArray(value))
+        cp[key] = [...value] // array is assumed to contain only primitive types
+      else if (typeof value === 'object')
+        cp[key] = Utils.deepClone(value)
+      else
+        cp[key] = value
+    })
+    return cp
   }
 }

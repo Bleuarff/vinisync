@@ -1,4 +1,3 @@
-import { v4 as uuid} from 'uuid'
 import { openDB, deleteDB, wrap, unwrap } from 'idb'
 
 const DB_VERSION = 1,
@@ -66,20 +65,6 @@ async function updateDoc(table, doc){
   await db.put(table, doc)
 }
 
-// delete all existing entries and create from provided list
-async function importEntries(entries){
-  const ids = await db.getAllKeys('entries')
-  const proms = []
-
-  ids.forEach(id => { proms.push(db.delete('entries', id)) })
-
-  entries.forEach(entry => {
-    entry.id = uuid()
-    proms.push(insertOne('entries', entry))
-  })
-  return Promise.all(proms)
-}
-
 function deleteOne(table, id){
   return db.delete(table, id)
 }
@@ -99,9 +84,6 @@ export const repo = {
   getOne: getOne,
 
   updateDoc: updateDoc,
-
-  import: importEntries,
-
 
   insertOne: insertOne,
 

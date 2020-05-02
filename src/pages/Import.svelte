@@ -2,6 +2,7 @@
 import { repo } from '../storage.js'
 import router from 'page'
 import { createEventDispatcher } from 'svelte'
+import { v4 as uuid} from 'uuid'
 const dispatch = createEventDispatcher()
 export let params
 
@@ -17,7 +18,15 @@ function importFile(e){
       const entries = JSON.parse(content)
       console.log(`${entries.length} entries in file`)
       await repo.open()
-      await repo.import(entries)
+      await repo.deleteAll('entries')
+      const proms = []
+      entries.forEach(entry => {
+        entry.id = uuid()
+        proms.push(repo.insertOne('entries', entry))
+      })
+      await Promise.all(proms)
+
+
       router('/wines')
     }
     catch(ex){

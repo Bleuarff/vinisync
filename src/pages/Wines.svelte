@@ -1,15 +1,24 @@
 <script>
 import { onMount } from 'svelte'
 import {repo } from '../storage.js'
+import { syncMgr } from '../syncMgr.js'
 export let params = {}
 
 let entries = []
+let config
 $: bottleCount = entries.reduce((cur, e)=> {return cur + e.count}, 0)
 
 onMount(async () => {
   await repo.open()
   entries = await repo.getAll('entries')
   entries = sort()
+  syncMgr.checkUpdates()
+  .then(async updated => {
+    if (updated)
+      entries = await repo.getAll('entries')
+      entries = sort()
+  })
+  config = await repo.getOne('config', 'sync')
 })
 
 function sort(){
@@ -49,9 +58,11 @@ function sort(){
 {/if}
 
 <a href="/entry">Ajouter un vin</a>
+{#if !config}
 <div>
   <a href="/import">Importer</a>
 </div>
+{/if}
 <div>
   <a href="/sync">Sync</a>
 </div>

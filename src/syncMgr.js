@@ -4,6 +4,8 @@ import Utils from './utils.js'
 import { v4 as uuid} from 'uuid'
 import moment from 'moment'
 
+const SYNC_INTERVAL = 1 // minimum interval between 2 update checks, in minutes
+
 class SyncMgr{
   constructor(){}
 
@@ -70,7 +72,7 @@ class SyncMgr{
       const config = await this._getConfig()
 
       // sync only if forced or last sync is at least an hour ago
-      if (!forced && moment().utc().diff(moment(config.lastSync), 'minute') < 60)
+      if (!forced && moment().utc().diff(moment(config.lastSync), 'minute') < SYNC_INTERVAL)
         return
 
       let updates = [] // updates received for this sync request
@@ -105,12 +107,13 @@ class SyncMgr{
         }
       }, Promise.resolve())
 
-      // await repo.updateDoc('config', config) // save config w/ last sync date after confirmation everything is saved
+      await repo.updateDoc('config', config) // save config w/ last sync date after confirmation everything is saved
 
-      // if notif id set: return whether the given id was in the list of updates
+      // if notif id set: return whether the given id was in the list of updates.
+      // otherwise return whether there were some updates
       if (typeof notifyId === 'string')
         return updates.some(x => x.changes && x.changes.id === notifyId)
-      else // otherwise return whether there were some updates
+      else
         return updates.length > 0
     }
     catch(ex){

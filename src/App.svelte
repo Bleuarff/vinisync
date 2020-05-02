@@ -1,10 +1,12 @@
 <script>
 	import router from 'page'
+	import { onMount } from 'svelte'
 	import Wines from './pages/Wines.svelte'
 	import Entry from './pages/Entry.svelte'
 	import Import from './pages/Import.svelte'
 	import Sync from './pages/Sync.svelte'
 	import Notif from './pages/Notif.svelte'
+	import syncMgr from './syncMgr.js'
 
 	let page
 	let params
@@ -19,6 +21,11 @@
 	router('/import', () => page = Import)
 	router('/sync', () => page = Sync)
 	router.start()
+
+	onMount(async () => {
+		console.log('app mount ')
+		syncMgr.pendingMonitor()
+	})
 
 </script>
 

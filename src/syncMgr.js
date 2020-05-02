@@ -4,7 +4,8 @@ import Utils from './utils.js'
 import { v4 as uuid} from 'uuid'
 import moment from 'moment'
 
-const SYNC_INTERVAL = 1 // minimum interval between 2 update checks, in minutes
+const SYNC_INTERVAL = 1, // minimum interval between 2 update checks, in minutes
+      PENDING_RETRY_INTERVAL = 2*60*1000 //3600 * 1000 // interval at which we check for pending updates to sync, in milliseconds
 
 class SyncMgr{
   constructor(){}
@@ -173,6 +174,44 @@ class SyncMgr{
         console.error(innerex)
         throw new Error('UPDATE_SERVER_AND_LOCAL_FAILED')
       }
+    }
+  }
+
+  async pendingMonitor(){
+    await repo.open()
+    this._sendPending()
+    setInterval(() => {this._sendPending()}, PENDING_RETRY_INTERVAL) // try every hour
+  }
+
+  // checks if there are pending updates, and send them
+  async _sendPending(){
+    let config
+    try{
+      config = await this._getConfig()
+    }
+    catch(ex){ return } // swallow error, not interested if config is not setup or disabled
+
+    try{
+      const updates = await repo.getAll('updates')
+      if (updates.length === 0) return // nothing to send
+
+      // process each upate, synchronously
+      await updates.reduce(async (prom, update) => {
+        await prom
+        try{
+          await send('/api/update', 'POST', update)
+          await repo.deleteOne('updates', update.id)
+          return Promise.resolve()
+        }
+        catch(ex){
+          // one failure does not impact the other udpates
+          return Promise.resolve()
+        }
+      }, Promise.resolve())
+    }
+    catch(ex){
+      console.error(ex)
+      throw ex
     }
   }
 }

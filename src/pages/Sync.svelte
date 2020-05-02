@@ -21,8 +21,8 @@
   let isLink = false // true to sync with existing & future device(s) with same userkey
   let showKey = false // true to show userkey
 
-  // $:hr_key = config.userkey ?
-  //     config.userkey.substring(0,4) + '-' + config.userkey.substring(4,8) + '-' + config.userkey.substring(8,10) : ''
+  $:readableUserkey = config.userkey ?
+      config.userkey.substring(0,4) + '-' + config.userkey.substring(4,8) + '-' + config.userkey.substring(8,10) : ''
 
 
   onMount(async () => {
@@ -123,6 +123,29 @@
     return checksum === computedChecksum
   }
 
+  // copy userkey to clipboard
+  // IDEA: share btns (email, whatsapp) ?
+  function copyKey(){
+    // creates text box with value to copy
+    var nd = document.createElement('input')
+    nd.setAttribute('type', 'text')
+    nd.classList.add('copy', 'invisible')
+    nd.value = readableUserkey
+    document.body.appendChild(nd)
+    nd.focus()
+    nd.setSelectionRange(0, readableUserkey.length)
+    document.addEventListener('copy', onCopy)
+    document.execCommand('copy')
+  }
+
+  // Removes textbox after a copy event
+  function onCopy(){
+    setTimeout(() => {
+      document.querySelector('.copy').remove()
+      document.removeEventListener('copy', onCopy)
+    }, 20)
+  }
+
 </script>
 
 <h2>Sync</h2>
@@ -135,7 +158,10 @@
   <p>Email associé: {config.email}</p>
   <button on:click="{() => {showKey = !showKey}}">{showKey ? 'Masquer' : 'Voir'} la clé</button>
   {#if showKey}
-    <p>Votre cle: {config.userkey.substring(0, 4)}-{config.userkey.substring(4, 8)}-{config.userkey.substring(8, 10)}</p>
+    <p>
+      Votre cle: {readableUserkey}
+      <button on:click={copyKey}>Copier</button>
+    </p>
   {/if}
   <!-- TODO: show sync details: last sync, # devices, etc. -->
 

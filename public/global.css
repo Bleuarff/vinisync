@@ -25,6 +25,12 @@ body {
 	display: none !important;
 }
 
+.invisible{
+	opacity: 0 !important;
+	color: transparent !important;
+	background: transparent !important;
+}
+
 h2{
 	margin: 0;
 }

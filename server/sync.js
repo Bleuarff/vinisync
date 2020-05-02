@@ -72,7 +72,7 @@ class Sync{
         devid: {$ne: req.params.devid}, // ignore updates made by the requesting node itself
         uploadedDate : {$gt: moment(req.params.lastSync).toDate()}
       }
-      const count = await db.collection('updates').countDocuments()
+      const count = await db.collection('updates').countDocuments(query)
       const lastSync = moment().utc().toDate()
       const docs = await db.collection('updates').find(query, {userkey: 0}).sort({ts: 1}).limit(PAGE_SIZE).toArray()
       res.send(200, {

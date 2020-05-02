@@ -47,6 +47,12 @@ onMount(async () => {
     if (entry){
       refEntry = Utils.deepClone(entry)
       cepageText = entry.wine.cepages.join(', ')
+      syncMgr.checkUpdates(params.id)
+      .then(async updated => {
+        if (updated)
+          entry = await repo.getOne('entries', params.id)
+          cepageText = entry.wine.cepages.join(', ')
+      })
     }
   }
 })

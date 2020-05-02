@@ -47,6 +47,9 @@ class SyncMgr{
       let diff
       if (ref != null){
         diff = Utils.getDiff(obj, ref)
+        if (diff == null)
+          return // no diff, nothing to sync
+        diff.id = obj.id
       }
       else{
         diff = obj // no reference object means new document, send all
@@ -61,13 +64,13 @@ class SyncMgr{
   }
 
   // requests server for updates.
-  async checkUpdates(forced = false){
+  async checkUpdates(notifyId = null, forced = false){
     try{
       // get sync info
       const config = await this._getConfig()
 
       // sync only if forced or last sync is at least an hour ago
-      if (!forced && moment().utc().diff(moment(config.lastSync), 'minute') >= 60)
+      if (!forced && moment().utc().diff(moment(config.lastSync), 'minute') < 60)
         return
 
       let updates = [] // updates received for this sync request
@@ -103,7 +106,12 @@ class SyncMgr{
       }, Promise.resolve())
 
       // await repo.updateDoc('config', config) // save config w/ last sync date after confirmation everything is saved
-      // emit event ?
+
+      // if notif id set: return whether the given id was in the list of updates
+      if (typeof notifyId === 'string')
+        return updates.some(x => x.changes && x.changes.id === notifyId)
+      else // otherwise return whether there were some updates
+        return updates.length > 0
     }
     catch(ex){
       throw ex

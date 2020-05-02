@@ -1,7 +1,7 @@
 <script>
 import { onMount } from 'svelte'
 import {repo } from '../storage.js'
-import { syncMgr } from '../syncMgr.js'
+import syncMgr from '../syncMgr.js'
 export let params = {}
 
 let entries = []

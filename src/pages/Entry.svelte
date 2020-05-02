@@ -1,7 +1,7 @@
 <script>
 import { onMount } from 'svelte'
 import { repo } from '../storage.js'
-import { syncMgr } from '../syncMgr.js'
+import syncMgr from '../syncMgr.js'
 import Utils from '../utils.js'
 import { v4 as uuid} from 'uuid'
 import router from 'page'

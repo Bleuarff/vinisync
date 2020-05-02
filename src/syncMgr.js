@@ -192,5 +192,4 @@ class SyncMgr{
   }
 }
 
-const syncMgr = new SyncMgr()
-export {syncMgr}
+export default new SyncMgr()

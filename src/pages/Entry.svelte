@@ -117,21 +117,6 @@ async function decrement(){
   await save()
 }
 
-async function deleteEntry(){
-  const res = confirm("Supprimer ?")
-  if (res){
-    try{
-      await repo.deleteOne('entries', entry.id)
-      // TODO: sync this update
-      router('/wines')
-    }
-    catch(ex){
-      console.error(ex)
-      dispatch('notif', {text: 'Erreur de suppression', err: true})
-    }
-  }
-}
-
 </script>
 
 <a href="/wines" class="back">liste</a>
@@ -196,7 +181,6 @@ async function deleteEntry(){
         <button on:click="{save}">Save</button>
         {#if params.id}
         <button on:click="{()=>{ edit = false }}">Annuler</button>
-        <button on:click="{deleteEntry}">Supprimer</button>
         {/if}
       {:else}
         <button on:click="{()=>{ edit = true }}">Edit</button>

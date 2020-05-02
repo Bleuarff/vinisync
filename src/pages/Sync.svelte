@@ -41,8 +41,11 @@
     if (!/.+@.+/.test(config.email))
       dispatch('notif', {text: 'email invalide', err: true})
 
-    if (config.userkey && !verifyChecksum(config.userkey))
-      dispatch('notif', {text: 'clef de sync invalide', err: true})
+    if (config.userkey){
+      config.userkey = config.userkey.replace(/[\s-]+/g, '')
+      if (!verifyChecksum(config.userkey))
+        dispatch('notif', {text: 'clef de sync invalide', err: true})
+    }
 
     if (!config.devid)
       config.devid = uuid()

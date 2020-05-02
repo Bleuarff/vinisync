@@ -19,22 +19,7 @@ class SyncMgr{
       // TODO: all entries currently sent in a burst. We should be waiting for each one (+ timeout?) before sending the next one.
       const entries = await repo.getAll('entries')
       entries.forEach(async entry => {
-        const data = {
-          id: uuid(),
-          changes: entry,
-          ts: entry.lastUpdateDate,
-          email: config.email,
-          userkey: config.userkey,
-          type: 'entry',
-          devid: config.devid
-        }
-
-        try{
-          await send('/api/update', 'POST', data)
-        }
-        catch(ex){
-          await repo.insertOne('updates', data)
-        }
+        await this._sendDiff('entry', entry, config)
       })
     }
     catch(ex){

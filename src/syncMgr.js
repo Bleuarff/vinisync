@@ -24,7 +24,10 @@ class SyncMgr{
       })
     }
     catch(ex){
-      throw ex
+      if (ex.message === 'SYNC_NOT_CONFIGURED')
+        console.warn(ex.message)
+      else
+        throw ex
     }
   }
 
@@ -47,7 +50,10 @@ class SyncMgr{
 
     }
     catch(ex){
-      throw ex
+      if (ex.message === 'SYNC_NOT_CONFIGURED')
+        console.warn(ex.message)
+      else
+        throw ex
     }
   }
 
@@ -103,7 +109,10 @@ class SyncMgr{
         return updates.length > 0
     }
     catch(ex){
-      throw ex
+      if (ex.message === 'SYNC_NOT_CONFIGURED')
+        console.warn(ex.message)
+      else
+        throw ex
     }
   }
 

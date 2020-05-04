@@ -148,6 +148,7 @@
 
 </script>
 
+<a href="/wines" class="back">liste</a>
 <h2>Sync</h2>
 
 {#if config.enabled}

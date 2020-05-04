@@ -1,5 +1,6 @@
 <script>
 import { onMount } from 'svelte'
+import FormText from '../components/FormText.svelte'
 import { repo } from '../storage.js'
 import syncMgr from '../syncMgr.js'
 import Utils from '../utils.js'
@@ -125,9 +126,12 @@ async function decrement(){
 <!-- <p>{serialized}</p> -->
 
 {#if entry}
-    {#if edit || entry.wine.name}<label>Cuvée</label><input bind:value={entry.wine.name} type="text" disabled={!edit}>{/if}
-    {#if edit || entry.wine.producer}<label>Producteur</label> <input type="text" bind:value={entry.wine.producer} disabled={!edit}>{/if}
-    {#if edit || entry.wine.appellation}<label>Appellation</label><input type="text" bind:value={entry.wine.appellation} disabled={!edit}>{/if}
+    <!-- {#if edit || entry.wine.name}<label>Cuvée</label><input bind:value={entry.wine.name} type="text" readonly={!edit}>{/if} -->
+    <FormText bind:value={entry.wine.name} readonly={!edit} label="Cuvée" placeholder="Vigneron Inconnu"></FormText>
+    <FormText bind:value={entry.wine.producer} readonly={!edit} label="Producteur" placeholder="Guigal"></FormText>
+    <FormText bind:value={entry.wine.appellation} readonly={!edit} label="Appellation" placeholder="Jasnières"></FormText>
+    <!-- {#if edit || entry.wine.producer}<label>Producteur</label> <input type="text" bind:value={entry.wine.producer} disabled={!edit}>{/if} -->
+    <!-- {#if edit || entry.wine.appellation}<label>Appellation</label><input type="text" bind:value={entry.wine.appellation} disabled={!edit}>{/if} -->
     {#if edit || entry.wine.year}<label>Millésime</label><input type="number" bind:value={entry.wine.year} disabled={!edit}>{/if}
     {#if edit || entry.wine.country}<label>Pays</label><input type="text" bind:value={entry.wine.country} disabled={!edit}>{/if}
 

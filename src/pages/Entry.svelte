@@ -1,6 +1,7 @@
 <script>
 import { onMount } from 'svelte'
 import FormText from '../components/FormText.svelte'
+import Apogee from '../components/Apogee.svelte'
 import { repo } from '../storage.js'
 import syncMgr from '../syncMgr.js'
 import Utils from '../utils.js'
@@ -132,16 +133,27 @@ async function decrement(){
     <FormText bind:value={entry.wine.appellation} readonly={!edit} label="Appellation" placeholder="Jasnières"></FormText>
     <!-- {#if edit || entry.wine.producer}<label>Producteur</label> <input type="text" bind:value={entry.wine.producer} disabled={!edit}>{/if} -->
     <!-- {#if edit || entry.wine.appellation}<label>Appellation</label><input type="text" bind:value={entry.wine.appellation} disabled={!edit}>{/if} -->
-    {#if edit || entry.wine.year}<label>Millésime</label><input type="number" bind:value={entry.wine.year} disabled={!edit}>{/if}
-    {#if edit || entry.wine.country}<label>Pays</label><input type="text" bind:value={entry.wine.country} disabled={!edit}>{/if}
+    <!-- {#if edit || entry.wine.year}<label>Millésime</label><input type="number" bind:value={entry.wine.year} disabled={!edit}>{/if} -->
+    <div class="line">
+      {#if edit || entry.wine.year}
+      <div class="year">
+        <FormText bind:value={entry.wine.year} readonly={!edit} label="Millésime" type="year"></FormText>
+      </div>
+      {/if}
+      <div>
+        <FormText bind:value={entry.wine.country} readonly={!edit} label="Pays" type="text"></FormText>
+      </div>
+      <!-- {#if edit || entry.wine.country}<label>Pays</label><input type="text" bind:value={entry.wine.country} disabled={!edit}>{/if} -->
+      </div>
 
-    <label>Apogée</label>
+    <!-- <label>Apogée</label>
     <div class="apogee">
       <span>de</span>
       <input type="number" bind:value={entry.wine.apogeeStart} disabled={!edit}>
       <span>à</span>
       <input type="number" bind:value={entry.wine.apogeeEnd} disabled={!edit}>
-    </div>
+    </div> -->
+    <Apogee bind:start={entry.wine.apogeeStart} bind:end={entry.wine.apogeeEnd} readonly={!edit}></Apogee>
 
     <label>Bouteilles</label><input type="number" bind:value={entry.count} disabled={!edit}>
 
@@ -231,6 +243,31 @@ async function decrement(){
     background: white;
     color: #333;
     border-bottom-color: transparent;
+  }
+
+  .line{
+    display: flex;
+    width: 100%;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+  }
+
+  .line :last-child{
+    width: auto;
+  }
+
+  .year{
+    max-width: 9em;
+    padding-right: 3em;
+  }
+
+  @media(min-width: 500px){
+    .line{
+      justify-content: flex-start;
+    }
+    .line :first-child{
+      width: 30%;
+    }
   }
 
   .apogee{

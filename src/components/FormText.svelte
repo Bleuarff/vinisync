@@ -63,6 +63,7 @@ function resize(e){
 
   label{
     font-size: .9em;
+    margin-bottom: 2px;
   }
 
   .input{
@@ -70,7 +71,7 @@ function resize(e){
     border: none;
     border-bottom: 1px solid #bb072d;
     padding-top: 0;
-    padding-bottom: 0;
+    padding-bottom: 2px;
     border-radius: 0;
   }
 

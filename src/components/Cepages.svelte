@@ -2,15 +2,23 @@
   export let cepages = []
   export let readonly = true
 
-  let inputNd
+  let inputNd // ref new cepage input node
 
+  // adds cepage to list
   function addCepage(e){
     const cepage = inputNd.value.trim() // sanitize
 
-    if (cepage && !cepages.includes(cepage)){
+    if (cepage && !cepages.includes(cepage)){ // checks if not already present
       cepages = [...cepages, cepage]
       inputNd.value = ''
       inputNd.focus()
+    }
+  }
+
+  // remove cepage from list
+  function remove(value){
+    if (value){
+      cepages = cepages.filter(x => x != value)
     }
   }
 </script>
@@ -19,12 +27,17 @@
 <label>Cépages</label>
 <div class="ctnr" class:readonly>
   {#each cepages as cepage}
-    <span class="cpg">{cepage}</span>
+    <div class="cpg">{cepage}
+      {#if !readonly}
+        <!-- delete button, only in edition -->
+        <span class="remove" on:click={remove(cepage)} title="Supprimer">✖</span>
+      {/if}
+    </div>
   {/each}
 
   {#if !readonly}
   <div>
-    <input bind:this={inputNd} type="text" placeholder="cabernet franc">
+    <input bind:this={inputNd} type="text" placeholder="Cabernet Franc">
     <button on:click={addCepage}>Ajouter</button>
   </div>
   {/if}
@@ -49,7 +62,7 @@
   .cpg{
     background: var(--main-color);
     color: white;
-    padding: 2px 4px;
+    padding: 2px 5px;
     border-radius: 4px;
     margin-bottom: 6px;
   }
@@ -58,11 +71,11 @@
     margin-right: 10px;
   }
 
-  /* .ctnr:not(.readonly) .cpg::after{
-    content: '✖';
-    padding-left: 12px;
+  .remove{
+    padding: 3px;
+    margin-left: 7px;
     cursor: pointer;
-  } */
+  }
 
   input{
     border: none;

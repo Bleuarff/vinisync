@@ -2,6 +2,7 @@
 import { onMount } from 'svelte'
 import FormText from '../components/FormText.svelte'
 import Apogee from '../components/Apogee.svelte'
+import Cepages from '../components/Cepages.svelte'
 import { repo } from '../storage.js'
 import syncMgr from '../syncMgr.js'
 import Utils from '../utils.js'
@@ -36,7 +37,6 @@ let entry = {
 let edit = false,
     refEntry // clone of the entry fresh out of db, to get diff of modifications
 
-let cepageText //intermediate for cepage text input values
 $: serialized = JSON.stringify(entry)
 
 onMount(async () => {
@@ -48,12 +48,10 @@ onMount(async () => {
     entry = await repo.getOne('entries', params.id)
     if (entry){
       refEntry = Utils.deepClone(entry)
-      cepageText = entry.wine.cepages.join(', ')
       syncMgr.checkUpdates(params.id)
       .then(async updated => {
         if (updated)
           entry = await repo.getOne('entries', params.id)
-          cepageText = entry.wine.cepages.join(', ')
       })
     }
   }
@@ -101,8 +99,6 @@ async function save(){
 }
 
 function sanitizeEntry(){
-  entry.wine.cepages = cepageText.split(',').filter(c => !!c).map(c => c.trim())
-
   if (!entry.wine.name && !entry.wine.producer)
     throw new Error('Producteur ou cuvée obligatoire')
 
@@ -131,9 +127,6 @@ async function decrement(){
     <FormText bind:value={entry.wine.name} readonly={!edit} label="Cuvée" placeholder="Vigneron Inconnu"></FormText>
     <FormText bind:value={entry.wine.producer} readonly={!edit} label="Producteur" placeholder="Guigal"></FormText>
     <FormText bind:value={entry.wine.appellation} readonly={!edit} label="Appellation" placeholder="Jasnières"></FormText>
-    <!-- {#if edit || entry.wine.producer}<label>Producteur</label> <input type="text" bind:value={entry.wine.producer} disabled={!edit}>{/if} -->
-    <!-- {#if edit || entry.wine.appellation}<label>Appellation</label><input type="text" bind:value={entry.wine.appellation} disabled={!edit}>{/if} -->
-    <!-- {#if edit || entry.wine.year}<label>Millésime</label><input type="number" bind:value={entry.wine.year} disabled={!edit}>{/if} -->
     <div class="line">
       {#if edit || entry.wine.year}
       <div class="year">
@@ -146,25 +139,11 @@ async function decrement(){
       <!-- {#if edit || entry.wine.country}<label>Pays</label><input type="text" bind:value={entry.wine.country} disabled={!edit}>{/if} -->
       </div>
 
-    <!-- <label>Apogée</label>
-    <div class="apogee">
-      <span>de</span>
-      <input type="number" bind:value={entry.wine.apogeeStart} disabled={!edit}>
-      <span>à</span>
-      <input type="number" bind:value={entry.wine.apogeeEnd} disabled={!edit}>
-    </div> -->
     <Apogee bind:start={entry.wine.apogeeStart} bind:end={entry.wine.apogeeEnd} readonly={!edit}></Apogee>
 
     <label>Bouteilles</label><input type="number" bind:value={entry.count} disabled={!edit}>
 
-    <label>Cepages</label>
-      {#if edit}
-        <input type="text" bind:value={cepageText} placeholder="muscat, sauvignon, malbec">
-      {:else}
-        {#each entry.wine.cepages as cepage}
-          <span>{cepage}</span>
-        {/each}
-      {/if}
+    <Cepages bind:cepages={entry.wine.cepages} readonly={!edit}></Cepages>
 
     <label>Contenance</label>
     {#if edit}

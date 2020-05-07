@@ -3,6 +3,7 @@ import { onMount } from 'svelte'
 import FormText from '../components/FormText.svelte'
 import Apogee from '../components/Apogee.svelte'
 import Cepages from '../components/Cepages.svelte'
+import Color from '../components/Color.svelte'
 import { repo } from '../storage.js'
 import syncMgr from '../syncMgr.js'
 import Utils from '../utils.js'
@@ -136,8 +137,7 @@ async function decrement(){
       <div>
         <FormText bind:value={entry.wine.country} readonly={!edit} label="Pays" type="text"></FormText>
       </div>
-      <!-- {#if edit || entry.wine.country}<label>Pays</label><input type="text" bind:value={entry.wine.country} disabled={!edit}>{/if} -->
-      </div>
+    </div>
 
     <Apogee bind:start={entry.wine.apogeeStart} bind:end={entry.wine.apogeeEnd} readonly={!edit}></Apogee>
 
@@ -145,29 +145,30 @@ async function decrement(){
 
     <Cepages bind:cepages={entry.wine.cepages} readonly={!edit}></Cepages>
 
-    <!-- <label>Contenance</label>
-    {#if edit}
-      <input type="text" bind:value="{entry.wine.containing}" placeholder="0.75">
-    {:else}
-      <span>{entry.wine.containing}</span>
-    {/if} -->
     <FormText bind:value={entry.wine.containing} readonly={!edit} label="Contenance" placeholder="75" type="containing"></FormText>
 
-    <label>Couleur</label>
-    {#if edit}
-      <input type="text" bind:value={entry.wine.color} placeholder="rouge">
-    {:else}
-      <span>{entry.wine.color}</span>
-    {/if}
+    <Color bind:value={entry.wine.color} readonly={!edit}></Color>
 
-    <div id="attrs">
-      <input type="checkbox" bind:value={entry.wine.sweet} id="sweet"><label for="sweet">Moelleux, Liquoreux</label>
-      <input type="checkbox" bind:value={entry.wine.sparkling} id="sparkling"><label for="sparkling">Pétillant</label>
+    {#if edit || entry.wine.sweet || entry.wine.sparkling}
+    <div id="attributes">
+      {#if edit || entry.wine.sweet}
+      <div class="attr">
+        <input type="checkbox" bind:checked={entry.wine.sweet} id="sweet" disabled={!edit}>
+        <label for="sweet">Moelleux, Liquoreux</label>
+      </div>
+      {/if}
+      {#if edit || entry.wine.sparkling}
+      <div class="attr">
+        <input type="checkbox" bind:checked={entry.wine.sparkling} id="sparkling" disabled={!edit}>
+        <label for="sparkling">Pétillant</label>
+      </div>
+      {/if}
     </div>
+    {/if}
 
     <label>Emplacement</label>
     {#if edit}
-      <input type="text" bind:value={entry.location} placeholder="rouge">
+      <input type="text" bind:value={entry.location} placeholder="Armoire">
     {:else}
       <span>{entry.location}</span>
     {/if}
@@ -199,12 +200,6 @@ async function decrement(){
     position: relative;
     padding-bottom: 2em;
     margin-top: 1.2em;
-  }
-
-  label{
-    display: block;
-    font-size: .8em;
-    user-select: none;
   }
 
   input{
@@ -250,24 +245,22 @@ async function decrement(){
     }
   }
 
-  .apogee{
+  #attributes{
     display: flex;
-    flex-flow: row nowrap;
-    justify-content: flex-start;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+    margin: 20px 0;
+    padding-left: 10px;
   }
 
-  .apogee > span {
-    flex: 0 1 auto;
-    /* min-width: 1em;
-    max-width: 50%; */
+  .attr{
+    margin-bottom: 10px;
   }
-  .apogee > input {
-    flex: 1 0 auto;
-    max-width: 7em;
-    text-align: center;
-    /* min-width: 1em;
-    max-width: 50%; */
+
+  #attributes label{
+    display: inline-block;
   }
+
 
   .timestamps{
     position: absolute;

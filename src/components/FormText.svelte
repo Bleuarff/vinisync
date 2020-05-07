@@ -100,4 +100,8 @@ function resize(e){
     padding: 0;
     min-height:1.187em;
   }
+
+  .containing input{
+    width: 6em;
+  }
 </style>

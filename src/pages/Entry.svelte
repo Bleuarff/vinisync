@@ -145,12 +145,13 @@ async function decrement(){
 
     <Cepages bind:cepages={entry.wine.cepages} readonly={!edit}></Cepages>
 
-    <label>Contenance</label>
+    <!-- <label>Contenance</label>
     {#if edit}
       <input type="text" bind:value="{entry.wine.containing}" placeholder="0.75">
     {:else}
       <span>{entry.wine.containing}</span>
-    {/if}
+    {/if} -->
+    <FormText bind:value={entry.wine.containing} readonly={!edit} label="Contenance" placeholder="75" type="containing"></FormText>
 
     <label>Couleur</label>
     {#if edit}

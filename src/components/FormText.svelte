@@ -15,6 +15,11 @@ $: if (!readonly && type === 'text'){
   }()
 }
 
+let containingUnit
+$: if (type === 'containing'){
+  containingUnit = value < 25 ? 'L': 'cl'
+}
+
 function resize(e){
   const nd = e ? e.currentTarget : inputNd
   setTimeout(() => {
@@ -28,12 +33,21 @@ function resize(e){
 <div class="formfield {type}">
   <label>{label}</label>
   {#if readonly}
-    <span class="readonly">{value}</span>
+    <span class="readonly">{value} {#if type === 'containing'}{containingUnit}{/if}</span>
   {:else if type === 'text'}
     <textarea bind:value wrap="soft" bind:this={inputNd} rows="1" placeholder={placeholder}
       on:input={resize} on:focus={resize} on:change={resize} class="input"></textarea>
   {:else if type === 'year'}
     <input type="number" bind:value class="input">
+  {:else if type=== 'containing'}
+    <input type="text" bind:value class="input" list="containing-choices">{containingUnit}
+    <datalist id="containing-choices">
+      <option value="37.5">
+      <option value="50">
+      <option value="52">
+      <option value="75">
+      <option value="1.5">
+    </datalist>
   {/if}
 </div>
 {/if}

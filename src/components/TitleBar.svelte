@@ -4,14 +4,21 @@
   // - force sync button
   export let path = ''
   let visible = true
+  let debouncer = 0
 
   // $: home = path === '/'
   let lastScrollY = 0
 
   window.addEventListener('scroll', e => {
+    const ts = Date.now()
+    if (ts - debouncer < 200)
+      return
+
 		const dir = window.scrollY - lastScrollY
+    console.log(dir)
     lastScrollY = window.scrollY
     visible = dir < 0
+    debouncer = ts
 	})
 
 </script>

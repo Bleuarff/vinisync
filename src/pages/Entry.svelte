@@ -90,7 +90,7 @@ async function save(){
 
     const imgOk = await imageEditor.save(entry.id)
     if (!imgOk)
-      msg += '\nErreur sauvegarde de l\'image'.
+      msg += '\nErreur sauvegarde de l\'image'
 
     console.log('sync update')
     syncMgr.syncIt(entry, refEntry, 'entry', 'entries')

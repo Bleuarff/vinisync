@@ -1,6 +1,7 @@
 <script>
   import { onMount, onDestroy} from 'svelte'
   import { repo } from '../storage.js'
+  import { resize } from '../imageResize.js'
   import { v4 as uuid} from 'uuid'
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher()
@@ -74,6 +75,8 @@
         dispatch('notif', {text: 'Le fichier selectionné n\'est pas une image' , err: true})
         return
       }
+      const newFile = resize(file)
+      // fileSize = (file.size / 1e3).toFixed(1)
       imageUrl = URL.createObjectURL(file)
     }
     catch(ex){

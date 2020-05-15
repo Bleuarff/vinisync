@@ -11,11 +11,11 @@
 
   window.addEventListener('scroll', e => {
     const ts = Date.now()
-    if (ts - debouncer < 200)
+    if (ts - debouncer < 50)
       return
 
 		const dir = window.scrollY - lastScrollY
-    console.log(dir)
+    // console.log(dir)
     lastScrollY = window.scrollY
     visible = dir < 0
     debouncer = ts

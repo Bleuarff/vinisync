@@ -29,6 +29,12 @@
       "css": "left",
       "code": 61815,
       "src": "fontawesome"
+    },
+    {
+      "uid": "dc3f1d5b1d006f7f7b3b6295eccab9da",
+      "css": "camera",
+      "code": 59392,
+      "src": "fontawesome"
     }
   ]
 }

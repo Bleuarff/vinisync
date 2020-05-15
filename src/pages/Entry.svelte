@@ -4,6 +4,7 @@ import FormText from '../components/FormText.svelte'
 import Apogee from '../components/Apogee.svelte'
 import Cepages from '../components/Cepages.svelte'
 import Color from '../components/Color.svelte'
+import ImageEdit from '../components/ImageEdit.svelte'
 import { repo } from '../storage.js'
 import syncMgr from '../syncMgr.js'
 import Utils from '../utils.js'
@@ -36,9 +37,10 @@ let entry = {
 }
 
 let edit = false,
-    refEntry // clone of the entry fresh out of db, to get diff of modifications
+    refEntry, // clone of the entry fresh out of db, to get diff of modifications
+    imageEditor
 
-$: serialized = JSON.stringify(entry)
+// $: serialized = JSON.stringify(entry)
 
 onMount(async () => {
   await repo.open()
@@ -83,8 +85,12 @@ async function save(){
       entry.id = uuid()
       entry = await repo.insertOne('entries', entry)
       msg = 'Bouteille ajoutée'
-      router(`/entry/${entry.id}`) // soft redirect: address bar updated but
+      router(`/entry/${entry.id}`) // soft redirect: address bar updated but that's all
     }
+
+    const imgOk = await imageEditor.save(entry.id)
+    if (!imgOk)
+      msg += '\nErreur sauvegarde de l\'image'.
 
     console.log('sync update')
     syncMgr.syncIt(entry, refEntry, 'entry', 'entries')
@@ -111,6 +117,7 @@ async function increment(){
   entry.count = entry.count + 1
   await save()
 }
+
 async function decrement(){
   entry.count = Math.max(0, entry.count - 1)
   await save()
@@ -121,12 +128,32 @@ async function decrement(){
 <a href="/wines" class="back">liste</a>
 
 <div id="entry">
-<!-- <p>{serialized}</p> -->
+  {#if entry}
+    <div class="top">
+      <!-- {#if edit || hasPicture}
+        <div class="photo-ctnr"> -->
+        <ImageEdit entryId={params.id} edit={edit} bind:this={imageEditor}></ImageEdit>
+        <!-- </div>
+      {/if} -->
+      <div class="headers">
+        {#if !edit}
+          {#if entry.wine.name}<div class="big">{entry.wine.name}</div>{/if}
+          {#if entry.wine.producer}<div class="big">{entry.wine.producer}</div>{/if}
+        {:else}
+          <FormText bind:value={entry.wine.name} readonly={!edit} label="Cuvée" placeholder="Vigneron Inconnu"></FormText>
+          <FormText bind:value={entry.wine.producer} readonly={!edit} label="Producteur" placeholder="Guigal"></FormText>
+        {/if}
+      </div>
+    </div>
+    <!-- {:else} -->
+      <!-- <div id="img-edit">
+        <ImageEdit entryId={entry.id}></ImageEdit>
+      </div> -->
+      <!-- {#if edit || entry.wine.name}<label>Cuvée</label><input bind:value={entry.wine.name} type="text" readonly={!edit}>{/if} -->
+      <!-- <FormText bind:value={entry.wine.name} readonly={!edit} label="Cuvée" placeholder="Vigneron Inconnu"></FormText>
+      <FormText bind:value={entry.wine.producer} readonly={!edit} label="Producteur" placeholder="Guigal"></FormText> -->
+    <!-- {/if } -->
 
-{#if entry}
-    <!-- {#if edit || entry.wine.name}<label>Cuvée</label><input bind:value={entry.wine.name} type="text" readonly={!edit}>{/if} -->
-    <FormText bind:value={entry.wine.name} readonly={!edit} label="Cuvée" placeholder="Vigneron Inconnu"></FormText>
-    <FormText bind:value={entry.wine.producer} readonly={!edit} label="Producteur" placeholder="Guigal"></FormText>
     <FormText bind:value={entry.wine.appellation} readonly={!edit} label="Appellation" placeholder="Jasnières"></FormText>
     <div class="line">
       {#if edit || entry.wine.year}
@@ -150,20 +177,20 @@ async function decrement(){
     <Color bind:value={entry.wine.color} readonly={!edit}></Color>
 
     {#if edit || entry.wine.sweet || entry.wine.sparkling}
-    <div id="attributes">
-      {#if edit || entry.wine.sweet}
-      <div class="attr">
-        <input type="checkbox" bind:checked={entry.wine.sweet} id="sweet" disabled={!edit}>
-        <label for="sweet">Moelleux, Liquoreux</label>
+      <div id="attributes">
+        {#if edit || entry.wine.sweet}
+        <div class="attr">
+          <input type="checkbox" bind:checked={entry.wine.sweet} id="sweet" disabled={!edit}>
+          <label for="sweet">Moelleux, Liquoreux</label>
+        </div>
+        {/if}
+        {#if edit || entry.wine.sparkling}
+        <div class="attr">
+          <input type="checkbox" bind:checked={entry.wine.sparkling} id="sparkling" disabled={!edit}>
+          <label for="sparkling">Pétillant</label>
+        </div>
+        {/if}
       </div>
-      {/if}
-      {#if edit || entry.wine.sparkling}
-      <div class="attr">
-        <input type="checkbox" bind:checked={entry.wine.sparkling} id="sparkling" disabled={!edit}>
-        <label for="sparkling">Pétillant</label>
-      </div>
-      {/if}
-    </div>
     {/if}
 
     <label>Emplacement</label>
@@ -173,18 +200,6 @@ async function decrement(){
       <span>{entry.location}</span>
     {/if}
 
-    <div>
-      {#if edit}
-        <button on:click="{save}">Save</button>
-        {#if params.id}
-        <button on:click="{()=>{ edit = false }}">Annuler</button>
-        {/if}
-      {:else}
-        <button on:click="{()=>{ edit = true }}">Edit</button>
-        <button on:click="{increment}">+1</button>
-        <button on:click="{decrement}">-1</button>
-      {/if}
-    </div>
   {:else}
     <p>Cannot retrieve entry {params.id}</p>
   {/if}
@@ -194,12 +209,40 @@ async function decrement(){
   {/if}
 </div>
 
+<div class="buttons-ctnr">
+  <div class="buttons">
+    {#if edit}
+      <button on:click="{save}">Save</button>
+      {#if params.id}
+      <button on:click="{()=>{ edit = false; imageEditor.clear() }}">Annuler</button>
+      {/if}
+    {:else}
+      <button on:click="{()=>{ edit = true }}" class="edit">Edit</button>
+      <button on:click="{increment}">+1</button>
+      <button on:click="{decrement}">-1</button>
+    {/if}
+  </div>
+</div>
+
 <style>
   #entry{
     width: 100%;
     position: relative;
     padding-bottom: 2em;
     margin-top: 1.2em;
+    margin-bottom: 4em;
+  }
+
+  .top{
+    display: flex;
+    flex-flow: row nowrap;
+    margin: 0 -.9em .5em -.9em;
+
+  }
+
+  .big{
+    font-size: 1.3em;
+    margin-bottom: .6em;
   }
 
   input{
@@ -268,5 +311,29 @@ async function decrement(){
     bottom: 0;
     font-size: .8em;
     text-align: center;
+  }
+
+  .buttons-ctnr{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+  .buttons{
+    max-width: 700px;
+    margin: auto;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+  }
+  .buttons button{
+    color: white;
+    background: #ba0e0e;
+    border: 1px solid white;
+    border-radius: 4px;
+    font-size: 1.3em;
+  }
+  .edit{
+    width: 25%;
   }
 </style>

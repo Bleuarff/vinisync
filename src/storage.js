@@ -19,7 +19,7 @@ async function open(){
 
         db.createObjectStore('config', {keyPath: 'key', autoIncrement: false})
         db.createObjectStore('updates', {keyPath: 'id', autoIncrement: false})
-
+        db.createObjectStore('images', {keyPath: 'id', autoIncrement: false})
       }
     }
   })
@@ -28,10 +28,10 @@ async function open(){
 // retrieve all documents for given table
 async function getAll(table){
   const docs = []
-  let cursor = await db.transaction(table).store.openCursor();
+  let cursor = await db.transaction(table).store.openCursor()
   while (cursor){
     docs.push(cursor.value)
-    cursor = await cursor.continue();
+    cursor = await cursor.continue()
   }
   return docs
 }
@@ -48,6 +48,26 @@ async function getOne(table, id){
   }
 }
 
+async function findOne(table, query){
+  try{
+    let cursor = await db.transaction(table).store.openCursor()
+    let doc
+    while (cursor && !doc){
+      // execute function with doc as argument
+      if (query(cursor.value) === true)
+        doc = cursor.value
+      else
+        cursor = await cursor.continue()
+    }
+    return doc
+  }
+  catch(ex){
+    console.error(`find error ${table}`)
+    throw ex
+  }
+}
+
+// creates new document in table
 async function insertOne(table, obj){
   try{
     obj.lastUpdateDate = obj.creationDate = (new Date()).toISOString()
@@ -82,6 +102,7 @@ export const repo = {
 
   getAll: getAll,
   getOne: getOne,
+  findOne: findOne,
 
   updateDoc: updateDoc,
 

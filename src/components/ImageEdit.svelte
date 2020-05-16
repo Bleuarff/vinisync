@@ -1,7 +1,7 @@
 <script>
   import { onMount, onDestroy} from 'svelte'
   import { repo } from '../storage.js'
-  import { resize } from '../imageResize.js'
+  import { resize } from '../imageEditor.js'
   import { v4 as uuid} from 'uuid'
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher()
@@ -12,6 +12,7 @@
   let imageUrl = null // data-url to image file
   let file = null // file object returned by file importer
   let imgDoc = null // db doc
+  let fullSizeImg = false
 
   let importer // fileImporter node
 
@@ -70,12 +71,13 @@
   // load image file
   async function addPicture(e){
     try{
-      file = e.currentTarget.files[0]
-      if (!file.type.startsWith('image/')){
+      const rawFile = e.currentTarget.files[0]
+      if (!rawFile.type.startsWith('image/')){
         dispatch('notif', {text: 'Le fichier selectionné n\'est pas une image' , err: true})
         return
       }
-      const newFile = resize(file)
+      file = await resize(rawFile)
+      console.debug(`Resized image size: ${file.size}`)
       // fileSize = (file.size / 1e3).toFixed(1)
       imageUrl = URL.createObjectURL(file)
     }
@@ -90,14 +92,19 @@
     imageUrl = null
   }
 
+  function toggleFullSize(e){
+    // e.currentTarget.classList.toggle('fullSize')
+    fullSizeImg = !fullSizeImg
+  }
+
 </script>
 
 {#if imageUrl || edit}
   <div class="image-editor">
     {#if imageUrl}
       <!-- TODO: if edit, onclick on image to change it (change/remove/rotate) -->
-      <!-- TODO: if readonly, click to enlarge -->
-      <img src={imageUrl} class="centered">
+      <img src={imageUrl} class="centered" class:fullSize={fullSizeImg} on:click="{toggleFullSize}">
+      <div class="img-background" class:fullSize={fullSizeImg} on:click="{toggleFullSize}"></div>
     {:else if edit}
       <span class="icon-camera btn centered" on:click="{importer.click()}"></span>
       <input type="file" bind:this={importer} class="importer" on:change={addPicture} accept="image/*" >
@@ -139,5 +146,30 @@
   img{
     max-width: 100%;
     max-height: 100%;
+  }
+
+  img.fullSize{
+    position: fixed;
+    left: 50vw;
+    top: 50vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    z-index: 1000;
+    transform: translate(-50%, -50%);
+  }
+
+  .img-background{
+    display: none;
+  }
+  .img-background.fullSize{
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #494949;
+    opacity: .8;
+    z-index: 900;
   }
 </style>

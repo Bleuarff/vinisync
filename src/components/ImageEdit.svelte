@@ -114,6 +114,7 @@
     {#if imageUrl}
       <!-- TODO: if edit, onclick on image to change it (change/remove/rotate) -->
       <img src={imageUrl} class="centered" class:fullSize={fullSizeImg} on:click="{toggleOrRotate}" on:dblclick="{resetFullsize}">
+      {#if edit && file}<span class="filesize">{(file.size / 1e3).toFixed(0)} kb</span>{/if}
       <div class="img-background" class:fullSize={fullSizeImg} on:click="{resetFullsize}"></div>
     {:else if edit}
       <span class="icon-camera btn centered" on:click="{importer.click()}"></span>
@@ -181,5 +182,16 @@
     background: #494949;
     opacity: .8;
     z-index: 900;
+  }
+
+  .filesize{
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    color: #202020;
+    background: white;
+    border-radius: 2px;
+    font-size: .8em;
+    padding: .1em .2em;
   }
 </style>

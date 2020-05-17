@@ -92,9 +92,19 @@
     imageUrl = null
   }
 
-  function toggleFullSize(e){
-    // e.currentTarget.classList.toggle('fullSize')
-    fullSizeImg = !fullSizeImg
+  let angle = 90
+  function toggleOrRotate(e){
+    if (!fullSizeImg)
+      fullSizeImg = true
+    else{
+      e.currentTarget.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`
+      // console.debug('rotate ' + angle)
+      angle = (angle + 90) % 360
+    }
+  }
+
+  function resetFullsize(){
+    fullSizeImg = false
   }
 
 </script>
@@ -103,8 +113,8 @@
   <div class="image-editor">
     {#if imageUrl}
       <!-- TODO: if edit, onclick on image to change it (change/remove/rotate) -->
-      <img src={imageUrl} class="centered" class:fullSize={fullSizeImg} on:click="{toggleFullSize}">
-      <div class="img-background" class:fullSize={fullSizeImg} on:click="{toggleFullSize}"></div>
+      <img src={imageUrl} class="centered" class:fullSize={fullSizeImg} on:click="{toggleOrRotate}" on:dblclick="{resetFullsize}">
+      <div class="img-background" class:fullSize={fullSizeImg} on:click="{resetFullsize}"></div>
     {:else if edit}
       <span class="icon-camera btn centered" on:click="{importer.click()}"></span>
       <input type="file" bind:this={importer} class="importer" on:change={addPicture} accept="image/*" >

@@ -27,7 +27,6 @@ export async function resize(file){
   const ctx = canvas.getContext('2d')
   ctx.drawImage(img, 0, 0, targetSize.width, targetSize.height)
   const newFile = await getBlob(ctx, file.type)
-  // TODO: resize. See https://zocada.com/compress-resize-images-javascript-browser/
   return newFile
 }
 
@@ -35,7 +34,7 @@ function getBlob(ctx, mime){
   return new Promise((resolve, reject) => {
     ctx.canvas.toBlob(blob => {
       resolve(new Blob([blob], {type: mime}))
-    }, mime)
+    }, mime, .92)
   })
 }
 

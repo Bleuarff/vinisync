@@ -1,6 +1,6 @@
 const MAX_FILE_SIZE = 500 * 1024,
-      MAX_WIDTH = 700,
-      MAX_HEIGHT = 700
+      MAX_WIDTH = 1000,
+      MAX_HEIGHT = 1000
 
 export async function resize(file){
   // Resize method & size validation

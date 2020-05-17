@@ -107,21 +107,26 @@
     fullSizeImg = false
   }
 
+  function changeImage(){
+    if (!edit) return
+    importer.click()
+  }
+
 </script>
 
 {#if imageUrl || edit}
   <div class="image-editor">
     {#if imageUrl}
       <!-- TODO: if edit, onclick on image to change it (change/remove/rotate) -->
-      <img src={imageUrl} class="centered" class:fullSize={fullSizeImg} on:click="{toggleOrRotate}" on:dblclick="{resetFullsize}">
-      {#if edit && file}<span class="filesize">{(file.size / 1e3).toFixed(0)} kb</span>{/if}
+      <img src={imageUrl} class="centered" class:fullSize={fullSizeImg} on:click="{toggleOrRotate}" on:dblclick="{changeImage}">
+      {#if edit && file}<span class="filesize">{(file.size / 1e3).toFixed(0)}kb</span>{/if}
       <div class="img-background" class:fullSize={fullSizeImg} on:click="{resetFullsize}"></div>
     {:else if edit}
       <span class="icon-camera btn centered" on:click="{importer.click()}"></span>
-      <input type="file" bind:this={importer} class="importer" on:change={addPicture} accept="image/*" >
     {/if}
   </div>
 {/if}
+<input type="file" bind:this={importer} class="importer" on:change={addPicture} accept="image/*" >
 
 <style>
   .image-editor{

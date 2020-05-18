@@ -245,6 +245,10 @@ async function decrement(){
     margin-bottom: .6em;
   }
 
+  .headers{
+    flex-grow: 1;
+  }
+
   input{
     border: none;
     border-bottom: 1px solid var(--main-color-light);

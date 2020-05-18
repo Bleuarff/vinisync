@@ -17,11 +17,25 @@ class SyncMgr{
       const config = await this._getConfig()
 
       // get all entries, send each one to server. On failure, save to dedicated table in db
-      // TODO: all entries currently sent in a burst. We should be waiting for each one (+ timeout?) before sending the next one.
       const entries = await repo.getAll('entries')
-      entries.forEach(async entry => {
-        await this._sendDiff('entry', entry, config)
-      })
+      await entries.reduce(async (prom, entry) => {
+        await prom
+        return this._sendDiff('entry', entry, config)
+      }, Promise.resolve())
+
+      const images = await repo.getAll('images')
+      await images.reduce(async (prom, img) => {
+        await prom
+        img.blob = await new Promise(resolve => {
+          const fr = new FileReader()
+          fr.addEventListener('load', e => {
+            resolve(fr.result.split(',')[1])
+          }, false)
+          fr.readAsDataURL(img.blob)
+        })
+        return this._sendDiff('picture', img, config)
+      }, Promise.resolve())
+
     }
     catch(ex){
       if (ex.message === 'SYNC_NOT_CONFIGURED')
@@ -94,8 +108,11 @@ class SyncMgr{
           case 'entry':
             await this._mergeEntry(update)
             break
+          case 'picture':
+            await this._mergePicture(update)
+            break
           default:
-            console.error('"${update.type}" type of update is not supported')
+            console.error(`"${update.type}" type of update is not supported`)
         }
       }, Promise.resolve())
 
@@ -149,9 +166,38 @@ class SyncMgr{
     }
   }
 
+  async _mergePicture(update){
+    const remotePicture = update.changes
+    let localPicture = await repo.getOne('images', remotePicture.id)
+
+    if (localPicture){
+      // local edited after remote, conflict !!
+      if (localPicture.lastUpdateDate > update.ts){
+        console.log('picture conflict')
+        return
+      }
+
+      localPicture = this._deepAssign(localPicture, remotePicture)
+      await repo.updateDoc('images', localPicture)
+    }
+    else{ // unknown picture
+      // convert base64 string to blob
+      remotePicture.blob = await new Promise(async (resolve, reject) => {
+        // mime type is just to make it a valid data url, not related to actual mime type of image
+        const res = await fetch('data:image/jpeg;base64,' + remotePicture.blob),
+              blob = await res.blob()
+        resolve(blob)
+      })
+      await repo.insertOne('images', remotePicture)
+      console.debug(`picture created from update ${update.id}`)
+    }
+  }
+
   // like Object.assign but recursive
   _deepAssign(target, changes){
     Object.entries(changes).forEach(([key, value]) => {
+      if (value instanceof Blob)
+        target[key] = value
       if (typeof value === 'object')
         target[key] = this._deepAssign(target[key], value)
       else

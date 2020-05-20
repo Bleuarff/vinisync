@@ -42,7 +42,7 @@
       dispatch('notif', {text: 'email invalide', err: true})
 
     if (config.userkey){
-      config.userkey = config.userkey.replace(/[\s-]+/g, '')
+      config.userkey = config.userkey.replace(/[\s-]+/g, '').toUpperCase()
       if (!verifyChecksum(config.userkey))
         dispatch('notif', {text: 'clef de sync invalide', err: true})
     }
@@ -60,6 +60,7 @@
     config.enabled = true
     await repo.insertOne('config', config)
     await repo.deleteAll('entries') // delete all local entries
+    await repo.deleteAll('images')
 
     syncMgr.checkUpdates() // request updates from server
     // config.enabled = true // TODO: activate sync in the future

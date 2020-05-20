@@ -92,7 +92,7 @@ async function save(){
     if (!imgOk)
       msg += '\nErreur sauvegarde de l\'image'
 
-    console.log('sync update')
+    console.log('sync update: entry')
     syncMgr.syncIt(entry, refEntry, 'entry', 'entries')
 
     edit = false

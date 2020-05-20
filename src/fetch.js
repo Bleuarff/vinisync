@@ -1,6 +1,6 @@
 // Wrapper around fetch
 
-const host = '//localhost:5002',
+const host = '//192.168.9.226:5002',
       TIMEOUT = 30 * 1e3
 
 function LogicException(data) {
@@ -13,6 +13,7 @@ function LogicException(data) {
 export async function send(path, method = 'GET', data = {}){
   const options = {
     method: method,
+    mode: 'cors',
     headers: {}
   }
 

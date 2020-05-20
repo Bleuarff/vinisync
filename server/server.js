@@ -1,7 +1,9 @@
 'use strict'
 
 const restify = require('restify'),
-      db = require('./db.js')
+      db = require('./db.js'),
+      moment = require('moment')
+
 const dbConnectionString = 'mongodb://localhost:27017'
 
 let server,
@@ -28,7 +30,7 @@ void async function(){
 
   server.use(restify.plugins.acceptParser(server.acceptable))
   server.use((req, res, next) => {
-    console.log(`${req.method} ${req.getPath()}`)
+    console.log(`[${moment().format('HH:mm:ss')}]${req.method} ${req.getPath()}`)
     return next()
   })
 

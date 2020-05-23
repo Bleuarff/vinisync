@@ -57,6 +57,10 @@ onMount(async () => {
           entry = await repo.getOne('entries', params.id)
       })
     }
+    else{
+      dispatch('notif', {text: `L'entrée n'existe pas`, err: true})
+      return router('/wines')
+    }
   }
 })
 
@@ -204,7 +208,7 @@ async function decrement(){
     <p>Cannot retrieve entry {params.id}</p>
   {/if}
 
-  {#if params.id}
+  {#if params.id && entry}
     <div class="timestamps">creation {entry.creationDate.substring(0, 16)} - MaJ {entry.lastUpdateDate.substring(0, 16)}</div>
   {/if}
 </div>

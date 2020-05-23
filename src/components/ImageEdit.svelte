@@ -2,6 +2,7 @@
   import { onMount, onDestroy} from 'svelte'
   import { repo } from '../storage.js'
   import { resize } from '../imageEditor.js'
+  import syncMgr from '../syncMgr.js'
   import { v4 as uuid} from 'uuid'
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher()
@@ -11,7 +12,7 @@
 
   let imageUrl = null // data-url to image file
   let file = null // file object returned by file importer
-  let imgDoc = null // db doc
+  let refPic = null // db doc
   let fullSizeImg = false
 
   let importer // fileImporter node
@@ -23,8 +24,8 @@
     try{
       const data = await file.arrayBuffer(),
             imgBlob = new Blob([data])
-
-      if (imgDoc){
+      let imgDoc = null
+      if (refPic){
         // TODO modified image
       }
       else
@@ -38,6 +39,10 @@
         repo.insertOne('images', imgDoc)
         file = null // won't overwrite file if click again without any other file upload
       }
+
+      console.log('sync update: picture')
+
+      syncMgr.syncIt(imgDoc, refPic, 'picture', 'images')
 
       return true
     }
@@ -53,11 +58,14 @@
     if (entryId){
       // fetch image for the entry
       console.log('get image for entry ' + entryId)
-      repo.findOne('images', x => { return x.entryId === entryId })
-      .then(imgDoc => {
-        if (!imgDoc) return
-        imageUrl = URL.createObjectURL(imgDoc.blob)
-      })
+      try{
+        refPic = await repo.findOne('images', x => { return x.entryId === entryId })
+        if (refPic)
+          imageUrl = URL.createObjectURL(refPic.blob)
+      }
+      catch(ex){
+        dispatch('notif', {text: `Erreur de récuperation de l'image`, err: true})
+      }
     }
   })
 
@@ -72,6 +80,8 @@
   async function addPicture(e){
     try{
       const rawFile = e.currentTarget.files[0]
+
+      if (!rawFile) return
       if (!rawFile.type.startsWith('image/')){
         dispatch('notif', {text: 'Le fichier selectionné n\'est pas une image' , err: true})
         return

@@ -51,12 +51,14 @@ class SyncMgr{
       const config = await this._getConfig()
       let diff
       if (ref != null){
-        diff = Utils.getDiff(obj, ref)
+        diff = await Utils.getDiff(obj, ref)
         if (diff == null)
           return // no diff, nothing to sync
         diff.id = obj.id
       }
       else{
+        if (type === 'picture' && obj.blob instanceof Blob)
+          obj.blob = await Utils.getBlobAsBase64(obj.blob)
         diff = obj // no reference object means new document, send all
       }
 

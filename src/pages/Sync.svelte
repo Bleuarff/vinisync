@@ -4,6 +4,7 @@
   import { send } from '../fetch.js'
   import syncMgr from '../syncMgr.js'
   import { v4 as uuid } from 'uuid'
+  import moment from 'moment'
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher();
   export let params = {}
@@ -158,6 +159,7 @@
     Pour synchroniser un autre appareil, aller sur la page de synchro et rentrer l'email associé et votre clé.
   </p>
   <p>Email associé: {config.email}</p>
+  <p>Dernière synchronisation le {moment(config.lastSync).format('DD/MM à HH:mm')}</p>
   <button on:click="{() => {showKey = !showKey}}">{showKey ? 'Masquer' : 'Voir'} la clé</button>
   {#if showKey}
     <p>

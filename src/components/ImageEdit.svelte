@@ -19,7 +19,7 @@
 
   // returns true if everything is ok, false otherwise
   export async function save(entryId){
-    if (!file || !entryId) return
+    if (!file || !entryId) return true
 
     try{
       const data = await file.arrayBuffer(),

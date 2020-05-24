@@ -1,7 +1,7 @@
 <script>
   import { fly } from 'svelte/transition';
-  // TODO:
-  // - force sync button
+  import syncMgr from '../syncMgr.js'
+
   export let path = ''
   let visible = true
   let debouncer = 0
@@ -21,6 +21,10 @@
     debouncer = ts
 	})
 
+  function forceSync(){
+    syncMgr.checkUpdates(null, true)
+  }
+
 </script>
 
 {#if visible}
@@ -28,7 +32,8 @@
     <div id="inner">
       <a href="/">V</a>
       <a href="/stats" class="icon-chart-bar"></a>
-      <span class="icon-arrows-cw"></span>
+      <a href="/sync" class="icon-cog-outline" title="Synchronisation"></a>
+      <button class="icon-arrows-cw force-sync" title="Forcer la synchro" on:click={forceSync}></button>
     </div>
   </div>
 {/if}
@@ -56,5 +61,14 @@
 		text-decoration: none;
 		color: unset;
 	}
+
+  .force-sync{
+    color: white;
+    background: transparent;
+    padding: 0;
+    border: none;
+    margin: 0;
+    float: right;
+  }
 
 </style>

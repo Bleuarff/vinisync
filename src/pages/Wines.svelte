@@ -63,9 +63,6 @@ function sort(){
   <a href="/import">Importer</a>
 </div>
 {/if}
-<div>
-  <a href="/sync">Sync</a>
-</div>
 
 <style>
   :root{

@@ -40,12 +40,12 @@
   // activate sync
   async function setSync(){
     if (!/.+@.+/.test(config.email))
-      dispatch('notif', {text: 'email invalide', err: true})
+      return dispatch('notif', {text: 'email invalide', err: true})
 
     if (config.userkey){
       config.userkey = config.userkey.replace(/[\s-]+/g, '').toUpperCase()
       if (!verifyChecksum(config.userkey))
-        dispatch('notif', {text: 'clef de sync invalide', err: true})
+        return dispatch('notif', {text: 'clef de sync invalide', err: true})
     }
 
     if (!config.devid)
@@ -64,7 +64,6 @@
     await repo.deleteAll('images')
 
     syncMgr.checkUpdates() // request updates from server
-    // config.enabled = true // TODO: activate sync in the future
   }
 
   async function createSync(){
@@ -159,7 +158,7 @@
     Pour synchroniser un autre appareil, aller sur la page de synchro et rentrer l'email associé et votre clé.
   </p>
   <p>Email associé: {config.email}</p>
-  <p>Dernière synchronisation le {moment(config.lastSync).format('DD/MM à HH:mm')}</p>
+  <p>Dernière synchronisation le {moment(config.lastSync).format('DD/MM/YYYY à HH:mm')}</p>
   <button on:click="{() => {showKey = !showKey}}">{showKey ? 'Masquer' : 'Voir'} la clé</button>
   {#if showKey}
     <p>

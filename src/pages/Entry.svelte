@@ -53,8 +53,11 @@ onMount(async () => {
       refEntry = Utils.deepClone(entry)
       syncMgr.checkUpdates(params.id)
       .then(async updated => {
-        if (updated)
+        if (updated){
           entry = await repo.getOne('entries', params.id)
+          console.debug('entry updated: reload picture')
+          imageEditor.loadPicture(entry.id)
+        }
       })
     }
     else{
@@ -129,7 +132,7 @@ function sanitizeEntry(){
 }
 
 async function increment(){
-  entry.count = entry.count + 1
+  entry.count += 1
   await save()
 }
 

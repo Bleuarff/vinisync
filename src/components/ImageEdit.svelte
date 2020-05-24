@@ -55,11 +55,19 @@
   }
 
   onMount(async () => {
-    console.log('onMount')
     await repo.open()
+    loadPicture(entryId)
+  })
+
+  // release image data when unmounting component
+  onDestroy(() => {
+    if (imageUrl)
+      URL.revokeObjectURL(imageUrl)
+  })
+
+  export async function loadPicture(entryId){
     if (entryId){
       // fetch image for the entry
-      console.log('get image for entry ' + entryId)
       try{
         refPic = await repo.findOne('images', x => { return x.entryId === entryId })
         if (refPic)
@@ -69,14 +77,7 @@
         dispatch('notif', {text: `Erreur de récuperation de l'image`, err: true})
       }
     }
-  })
-
-  onDestroy(() => {
-    console.log('revoke img url')
-    // release image data when unmounting component
-    if (imageUrl)
-      URL.revokeObjectURL(imageUrl)
-  })
+  }
 
   // load image file
   async function addPicture(e){

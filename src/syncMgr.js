@@ -5,7 +5,7 @@ import { v4 as uuid} from 'uuid'
 import moment from 'moment'
 
 const SYNC_INTERVAL = 1, // minimum interval between 2 update checks, in minutes
-      PENDING_RETRY_INTERVAL = 30*1000 //3600 * 1000 // interval at which we check for pending updates to sync, in milliseconds
+      PENDING_RETRY_INTERVAL = 3600 * 1000 // interval at which we check for pending updates to sync, in milliseconds
 
 class SyncMgr{
   constructor(){}
@@ -55,6 +55,8 @@ class SyncMgr{
         if (diff == null)
           return // no diff, nothing to sync
         diff.id = obj.id
+        if (type === 'picture') // add entryId so that receiving client can tell if an update is for entry picture
+          diff.entryId = obj.entryId
       }
       else{
         if (type === 'picture' && obj.blob instanceof Blob)
@@ -74,14 +76,17 @@ class SyncMgr{
   }
 
   // requests server for updates.
+  // Returns whether any updates were downloaded
+  // notifyId: (string) returns true only if there's an update for the given id or entryId
+  // forced: (boolean) set to true to perform a check even if sync time interval is not elapsed.
   async checkUpdates(notifyId = null, forced = false){
     try{
       // get sync info
       const config = await this._getConfig()
 
-      // sync only if forced or last sync is at least an hour ago
+      // sync only if forced or last sync is older than minimum time interval between syncs
       if (!forced && moment().utc().diff(moment(config.lastSync), 'minute') < SYNC_INTERVAL)
-        return
+        return false
 
       let updates = [] // updates received for this sync request
       let paginated = false
@@ -122,10 +127,13 @@ class SyncMgr{
 
       // if notif id set: return whether the given id was in the list of updates.
       // otherwise return whether there were some updates
+      let hasUpdates
       if (typeof notifyId === 'string')
-        return updates.some(x => x.changes && x.changes.id === notifyId)
+        hasUpdates = updates.some(x => x.changes && (x.changes.id === notifyId || x.changes.entryId ===  notifyId))
       else
-        return updates.length > 0
+        hasUpdates = updates.length > 0
+
+      return hasUpdates
     }
     catch(ex){
       if (ex.message === 'SYNC_NOT_CONFIGURED')

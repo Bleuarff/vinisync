@@ -5,7 +5,7 @@ import { v4 as uuid} from 'uuid'
 import moment from 'moment'
 
 const SYNC_INTERVAL = 1, // minimum interval between 2 update checks, in minutes
-      PENDING_RETRY_INTERVAL = 2*60*1000 //3600 * 1000 // interval at which we check for pending updates to sync, in milliseconds
+      PENDING_RETRY_INTERVAL = 30*1000 //3600 * 1000 // interval at which we check for pending updates to sync, in milliseconds
 
 class SyncMgr{
   constructor(){}
@@ -98,7 +98,7 @@ class SyncMgr{
 
         updates = [...updates, ...data.updates]
         paginated = data.total > updates.length
-        config.lastSync = data.lastSync
+        config.lastSync = data.lastSync // update lastSync for next iteration: pagination
       }
       while(paginated)
 
@@ -178,20 +178,15 @@ class SyncMgr{
         console.log('picture conflict')
         return
       }
-
+      remotePicture.blob = await Utils.getBlobFromBase64(remotePicture.blob)
       localPicture = this._deepAssign(localPicture, remotePicture)
       await repo.updateDoc('images', localPicture)
     }
     else{ // unknown picture
       // convert base64 string to blob
-      remotePicture.blob = await new Promise(async (resolve, reject) => {
-        // mime type is just to make it a valid data url, not related to actual mime type of image
-        const res = await fetch('data:image/jpeg;base64,' + remotePicture.blob),
-              blob = await res.blob()
-        resolve(blob)
-      })
+      remotePicture.blob = await Utils.getBlobFromBase64(remotePicture.blob)
       await repo.insertOne('images', remotePicture)
-      console.debug(`picture created from update ${update.id}`)
+      console.debug(`picture created from update ${update._id}`)
     }
   }
 

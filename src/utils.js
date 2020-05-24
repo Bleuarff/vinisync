@@ -9,14 +9,13 @@ export default class Utils{
     // get ref object's keys, to check if some keys have been removed.
     Object.keys(ref).forEach(key => {
       if (obj[key] == null && ref[key] != null){
-        diff = diff || {}
-        diff[key] = null
-        // HACK: try object spread instead of above
+        diff = {...diff, key: null}
       }
     })
 
     // loop modified object's entries to check for addition & modifications
-    Object.entries(obj).forEach(async ([key, value]) => {
+    await Object.entries(obj).reduce(async (prom, [key, value]) => {
+      await prom
       if (ref[key] == null && value != null){ // key is new in obj
         diff = diff || {}
         if (value instanceof Blob)
@@ -49,7 +48,7 @@ export default class Utils{
           ])
           if (dataRef !== dataObj){
             diff = diff || {}
-            dif[key] = dataObj
+            diff[key] = dataObj
           }
         }
       }
@@ -64,11 +63,12 @@ export default class Utils{
         diff = diff || {}
         diff[key] = value
       }
-    })
+    }, Promise.resolve())
 
     return diff
   }
 
+  // convert blob to base64
   static getBlobAsBase64(blob){
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
@@ -79,6 +79,13 @@ export default class Utils{
     })
   }
 
+  // convert base64 value to blob
+  // mime type is just to make it a valid data url, not related to actual mime type of image
+  static async getBlobFromBase64(value){
+    const res = await fetch('data:image/jpeg;base64,' + value)
+    return res.blob()
+  }
+
   static deepClone(obj){
     if (obj == null) return null
 
@@ -86,6 +93,8 @@ export default class Utils{
     Object.entries(obj).forEach(([key, value]) => {
       if (Array.isArray(value))
         cp[key] = [...value] // array is assumed to contain only primitive types
+      else if (value instanceof Blob)
+        cp[key] === value // no copy for blobs
       else if (typeof value === 'object')
         cp[key] = Utils.deepClone(value)
       else

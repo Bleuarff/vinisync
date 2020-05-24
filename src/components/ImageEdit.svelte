@@ -3,6 +3,7 @@
   import { repo } from '../storage.js'
   import { resize } from '../imageEditor.js'
   import syncMgr from '../syncMgr.js'
+  import Utils from '../utils.js'
   import { v4 as uuid} from 'uuid'
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher()
@@ -24,21 +25,22 @@
     try{
       const data = await file.arrayBuffer(),
             imgBlob = new Blob([data])
-      let imgDoc = null
+      let imgDoc
+
       if (refPic){
-        // TODO modified image
+        imgDoc = Utils.deepClone(refPic)
+        imgDoc.blob = imgBlob
+        repo.updateDoc('images', imgDoc)
       }
-      else
-      {
-        // new image for new or existing entry
+      else{
         imgDoc = {
           id: uuid(),
           entryId: entryId,
           blob: imgBlob
         }
-        repo.insertOne('images', imgDoc)
-        file = null // won't overwrite file if click again without any other file upload
+        imgDoc = await repo.insertOne('images', imgDoc)
       }
+      file = null // won't overwrite file if click again without any other file upload
 
       console.log('sync update: picture')
 

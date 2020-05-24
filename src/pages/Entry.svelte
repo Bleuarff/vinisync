@@ -75,15 +75,22 @@ async function save(){
   }
 
   try{
-    let msg
+    let msg = '',
+        hasModif = true
+
     if (params.id){ // update existing entry
-      // timestamp validation: make sure the reference data before modification
-      //  is the last version (not updated in background during edition process).
-      const dbRef = await repo.getOne('entries', params.id)
-      if (dbRef && (refEntry.lastUpdateDate < dbRef.lastUpdateDate))
-        throw new Error('DB OBJECT EDITED SINCE YOU OPENED IT') // TODO:save for resolution?
-      await repo.updateDoc('entries', entry)
-      msg = 'Mise à jour OK'
+      // compute diff with ref doc. Skip save & sync if no modification
+      hasModif = (await Utils.getDiff(entry, refEntry)) !== null
+
+      if (hasModif){
+        // timestamp validation: make sure the reference data before modification
+        //  is the last version (not updated in background during edition process).
+        const dbRef = await repo.getOne('entries', params.id)
+        if (dbRef && (refEntry.lastUpdateDate < dbRef.lastUpdateDate))
+          throw new Error('DB OBJECT EDITED SINCE YOU OPENED IT') // TODO:save for resolution?
+        await repo.updateDoc('entries', entry)
+        msg = 'Mise à jour OK'
+      }
     }
     else{ // create new entry
       entry.id = uuid()
@@ -96,12 +103,16 @@ async function save(){
     if (!imgOk)
       msg += '\nErreur sauvegarde de l\'image'
 
-    console.log('sync update: entry')
-    syncMgr.syncIt(entry, refEntry, 'entry', 'entries')
+    if (hasModif){
+      console.log('sync update: entry')
+      syncMgr.syncIt(entry, refEntry, 'entry', 'entries')
+    }
 
     edit = false
     refEntry = Utils.deepClone(entry) // refresh reference object after a save
-    dispatch('notif', {text: msg})
+
+    if (msg)
+      dispatch('notif', {text: msg})
   }
   catch(ex){
     console.error(ex)

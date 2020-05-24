@@ -149,14 +149,6 @@ async function decrement(){
         {/if}
       </div>
     </div>
-    <!-- {:else} -->
-      <!-- <div id="img-edit">
-        <ImageEdit entryId={entry.id}></ImageEdit>
-      </div> -->
-      <!-- {#if edit || entry.wine.name}<label>Cuvée</label><input bind:value={entry.wine.name} type="text" readonly={!edit}>{/if} -->
-      <!-- <FormText bind:value={entry.wine.name} readonly={!edit} label="Cuvée" placeholder="Vigneron Inconnu"></FormText>
-      <FormText bind:value={entry.wine.producer} readonly={!edit} label="Producteur" placeholder="Guigal"></FormText> -->
-    <!-- {/if } -->
 
     <FormText bind:value={entry.wine.appellation} readonly={!edit} label="Appellation" placeholder="Jasnières"></FormText>
     <div class="line">
@@ -197,12 +189,8 @@ async function decrement(){
       </div>
     {/if}
 
-    <label>Emplacement</label>
-    {#if edit}
-      <input type="text" bind:value={entry.location} placeholder="Armoire">
-    {:else}
-      <span>{entry.location}</span>
-    {/if}
+    <FormText bind:value={entry.location} readonly={!edit} label="Emplacement" placeholder="Cave 1, etagère 3" type="text"></FormText>
+    <FormText bind:value={entry.offeredBy} readonly={!edit} label="Offert par" placeholder="Robert Parker" type="text"></FormText>
 
   {:else}
     <p>Cannot retrieve entry {params.id}</p>

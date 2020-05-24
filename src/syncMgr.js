@@ -159,12 +159,12 @@ class SyncMgr{
 
       // update is later than last local update, we can apply the change
       localEntry = this._deepAssign(localEntry, remoteEntry)
-      await repo.updateDoc('entries', localEntry)
+      await repo.updateDoc('entries', localEntry, true)
     }
     else{
       // entry id is unknown on this device, just create it
       await repo.insertOne('entries', remoteEntry)
-      console.debug(`entry created from update ${update.id}`)
+      console.debug(`entry created from update ${update._id}`)
     }
   }
 
@@ -178,9 +178,10 @@ class SyncMgr{
         console.log('picture conflict')
         return
       }
+      console.debug(`Update picture ${remotePicture.id} at ${update.ts}`)
       remotePicture.blob = await Utils.getBlobFromBase64(remotePicture.blob)
       localPicture = this._deepAssign(localPicture, remotePicture)
-      await repo.updateDoc('images', localPicture)
+      await repo.updateDoc('images', localPicture, true)
     }
     else{ // unknown picture
       // convert base64 string to blob

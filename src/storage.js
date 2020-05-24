@@ -70,7 +70,12 @@ async function findOne(table, query){
 // creates new document in table
 async function insertOne(table, obj){
   try{
-    obj.lastUpdateDate = obj.creationDate = (new Date()).toISOString()
+    const ts = (new Date()).toISOString()
+    if (!obj.lastUpdateDate)
+      obj.lastUpdateDate = ts
+    if (!obj.creationDate)
+      obj.creationDate = ts
+
     await db.add(table, obj)
     return obj
   }
@@ -80,8 +85,13 @@ async function insertOne(table, obj){
   }
 }
 
-async function updateDoc(table, doc){
-  doc.lastUpdateDate = (new Date()).toISOString()
+// table: table name to update
+// doc: document to update
+// keepTime: whether to refresh the lastUpdateDate field. Default: false. Should be true
+// only when update comes from sync
+async function updateDoc(table, doc, keepTime = false){
+  if (!keepTime || !doc.lastUpdateDate)
+    doc.lastUpdateDate = (new Date()).toISOString()
   await db.put(table, doc)
 }
 

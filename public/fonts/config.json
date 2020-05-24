@@ -35,6 +35,12 @@
       "css": "camera",
       "code": 59392,
       "src": "fontawesome"
+    },
+    {
+      "uid": "3a89ddb1c81111c15d6c4e26cc3c546a",
+      "css": "cog-outline",
+      "code": 59393,
+      "src": "typicons"
     }
   ]
 }

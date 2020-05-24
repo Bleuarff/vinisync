@@ -15,6 +15,7 @@
   let file = null // file object returned by file importer
   let refPic = null // db doc
   let fullSizeImg = false
+  let filesize = 0
   let rotation = 0 // picture rotation angle
 
   $: imgStyle = `transform: translate(-50%, -50%) rotate(${rotation}deg)`
@@ -73,8 +74,10 @@
       // fetch image for the entry
       try{
         refPic = await repo.findOne('images', x => { return x.entryId === entryId })
-        if (refPic)
+        if (refPic){
           imageUrl = URL.createObjectURL(refPic.blob)
+          filesize = refPic.blob.size
+        }
       }
       catch(ex){
         dispatch('notif', {text: `Erreur de récuperation de l'image`, err: true})
@@ -94,8 +97,8 @@
       }
       file = await resize(rawFile)
       console.debug(`Resized image size: ${file.size}`)
-      // fileSize = (file.size / 1e3).toFixed(1)
       imageUrl = URL.createObjectURL(file)
+      filesize = file.size
       rotation = 0
     }
     catch(ex){
@@ -138,7 +141,7 @@
       <!-- TODO: if edit, onclick on image to change it (change/remove/rotate) -->
       <img src={imageUrl} class="centered" class:fullSize={fullSizeImg} on:click="{toggleOrRotate}" on:dblclick="{changeImage}"
         style={imgStyle} >
-      {#if edit && file}<span class="filesize">{(file.size / 1e3).toFixed(0)}kb</span>{/if}
+      {#if edit}<span class="filesize">{(filesize / 1e3).toFixed(0)}kb</span>{/if}
       <div class="img-background" class:fullSize={fullSizeImg} on:click="{resetFullsize}"></div>
     {:else if edit}
       <span class="icon-camera btn centered" on:click="{importer.click()}"></span>

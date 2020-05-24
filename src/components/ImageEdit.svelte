@@ -15,6 +15,9 @@
   let file = null // file object returned by file importer
   let refPic = null // db doc
   let fullSizeImg = false
+  let rotation = 0 // picture rotation angle
+
+  $: imgStyle = `transform: translate(-50%, -50%) rotate(${rotation}deg)`
 
   let importer // fileImporter node
 
@@ -93,6 +96,7 @@
       console.debug(`Resized image size: ${file.size}`)
       // fileSize = (file.size / 1e3).toFixed(1)
       imageUrl = URL.createObjectURL(file)
+      rotation = 0
     }
     catch(ex){
       console.error(ex)
@@ -113,9 +117,7 @@
     if (!fullSizeImg)
       fullSizeImg = true
     else{
-      e.currentTarget.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`
-      // console.debug('rotate ' + angle)
-      angle = (angle + 90) % 360
+      rotation = (rotation + 90) % 360
     }
   }
 
@@ -134,7 +136,8 @@
   <div class="image-editor">
     {#if imageUrl}
       <!-- TODO: if edit, onclick on image to change it (change/remove/rotate) -->
-      <img src={imageUrl} class="centered" class:fullSize={fullSizeImg} on:click="{toggleOrRotate}" on:dblclick="{changeImage}">
+      <img src={imageUrl} class="centered" class:fullSize={fullSizeImg} on:click="{toggleOrRotate}" on:dblclick="{changeImage}"
+        style={imgStyle} >
       {#if edit && file}<span class="filesize">{(file.size / 1e3).toFixed(0)}kb</span>{/if}
       <div class="img-background" class:fullSize={fullSizeImg} on:click="{resetFullsize}"></div>
     {:else if edit}
@@ -150,7 +153,6 @@
     height: 150px;
     margin-right: 1em;
     position: relative;
-    /* background: #8b8b8b; */
   }
 
   @media(min-width: 500px){

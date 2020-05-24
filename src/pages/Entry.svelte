@@ -220,7 +220,7 @@ async function decrement(){
     {#if edit}
       <button on:click="{save}">Save</button>
       {#if params.id}
-      <button on:click="{()=>{ edit = false; imageEditor.clear() }}">Annuler</button>
+      <button on:click="{()=>{ edit = false; imageEditor.clearEdit() }}">Annuler</button>
       {/if}
     {:else}
       <button on:click="{()=>{ edit = true }}" class="edit">Edit</button>

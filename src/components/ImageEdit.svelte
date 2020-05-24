@@ -100,9 +100,12 @@
     }
   }
 
-  export function clear(){
-    URL.revokeObjectURL(imageUrl)
-    imageUrl = null
+  export function clearEdit(){
+    if (file){
+      URL.revokeObjectURL(imageUrl)
+      if (entryId)
+        loadPicture(entryId)
+    }
   }
 
   let angle = 90

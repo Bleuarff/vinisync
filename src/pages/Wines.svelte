@@ -4,8 +4,13 @@ import {repo } from '../storage.js'
 import syncMgr from '../syncMgr.js'
 export let params = {}
 
+// IDEA: show sort order in sort icon. Use an overlay with vertical gradient opacity background to hide icon top/bottom.
+
 let entries = []
 let config
+let lastSortField // name of the last field used for sorting
+let lastSortASC // whether last sort was in ascending order
+
 $: bottleCount = entries.reduce((cur, e)=> {return cur + e.count}, 0)
 
 onMount(async () => {
@@ -25,12 +30,57 @@ export async function load(){
   })
 }
 
-function sort(){
+// sort entries on given field
+function sort(field){
+  const manual = !!field // whether sort is due to user action
+  let asc // sort order true: ascending, false: descending
+  field = field || 'year' // default field
+
+  switch(field){
+    // numbers defaut to descending order
+    case 'year':
+    case 'count':
+      asc = (lastSortField === field && manual) ? !lastSortASC : false
+    break
+    // strings default to ascending order
+    case 'appellation':
+    case 'producer':
+      asc = (lastSortField === field && manual) ? !lastSortASC : true
+    break
+  }
+
   entries.sort((a, b) => {
-    if (a.wine.year < b.wine.year) return 1
-    else if (a.wine.year > b.wine.year) return -1
+    let valA, valB
+    switch(field){
+      case 'year':
+      case 'appellation':
+        valA = a.wine[field]
+        valB = b.wine[field]
+        break
+      case 'producer':
+        // if producer is falsy, use wine name instead
+        valA = a.wine.producer || a.wine.name
+        valB = b.wine.producer || b.wine.name
+        break
+      case 'count':
+        valA = a.count
+        valB = b.count
+        break
+    }
+    // falsy values should be at the bottom in default sort.
+    // for string fields, that means reversing the sort order for false values
+    if (['appellation', 'producer'].includes(field) && (!valA || !valB)){
+      if (!valA && !valB) return 0
+      else if (!valA) return asc ? 1 : -1
+      else if (!valB) return asc ? -1 : 1
+    }
+    else if (valA < valB) return asc ? -1 : 1
+    else if (valA > valB) return asc ? 1 : -1
     else return 0
   })
+
+  lastSortField = field
+  lastSortASC = asc
   return entries
 }
 
@@ -42,6 +92,12 @@ function sort(){
   <p><span class="bold">{entries.length}</span> references et <span class="bold">{bottleCount}</span> bouteilles en cave.</p>
 
   <div id="entries">
+    <div class="entry sort-ctnr">
+      <span class="year icon-sort" class:selected="{lastSortField === 'year'}" on:click="{e => entries = sort('year')}"></span>
+      <div class="names icon-sort" class:selected="{lastSortField === 'producer'}" on:click="{e => entries = sort('producer')}"></div>
+      <div class="app icon-sort" class:selected="{lastSortField === 'appellation'}" on:click="{e => entries = sort('appellation')}"></div>
+      <span class="count icon-sort" class:selected="{lastSortField === 'count'}" on:click="{e => entries = sort('count')}"></span>
+    </div>
     {#each entries as entry}
       <a href="/entry/{entry.id}" class="entry">
         <span class="year {entry.wine.color}" >{entry.wine.year || ''}</span>
@@ -87,7 +143,7 @@ function sort(){
   font-weight: bold;
 }
 
-a.entry{
+.entry{
   text-decoration: none;
   color: unset;
   padding: var(--vt-row-padding) 2px;
@@ -98,16 +154,40 @@ a.entry{
   min-height: var(--min-row-height);
   vertical-align: middle;
 }
-.entry:nth-child(2n+1){
+.entry:nth-child(2n){
     background: #eeeeee;
 }
 .entry:hover{
   background: #daeeff;
 }
 
+.sort-ctnr{
+  min-height: auto;
+  background: transparent !important;
+  padding-bottom: .5em;
+}
+.sort-ctnr .year,
+.sort-ctnr .count{
+  margin: 0;
+  padding: 0;
+  height: auto;
+}
+.sort-ctnr .year{
+  text-align: left;
+}
+.sort-ctnr .app{
+  text-align: right;
+  min-width: 3em;
+}
+.sort-ctnr .count{
+}
+
+.icon-sort.selected{
+  color: #8c0101;
+}
+
 .year{
   flex: 0 0 3em;
-  /* width: 3em; */
   text-align: center;
   border-radius: 3px;
   align-self: flex-start;

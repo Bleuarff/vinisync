@@ -27,7 +27,6 @@
 
 
   onMount(async () => {
-    console.log('mount /sync')
     try{
       await repo.open()
       config = (await repo.getOne('config', config.key)) || config

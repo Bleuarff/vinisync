@@ -1,12 +1,10 @@
 <script>
-  import { fly } from 'svelte/transition';
-  import syncMgr from '../syncMgr.js'
+  import { fly } from 'svelte/transition'
+  import { createEventDispatcher } from 'svelte'
+  const dispatch = createEventDispatcher()
 
-  export let path = ''
   let visible = true
   let debouncer = 0
-
-  // $: home = path === '/'
   let lastScrollY = 0
 
   window.addEventListener('scroll', e => {
@@ -21,10 +19,6 @@
     debouncer = ts
 	})
 
-  function forceSync(){
-    syncMgr.checkUpdates(null, true)
-  }
-
 </script>
 
 {#if visible}
@@ -33,7 +27,7 @@
       <a href="/">V</a>
       <a href="/stats" class="icon-chart-bar"></a>
       <a href="/sync" class="icon-cog-outline" title="Synchronisation"></a>
-      <button class="icon-arrows-cw force-sync" title="Forcer la synchro" on:click={forceSync}></button>
+      <button class="icon-arrows-cw force-sync" title="Forcer la synchro" on:click="{()=>{dispatch('sync-request')}}"></button>
     </div>
   </div>
 {/if}

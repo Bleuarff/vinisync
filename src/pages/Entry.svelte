@@ -44,7 +44,11 @@ let edit = false,
 
 onMount(async () => {
   await repo.open()
+  load()
+})
 
+export async function load(){
+  // console.debug('log entry')
   refEntry = null
   edit = !params.id
   if (params.id){
@@ -56,7 +60,7 @@ onMount(async () => {
         if (updated){
           entry = await repo.getOne('entries', params.id)
           console.debug('entry updated: reload picture')
-          imageEditor.loadPicture(entry.id)
+          imageEditor.load(entry.id)
         }
       })
     }
@@ -65,7 +69,7 @@ onMount(async () => {
       return router('/wines')
     }
   }
-})
+}
 
 // validation, save logic & sync
 async function save(){

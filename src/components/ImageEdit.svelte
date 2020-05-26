@@ -60,7 +60,7 @@
 
   onMount(async () => {
     await repo.open()
-    loadPicture(entryId)
+    load(entryId)
   })
 
   // release image data when unmounting component
@@ -69,7 +69,7 @@
       URL.revokeObjectURL(imageUrl)
   })
 
-  export async function loadPicture(entryId){
+  export async function load(entryId){
     if (entryId){
       // fetch image for the entry
       try{
@@ -111,7 +111,7 @@
     if (file){
       URL.revokeObjectURL(imageUrl)
       if (entryId)
-        loadPicture(entryId)
+        load(entryId)
     }
   }
 

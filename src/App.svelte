@@ -9,10 +9,12 @@
 	import TitleBar from './components/TitleBar.svelte'
 	import syncMgr from './syncMgr.js'
 
-	let page
-	let path
-	let params
+	let page,
+			currentComponent // component instance
+	let path // url pathname
+	let params // router path parameters
 	let notif // notif child component
+	// let name // page name
 
 	router('/', getPath, () => page = Wines)
 	router('/wines', getPath, () => page = Wines)
@@ -20,13 +22,12 @@
 		params = ctx.params
 		next()
 	}, () => page = Entry)
-	router('/import', () => page = Import)
-	router('/sync', () => page = Sync)
+	router('/import', getPath, () => page = Import)
+	router('/sync', getPath, () => page = Sync)
 	router.start()
 
 	function getPath(ctx, next){
 		path = ctx.path
-		// console.log('path: '+ path)
 		next()
 	}
 
@@ -35,12 +36,30 @@
 		syncMgr.pendingMonitor()
 	})
 
+	async function forceSync(){
+		try{
+			let notifyId
+			if (currentComponent instanceof Entry)
+				notifyId = params.id
+
+			const hasUpdates = await syncMgr.checkUpdates(notifyId, true)
+			if (hasUpdates && typeof currentComponent.load === 'function'){
+				currentComponent.load()
+				notif.show({text: 'Mise à jour OK'})
+			}
+		}
+		catch(ex){
+			console.error(ex)
+			notif.show({text: 'Erreur de synchro', err: true})
+		}
+	}
+
 </script>
 
 <main>
-	<TitleBar path={path}></TitleBar>
+	<TitleBar on:sync-request={forceSync}></TitleBar>
 
-	<svelte:component this={page} params={params} on:notif="{e => {notif.show(e.detail)}}"/>
+	<svelte:component this={page} bind:this={currentComponent} params={params} on:notif="{e => {notif.show(e.detail)}}"/>
 
 	<Notif bind:this={notif}></Notif>
 </main>

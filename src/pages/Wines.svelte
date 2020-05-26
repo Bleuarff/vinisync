@@ -10,6 +10,11 @@ $: bottleCount = entries.reduce((cur, e)=> {return cur + e.count}, 0)
 
 onMount(async () => {
   await repo.open()
+  load()
+  config = await repo.getOne('config', 'sync')
+})
+
+export async function load(){
   entries = await repo.getAll('entries')
   entries = sort()
   syncMgr.checkUpdates()
@@ -18,8 +23,7 @@ onMount(async () => {
       entries = await repo.getAll('entries')
       entries = sort()
   })
-  config = await repo.getOne('config', 'sync')
-})
+}
 
 function sort(){
   entries.sort((a, b) => {

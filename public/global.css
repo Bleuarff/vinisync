@@ -3,7 +3,7 @@
 }
 
 :root {
-  --main-color: #25080e;
+  --main-color: #ba0e0e;
 	--main-color-light: #791a1a8a;
 }
 
@@ -98,4 +98,9 @@ button:not(:disabled):active {
 
 button:focus {
 	border-color: #666;
+}
+
+/* cancels main horizontal space */
+.wide{
+  margin: 0 -.8em 1.5em;
 }

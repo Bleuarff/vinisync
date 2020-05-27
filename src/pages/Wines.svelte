@@ -2,6 +2,7 @@
 import { onMount } from 'svelte'
 import {repo } from '../storage.js'
 import syncMgr from '../syncMgr.js'
+import Filters from '../components/Filters.svelte'
 export let params = {}
 
 // IDEA: show sort order in sort icon. Use an overlay with vertical gradient opacity background to hide icon top/bottom.
@@ -91,13 +92,16 @@ function sort(field){
   <h2>Mes vins</h2>
   <p><span class="bold">{entries.length}</span> references et <span class="bold">{bottleCount}</span> bouteilles en cave.</p>
 
-  <div id="entries">
+  <Filters></Filters>
+
+  <div id="entries" class="wide">
     <div class="entry sort-ctnr">
       <span class="year icon-sort" class:selected="{lastSortField === 'year'}" on:click="{e => entries = sort('year')}"></span>
       <div class="names icon-sort" class:selected="{lastSortField === 'producer'}" on:click="{e => entries = sort('producer')}"></div>
       <div class="app icon-sort" class:selected="{lastSortField === 'appellation'}" on:click="{e => entries = sort('appellation')}"></div>
       <span class="count icon-sort" class:selected="{lastSortField === 'count'}" on:click="{e => entries = sort('count')}"></span>
     </div>
+
     {#each entries as entry}
       <a href="/entry/{entry.id}" class="entry">
         <span class="year {entry.wine.color}" >{entry.wine.year || ''}</span>
@@ -133,7 +137,6 @@ function sort(field){
 #entries{
   display: flex;
   flex-flow: column nowrap;
-  margin: 0 -.8em 1.5em;
 }
 
 /* .entry > * {

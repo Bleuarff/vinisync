@@ -10,5 +10,12 @@ Chrome and Firefox only. Not even tested once on other browsers, because I don't
 
 ## Run dev
 
-bundler: `npm run dev`
-server: `node server/server.js`
+bundler:
+````
+npm run dev
+````
+
+server:
+````
+node server/server.js
+````

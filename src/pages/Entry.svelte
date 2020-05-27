@@ -168,7 +168,8 @@ async function decrement(){
       </div>
     </div>
 
-    <FormText bind:value={entry.wine.appellation} readonly={!edit} label="Appellation" placeholder="Jasnières"></FormText>
+    <FormText bind:value={entry.wine.appellation} readonly={!edit} label="Appellation" placeholder="Jasnières" datasource="appellation">
+    </FormText>
     <div class="line">
       {#if edit || entry.wine.year}
       <div class="year">

@@ -1,12 +1,16 @@
 <script>
 import { tick } from 'svelte'
+import Autocomplete from './Autocomplete.svelte'
+
 export let value = ''
 export let label = ''
 export let readonly = true
 export let placeholder = ''
 export let type = 'text'
+export let datasource = ''
 
 let inputNd
+let autocomplete = null // Autocomplete instance
 
 $: if (!readonly && type === 'text'){
   void async function(){
@@ -36,7 +40,13 @@ function resize(e){
     <span class="readonly">{value} {#if type === 'containing'}{containingUnit}{/if}</span>
   {:else if type === 'text'}
     <textarea bind:value wrap="soft" bind:this={inputNd} rows="1" placeholder={placeholder}
-      on:input={resize} on:focus={resize} on:change={resize} class="input"></textarea>
+      on:input={resize} on:focus={resize} on:change={resize} class="input"
+      on:focus={autocomplete.show()} on:blur={autocomplete.hide}></textarea>
+    {#if datasource}
+      <Autocomplete source={datasource} bind:this={autocomplete} bind:value></Autocomplete>
+    {/if}
+
+
   {:else if type === 'year'}
     <input type="number" bind:value class="input">
   {:else if type=== 'containing'}

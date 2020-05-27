@@ -43,7 +43,7 @@
     font-size: 1.2em;
     padding: 5px 10px;
     border-bottom: 1px solid white;
-    z-index: 10;
+    z-index: 100;
   }
 
   #inner{

@@ -1,5 +1,5 @@
 <script>
-  import { onMount, onDestroy} from 'svelte'
+  import { onDestroy} from 'svelte'
   import { repo } from '../storage.js'
   import { resize } from '../imageEditor.js'
   import syncMgr from '../syncMgr.js'
@@ -57,11 +57,6 @@
       return false
     }
   }
-
-  onMount(async () => {
-    await repo.open()
-    load(entryId)
-  })
 
   // release image data when unmounting component
   onDestroy(() => {

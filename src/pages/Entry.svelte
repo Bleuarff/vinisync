@@ -11,6 +11,7 @@ import Utils from '../utils.js'
 import { v4 as uuid} from 'uuid'
 import router from 'page'
 import { createEventDispatcher } from 'svelte'
+import moment from 'moment'
 const dispatch = createEventDispatcher();
 
 export let params
@@ -55,6 +56,7 @@ export async function load(){
     entry = await repo.getOne('entries', params.id)
     if (entry){
       refEntry = Utils.deepClone(entry)
+      imageEditor.load(entry.id)
       syncMgr.checkUpdates(params.id)
       .then(async updated => {
         if (updated){
@@ -216,7 +218,8 @@ async function decrement(){
   {/if}
 
   {#if params.id && entry}
-    <div class="timestamps">creation {entry.creationDate.substring(0, 16)} - MaJ {entry.lastUpdateDate.substring(0, 16)}</div>
+    <!-- TODO: display local time -->
+    <div class="timestamps">création {moment(entry.creationDate).format('DD/MM/YYYY HH:mm')} - MàJ {moment(entry.lastUpdateDate).format('DD/MM/YYYY HH:mm')}</div>
   {/if}
 </div>
 
@@ -258,6 +261,7 @@ async function decrement(){
 
   .headers{
     flex-grow: 1;
+    padding: 0 1em;
   }
 
   input{

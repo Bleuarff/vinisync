@@ -92,7 +92,7 @@ function sort(field){
   <h2>Mes vins</h2>
   <p><span class="bold">{entries.length}</span> references et <span class="bold">{bottleCount}</span> bouteilles en cave.</p>
 
-  <Filters></Filters>
+  <Filters source="{entries.map(x => {return {year: x.wine.year, appellation: x.wine.appellation, producer: x.wine.producer}})}"></Filters>
 
   <div id="entries" class="wide">
     <div class="entry sort-ctnr">

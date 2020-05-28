@@ -1,7 +1,12 @@
 <script>
-  import {onMount} from 'svelte'
+  import {onMount, tick} from 'svelte'
+  import { createEventDispatcher } from 'svelte'
+  const dispatch = createEventDispatcher();
+
   export let source = []
   let selected // current filter displayed (year, appellation, producer)
+
+  let selectNd = null
 
   // set datalist for each filter
   $: appellationData = dedup(source, 'appellation')
@@ -11,7 +16,7 @@
   // dedup & sort values
   function dedup(src, field){
     return src.reduce((dedup, cur) => {
-      if (!dedup.includes(cur[field]))
+      if (!!cur[field] && !dedup.includes(cur[field]))
         dedup.push(cur[field])
       return dedup
     }, []).sort()
@@ -32,10 +37,26 @@
   onMount(() => {
   })
 
-  // set selected if set to a new value, or null to erase if value is the same
-  function toggle(e){
+  async function toggle(e){
     const field = e.currentTarget.dataset.name
-    selected = selected !== field ? field : null
+
+    if (selected === field){
+      // hide selector, notify parent to clear filters
+      selected = null
+      dispatch('filter', {reset: true})
+    }
+    else{
+      // show selector
+      selected = field
+    }
+
+    await tick()
+    if (selectNd)
+      selectNd.selectedIndex = -1
+  }
+
+  function filter(e){
+    dispatch('filter', {filter: selected, value: e.currentTarget.value})
   }
 </script>
 
@@ -49,10 +70,11 @@
     </div>
 
     {#if selected}
-      <select class="filter-value {selected}">
+      <select class="filter-value {selected}" on:change={filter} bind:this={selectNd}>
         {#each datalist as elem}
           <option value={elem}>{elem}</option>
         {/each}
+        <option value="">Non renseigné</option>
       </select>
     {/if}
   </div>

@@ -7,12 +7,13 @@ export let params = {}
 
 // IDEA: show sort order in sort icon. Use an overlay with vertical gradient opacity background to hide icon top/bottom.
 
+let origEntries = []
 let entries = []
 let config
 let lastSortField // name of the last field used for sorting
 let lastSortASC // whether last sort was in ascending order
 
-$: bottleCount = entries.reduce((cur, e)=> {return cur + e.count}, 0)
+$: bottleCount = origEntries.reduce((cur, e)=> {return cur + e.count}, 0)
 
 onMount(async () => {
   await repo.open()
@@ -21,12 +22,12 @@ onMount(async () => {
 })
 
 export async function load(){
-  entries = await repo.getAll('entries')
+  origEntries = entries = await repo.getAll('entries')
   entries = sort()
   syncMgr.checkUpdates()
   .then(async updated => {
     if (updated)
-      entries = await repo.getAll('entries')
+      origEntries = entries = await repo.getAll('entries')
       entries = sort()
   })
 }
@@ -85,37 +86,62 @@ function sort(field){
   return entries
 }
 
+function filterList(e){
+  if (e.detail.reset){
+    entries = origEntries
+    return
+  }
+  console.log(`filter ${e.detail.filter}=${e.detail.value}`)
+  const filter = e.detail.filter,
+        value = e.detail.value
+  let filterFn
+
+  if (!!value)
+    filterFn = x => x.wine[filter] == value
+  else
+    filterFn = x => !x.wine[filter]
+
+  entries = origEntries.filter(filterFn)
+  // debugger
+}
+
 </script>
 
-{#if entries.length > 0}
+{#if origEntries.length > 0}
 
   <h2>Mes vins</h2>
-  <p><span class="bold">{entries.length}</span> references et <span class="bold">{bottleCount}</span> bouteilles en cave.</p>
+  <p><span class="bold">{origEntries.length}</span> references et <span class="bold">{bottleCount}</span> bouteilles en cave.</p>
 
-  <Filters source="{entries.map(x => {return {year: x.wine.year, appellation: x.wine.appellation, producer: x.wine.producer}})}"></Filters>
+  <Filters source="{origEntries.map(x => {return {year: x.wine.year, appellation: x.wine.appellation, producer: x.wine.producer}})}"
+    on:filter={filterList}>
+  </Filters>
 
-  <div id="entries" class="wide">
-    <div class="entry sort-ctnr">
-      <span class="year icon-sort" class:selected="{lastSortField === 'year'}" on:click="{e => entries = sort('year')}"></span>
-      <div class="names icon-sort" class:selected="{lastSortField === 'producer'}" on:click="{e => entries = sort('producer')}"></div>
-      <div class="app icon-sort" class:selected="{lastSortField === 'appellation'}" on:click="{e => entries = sort('appellation')}"></div>
-      <span class="count icon-sort" class:selected="{lastSortField === 'count'}" on:click="{e => entries = sort('count')}"></span>
+  {#if entries.length > 0}
+    <div id="entries" class="wide">
+      <div class="entry sort-ctnr">
+        <span class="year icon-sort" class:selected="{lastSortField === 'year'}" on:click="{e => entries = sort('year')}"></span>
+        <div class="names icon-sort" class:selected="{lastSortField === 'producer'}" on:click="{e => entries = sort('producer')}"></div>
+        <div class="app icon-sort" class:selected="{lastSortField === 'appellation'}" on:click="{e => entries = sort('appellation')}"></div>
+        <span class="count icon-sort" class:selected="{lastSortField === 'count'}" on:click="{e => entries = sort('count')}"></span>
+      </div>
+
+      {#each entries as entry}
+        <a href="/entry/{entry.id}" class="entry">
+          <span class="year {entry.wine.color}" >{entry.wine.year || ''}</span>
+          <div class="names">
+            {#if entry.wine.name}<div class="name">{entry.wine.name}</div>{/if}
+            {#if entry.wine.name && entry.wine.producer}<div class="name-sep"></div>{/if}
+            {#if entry.wine.producer}<div class="producer">{entry.wine.producer}</div>{/if}
+          </div>
+          <div class="app">{entry.wine.appellation}</div>
+          <span class="count">{entry.count}</span>
+        </a>
+
+      {/each}
     </div>
-
-    {#each entries as entry}
-      <a href="/entry/{entry.id}" class="entry">
-        <span class="year {entry.wine.color}" >{entry.wine.year || ''}</span>
-        <div class="names">
-          {#if entry.wine.name}<div class="name">{entry.wine.name}</div>{/if}
-          {#if entry.wine.name && entry.wine.producer}<div class="name-sep"></div>{/if}
-          {#if entry.wine.producer}<div class="producer">{entry.wine.producer}</div>{/if}
-        </div>
-        <div class="app">{entry.wine.appellation}</div>
-        <span class="count">{entry.count}</span>
-      </a>
-
-    {/each}
-  </div>
+  {:else}
+    <div class="err">Pas de résultat.</div>
+  {/if}
 
 {:else}
   <p>Votre cave est vide.</p>
@@ -229,5 +255,12 @@ function sort(field){
 }
 .rose{
   background: #f78dad;
+}
+
+.err{
+  border: 1px solid var(--main-color);
+  padding: 1em;
+  text-align: center;
+  margin-bottom: 2em;
 }
 </style>

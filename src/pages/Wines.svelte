@@ -7,8 +7,8 @@ export let params = {}
 
 // IDEA: show sort order in sort icon. Use an overlay with vertical gradient opacity background to hide icon top/bottom.
 
-let origEntries = []
-let entries = []
+let origEntries = [] // db data, may be sorted
+let entries = [] // subset of entries
 let config
 let lastSortField // name of the last field used for sorting
 let lastSortASC // whether last sort was in ascending order
@@ -22,18 +22,18 @@ onMount(async () => {
 })
 
 export async function load(){
-  origEntries = entries = await repo.getAll('entries')
-  entries = sort()
+  entries = origEntries = await repo.getAll('entries')
+  entries = sort(entries) // origEntries is also sorted, since sort is in-place and both variables refer to the same array
   syncMgr.checkUpdates()
   .then(async updated => {
     if (updated)
-      origEntries = entries = await repo.getAll('entries')
-      entries = sort()
+      entries = origEntries  = await repo.getAll('entries')
+      entries = sort(entries) // origEntries also sorted.
   })
 }
 
 // sort entries on given field
-function sort(field){
+function sort(list, field){
   const manual = !!field // whether sort is due to user action
   let asc // sort order true: ascending, false: descending
   field = field || 'year' // default field
@@ -51,7 +51,7 @@ function sort(field){
     break
   }
 
-  entries.sort((a, b) => {
+  list.sort((a, b) => {
     let valA, valB
     switch(field){
       case 'year':
@@ -83,15 +83,18 @@ function sort(field){
 
   lastSortField = field
   lastSortASC = asc
-  return entries
+  return list
 }
 
 function filterList(e){
   if (e.detail.reset){
-    entries = origEntries
+    // on reset, we want the same filter as what the filtered list was filtered by.
+    // Since field will be same as lastSortField, switch lastSortASC to have the same order as previous sort on filtered items.
+    lastSortASC = !lastSortASC
+    entries = sort(origEntries, lastSortField)
     return
   }
-  console.log(`filter ${e.detail.filter}=${e.detail.value}`)
+  // console.log(`filter ${e.detail.filter}=${e.detail.value}`)
   const filter = e.detail.filter,
         value = e.detail.value
   let filterFn
@@ -102,7 +105,6 @@ function filterList(e){
     filterFn = x => !x.wine[filter]
 
   entries = origEntries.filter(filterFn)
-  // debugger
 }
 
 </script>
@@ -119,10 +121,10 @@ function filterList(e){
   {#if entries.length > 0}
     <div id="entries" class="wide">
       <div class="entry sort-ctnr">
-        <span class="year icon-sort" class:selected="{lastSortField === 'year'}" on:click="{e => entries = sort('year')}"></span>
-        <div class="names icon-sort" class:selected="{lastSortField === 'producer'}" on:click="{e => entries = sort('producer')}"></div>
-        <div class="app icon-sort" class:selected="{lastSortField === 'appellation'}" on:click="{e => entries = sort('appellation')}"></div>
-        <span class="count icon-sort" class:selected="{lastSortField === 'count'}" on:click="{e => entries = sort('count')}"></span>
+        <span class="year icon-sort" class:selected="{lastSortField === 'year'}" on:click="{e => entries = sort(entries, 'year')}"></span>
+        <div class="names icon-sort" class:selected="{lastSortField === 'producer'}" on:click="{e => entries = sort(entries, 'producer')}"></div>
+        <div class="app icon-sort" class:selected="{lastSortField === 'appellation'}" on:click="{e => entries = sort(entries, 'appellation')}"></div>
+        <span class="count icon-sort" class:selected="{lastSortField === 'count'}" on:click="{e => entries = sort(entries, 'count')}"></span>
       </div>
 
       {#each entries as entry}

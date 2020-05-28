@@ -97,14 +97,21 @@ function filterList(e){
   // console.log(`filter ${e.detail.filter}=${e.detail.value}`)
   const filter = e.detail.filter,
         value = e.detail.value
-  let filterFn
+  let filterFn // filter function to filter by
 
   if (!!value)
+    // truthy value provided: non-strict equality check
     filterFn = x => x.wine[filter] == value
   else
+    // filter for all falsy values
     filterFn = x => !x.wine[filter]
 
   entries = origEntries.filter(filterFn)
+}
+
+function sortHandler(e){
+  const field = e.currentTarget.dataset.name
+  entries = sort(entries, field)
 }
 
 </script>
@@ -121,10 +128,10 @@ function filterList(e){
   {#if entries.length > 0}
     <div id="entries" class="wide">
       <div class="entry sort-ctnr">
-        <span class="year icon-sort" class:selected="{lastSortField === 'year'}" on:click="{e => entries = sort(entries, 'year')}"></span>
-        <div class="names icon-sort" class:selected="{lastSortField === 'producer'}" on:click="{e => entries = sort(entries, 'producer')}"></div>
-        <div class="app icon-sort" class:selected="{lastSortField === 'appellation'}" on:click="{e => entries = sort(entries, 'appellation')}"></div>
-        <span class="count icon-sort" class:selected="{lastSortField === 'count'}" on:click="{e => entries = sort(entries, 'count')}"></span>
+        <span class="year icon-sort" class:selected="{lastSortField === 'year'}" on:click={sortHandler} data-name="year"></span>
+        <div class="names icon-sort" class:selected="{lastSortField === 'producer'}" on:click={sortHandler} data-name="producer"></div>
+        <div class="app icon-sort" class:selected="{lastSortField === 'appellation'}" on:click={sortHandler} data-name="appellation"></div>
+        <span class="count icon-sort" class:selected="{lastSortField === 'count'}" on:click={sortHandler} data-name="count"></span>
       </div>
 
       {#each entries as entry}

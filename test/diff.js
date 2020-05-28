@@ -6,18 +6,18 @@ import utils from '/home/bleuarff/dev/vinisync/src/utils.js'
 
 
 describe('Diff', () => {
-  it('modified key', () => {
+  it('modified key', async () => {
     const ref = {a: 1},
           obj = {a: 2},
           expected = {a: 2}
-    const diff = utils.getDiff(obj, ref)
+    const diff = await utils.getDiff(obj, ref)
     assert.deepEqual(diff, expected)
   })
-  it('deleted key', () => {
+  it('deleted key', async () => {
     const ref = {a: 1, b:2},
           obj = {a: 1},
           expected = {b: null}
-    const diff = utils.getDiff(obj, ref)
+    const diff = await utils.getDiff(obj, ref)
     assert.deepEqual(diff, expected)
   })
   it('new key', () => {

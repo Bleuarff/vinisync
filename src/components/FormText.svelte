@@ -31,6 +31,7 @@ function resize(e){
     nd.style.height = nd.scrollHeight+'px'
   }, 0)
 }
+
 </script>
 
 {#if !readonly || !!value}
@@ -41,7 +42,8 @@ function resize(e){
   {:else if type === 'text'}
     <textarea bind:value wrap="soft" bind:this={inputNd} rows="1" placeholder={placeholder}
       on:input={resize} on:focus={resize} on:change={resize} class="input"
-      on:focus={autocomplete.show()} on:blur={autocomplete.hide}></textarea>
+      on:focus="{e => {autocomplete && autocomplete.show()}}"
+      on:blur="{e => {autocomplete && autocomplete.hide()}}"></textarea>
     {#if datasource}
       <Autocomplete source={datasource} bind:this={autocomplete} bind:value></Autocomplete>
     {/if}

@@ -9,16 +9,31 @@ export let params = {}
 
 let origEntries = [] // db data, may be sorted
 let entries = [] // subset of entries
-let config
+let syncConfig
+let pageConfig
 let lastSortField // name of the last field used for sorting
 let lastSortASC // whether last sort was in ascending order
+
+const defaultPageConfig = {
+  key: 'wines',
+  sort: {
+    field: 'year', orderAsc: false
+  }
+}
 
 $: bottleCount = origEntries.reduce((cur, e)=> {return cur + e.count}, 0)
 
 onMount(async () => {
   await repo.open()
   load()
-  config = await repo.getOne('config', 'sync')
+
+  // getting these objects concurrently (with Promise.all) fails, both are undefined. IDB/indexedDB concurrency issue?
+  syncConfig = await repo.getOne('config', 'sync')
+  pageConfig =  await repo.getOne('config', 'wines')
+
+  if (!pageConfig){
+    pageConfig = defaultPageConfig
+  }
 })
 
 export async function load(){
@@ -36,18 +51,18 @@ export async function load(){
 function sort(list, field){
   const manual = !!field // whether sort is due to user action
   let asc // sort order true: ascending, false: descending
-  field = field || 'year' // default field
+  field = field || pageConfig.sort.field
 
   switch(field){
     // numbers defaut to descending order
     case 'year':
     case 'count':
-      asc = (lastSortField === field && manual) ? !lastSortASC : false
+      asc = (lastSortField === field && manual) ? !lastSortASC : pageConfig.sort.orderAsc
     break
     // strings default to ascending order
     case 'appellation':
     case 'producer':
-      asc = (lastSortField === field && manual) ? !lastSortASC : true
+      asc = (lastSortField === field && manual) ? !lastSortASC : pageConfig.sort.orderAsc
     break
   }
 
@@ -110,8 +125,12 @@ function filterList(e){
 }
 
 function sortHandler(e){
-  const field = e.currentTarget.dataset.name
-  entries = sort(entries, field)
+  pageConfig.sort.field = e.currentTarget.dataset.name
+  entries = sort(entries, pageConfig.sort.field)
+  pageConfig.sort.orderAsc = lastSortASC
+
+  // on each sort, store field & order as the new defaults
+  repo.updateDoc('config', pageConfig)
 }
 
 </script>
@@ -157,7 +176,8 @@ function sortHandler(e){
 {/if}
 
 <a href="/entry">Ajouter un vin</a>
-{#if !config}
+{#if !syncConfig}
+<!-- Import is not possible when device is sync'ed with others -->
 <div>
   <a href="/import">Importer</a>
 </div>

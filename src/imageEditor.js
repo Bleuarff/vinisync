@@ -59,7 +59,6 @@ function getImage(file){
 
 // get dimensions of image with same aspect ratio, both dimensions respecting their max size
 function getDesiredSize({height, width}){
-  // debugger
   let dh = height,
       dw = width
 

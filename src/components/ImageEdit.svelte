@@ -62,6 +62,7 @@
   onDestroy(() => {
     if (imageUrl)
       URL.revokeObjectURL(imageUrl)
+    document.body.style.overflow = 'visible'
   })
 
   export async function load(entryId){
@@ -110,10 +111,11 @@
     }
   }
 
-  let angle = 90
   function toggleOrRotate(e){
-    if (!fullSizeImg)
+    if (!fullSizeImg){
       fullSizeImg = true
+      document.body.style.overflow = 'hidden'
+    }
     else{
       rotation = (rotation + 90) % 360
     }
@@ -121,6 +123,7 @@
 
   function resetFullsize(){
     fullSizeImg = false
+    document.body.style.overflow = 'visible'
   }
 
   function changeImage(){
@@ -131,11 +134,10 @@
 </script>
 
 {#if imageUrl || edit}
-  <div class="image-editor">
+  <div class="image-editor" class:fullSize={fullSizeImg} style="--fullsizeMaxWidth: 85{!!(rotation % 180) ? 'vh' : 'vw'}; --fullsizeMaxHeight: 85{!!(rotation % 180) ? 'vw' : 'vh'};">
     {#if imageUrl}
-      <!-- TODO: if edit, onclick on image to change it (change/remove/rotate) -->
       <img src={imageUrl} class="centered" class:fullSize={fullSizeImg} on:click="{toggleOrRotate}" on:dblclick="{changeImage}"
-        style={imgStyle} >
+        style={imgStyle}>
       {#if edit}<span class="filesize">{(filesize / 1e3).toFixed(0)}kb</span>{/if}
       <div class="img-background" class:fullSize={fullSizeImg} on:click="{resetFullsize}"></div>
     {:else if edit}
@@ -184,8 +186,8 @@
     position: fixed;
     left: 50vw;
     top: 50vh;
-    max-width: 100vw;
-    max-height: 100vh;
+    max-width: var(--fullsizeMaxWidth);
+    max-height: var(--fullsizeMaxHeight);
     z-index: 1000;
     transform: translate(-50%, -50%);
   }

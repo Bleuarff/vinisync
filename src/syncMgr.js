@@ -145,7 +145,7 @@ class SyncMgr{
 
   // helper to retrieve config from db
   async _getConfig(){
-    const config = await repo.getOne('config', 'sync')
+    const config = await repo.findById('config', 'sync')
     if (!config)
       throw new Error('SYNC_NOT_CONFIGURED')
     if (!config.enabled)
@@ -155,7 +155,7 @@ class SyncMgr{
 
   async _mergeEntry(update){
     const remoteEntry = update.changes
-    let localEntry = await repo.getOne('entries', remoteEntry.id)
+    let localEntry = await repo.findById('entries', remoteEntry.id)
 
     if (localEntry){
       // compare local entry updateDate and timestamp the update was made at
@@ -178,7 +178,7 @@ class SyncMgr{
 
   async _mergePicture(update){
     const remotePicture = update.changes
-    let localPicture = await repo.getOne('images', remotePicture.id)
+    let localPicture = await repo.findById('images', remotePicture.id)
 
     if (localPicture){
       // local edited after remote, conflict !!

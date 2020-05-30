@@ -36,7 +36,7 @@ async function getAll(table){
   return docs
 }
 
-async function getOne(table, id){
+async function findById(table, id){
   try{
     // throw new Error('la mouche qui pète !')
     const store = db.transaction(table).store
@@ -113,7 +113,7 @@ async function updateOne(table, id, modifs, keepTime = false){
       doc.lastUpdateDate = (new Date()).toISOString()
 
     await db.put(table, doc)
-    return getOne(table, id)
+    return findById(table, id)
   }
   catch(ex){
     console.error(ex)
@@ -137,7 +137,11 @@ export const repo = {
   open: open,
 
   getAll: getAll,
-  getOne: getOne,
+
+  // find by providing document id
+  findById: findById,
+
+  // find by providing a query function.
   findOne: findOne,
 
   // updates doc by replacing it entirely

@@ -29,7 +29,7 @@
   onMount(async () => {
     try{
       await repo.open()
-      config = (await repo.getOne('config', config.key)) || config
+      config = (await repo.findById('config', config.key)) || config
     }
     catch(ex){
       console.error('Get sync config error')

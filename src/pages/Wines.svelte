@@ -28,8 +28,8 @@ onMount(async () => {
   load()
 
   // getting these objects concurrently (with Promise.all) fails, both are undefined. IDB/indexedDB concurrency issue?
-  syncConfig = await repo.getOne('config', 'sync')
-  pageConfig =  await repo.getOne('config', 'wines')
+  syncConfig = await repo.findById('config', 'sync')
+  pageConfig =  await repo.findById('config', 'wines')
 
   if (!pageConfig){
     pageConfig = defaultPageConfig

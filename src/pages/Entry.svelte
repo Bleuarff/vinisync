@@ -53,14 +53,14 @@ export async function load(){
   refEntry = null
   edit = !params.id
   if (params.id){
-    entry = await repo.getOne('entries', params.id)
+    entry = await repo.findById('entries', params.id)
     if (entry){
       refEntry = Utils.deepClone(entry)
       imageEditor.load(entry.id)
       syncMgr.checkUpdates(params.id)
       .then(async updated => {
         if (updated){
-          entry = await repo.getOne('entries', params.id)
+          entry = await repo.findById('entries', params.id)
           console.debug('entry updated: reload picture')
           imageEditor.load(entry.id)
         }
@@ -94,7 +94,7 @@ async function save(){
       if (hasModif){
         // timestamp validation: make sure the reference data before modification
         //  is the last version (not updated in background during edition process).
-        const dbRef = await repo.getOne('entries', params.id)
+        const dbRef = await repo.findById('entries', params.id)
         if (dbRef && (refEntry.lastUpdateDate < dbRef.lastUpdateDate))
           throw new Error('DB OBJECT EDITED SINCE YOU OPENED IT') // TODO:save for resolution?
         await repo.updateDoc('entries', entry)

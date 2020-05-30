@@ -49,7 +49,7 @@ function resize(e){
     <input type="number" bind:value class="input">
 
   {:else if type=== 'containing'}
-    <input type="text" bind:value class="input" list="containing-choices"
+    <input type="text" bind:value class="input"
       on:focus="{e => {autocomplete && autocomplete.show()}}"
       on:blur="{e => {autocomplete && autocomplete.hide()}}">{containingUnit}
 

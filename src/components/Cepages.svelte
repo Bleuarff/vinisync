@@ -1,16 +1,20 @@
 <script>
+  import Autocomplete from './Autocomplete.svelte'
   export let cepages = []
   export let readonly = true
 
+  let cepValue // current entry
   let inputNd // ref new cepage input node
+  let autocomplete // node ref
 
   // adds cepage to list
   function addCepage(e){
-    const cepage = inputNd.value.trim() // sanitize
+    cepValue = cepValue.trim() // sanitize
 
-    if (cepage && !cepages.includes(cepage)){ // checks if not already present
-      cepages = [...cepages, cepage]
-      inputNd.value = ''
+    if (cepValue && !cepages.includes(cepValue)){ // checks if not already present
+      cepages = [...cepages, cepValue]
+      cepValue = ''
+
       inputNd.focus()
     }
   }
@@ -37,14 +41,18 @@
 
   {#if !readonly}
   <div>
-    <input bind:this={inputNd} type="text" placeholder="Cabernet Franc" list="cepages-choices">
+    <input bind:this={inputNd} type="text" placeholder="Cabernet Franc" bind:value={cepValue}
+      on:focus="{e => {autocomplete && autocomplete.show()}}"
+      on:blur="{e => {autocomplete && autocomplete.hide()}}">
+    <Autocomplete source="cepage" bind:this={autocomplete} bind:value={cepValue}></Autocomplete>
+
     <button on:click={addCepage}>Ajouter</button>
   </div>
   {/if}
 </div>
 {/if}
 
-<datalist id="cepages-choices">
+<!-- <datalist id="cepages-choices">
   <option value="Altesse">
   <option value="Aligoté">
   <option value="Arbanne">
@@ -127,7 +135,7 @@
   <option value="Vermentino">
   <option value="Viognier">
   <option value="Zinfandel">
-</datalist>
+</datalist> -->
 
 <style>
   label{

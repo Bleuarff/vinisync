@@ -4,6 +4,7 @@
   // TODO: keyboard navigation/selection
 
   import appellations from '../data/appellations.js'
+  import cepages from '../data/cepages.js'
 
   const containings = ['37.5', '50', '52', '75', '1.5']
 
@@ -23,6 +24,8 @@
       break
       case 'containing':
         origList = containings
+      case 'cepage':
+        origList = cepages
     }
   }
 

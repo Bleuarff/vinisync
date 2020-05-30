@@ -5,6 +5,8 @@
 
   import appellations from '../data/appellations.js'
 
+  const containings = ['37.5', '50', '52', '75', '1.5']
+
   export let source = ''
   export let value = ''
 
@@ -19,6 +21,8 @@
       case 'appellation':
         origList = appellations
       break
+      case 'containing':
+        origList = containings
     }
   }
 
@@ -49,7 +53,7 @@
   }
 
 </script>
-  <ul class:hidden class:empty="{filteredList.length === 0}">
+  <ul class="{source}" class:hidden class:empty="{filteredList.length === 0}">
     {#each filteredList as elem}
     <li on:click={select} data-value={elem}>{elem}</li>
     {/each}
@@ -70,6 +74,9 @@
     font-size: .9em;
     max-height: 9.2em;
     overflow: hidden auto;
+  }
+  .containing{
+    width: 6.7em;
   }
 
   li{

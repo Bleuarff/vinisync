@@ -44,22 +44,19 @@ function resize(e){
       on:input={resize} on:focus={resize} on:change={resize} class="input"
       on:focus="{e => {autocomplete && autocomplete.show()}}"
       on:blur="{e => {autocomplete && autocomplete.hide()}}"></textarea>
-    {#if datasource}
-      <Autocomplete source={datasource} bind:this={autocomplete} bind:value></Autocomplete>
-    {/if}
-
 
   {:else if type === 'year'}
     <input type="number" bind:value class="input">
+
   {:else if type=== 'containing'}
-    <input type="text" bind:value class="input" list="containing-choices">{containingUnit}
-    <datalist id="containing-choices">
-      <option value="37.5">
-      <option value="50">
-      <option value="52">
-      <option value="75">
-      <option value="1.5">
-    </datalist>
+    <input type="text" bind:value class="input" list="containing-choices"
+      on:focus="{e => {autocomplete && autocomplete.show()}}"
+      on:blur="{e => {autocomplete && autocomplete.hide()}}">{containingUnit}
+
+  {/if}
+
+  {#if datasource}
+    <Autocomplete source={datasource} bind:this={autocomplete} bind:value></Autocomplete>
   {/if}
 </div>
 {/if}

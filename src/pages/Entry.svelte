@@ -25,7 +25,7 @@ let entry = {
     apogeeStart: null,
     apogeeEnd: null,
     cepages: [],
-    containing: '0.75',
+    containing: '75',
     color: '',
     sweet: false,
     sparkling: false
@@ -46,6 +46,7 @@ let edit = false,
 onMount(async () => {
   await repo.open()
   load()
+  window.scrollTo(0, 0)
 })
 
 export async function load(){
@@ -189,7 +190,7 @@ async function decrement(){
 
     <Cepages bind:cepages={entry.wine.cepages} readonly={!edit}></Cepages>
 
-    <FormText bind:value={entry.wine.containing} readonly={!edit} label="Contenance" placeholder="75" type="containing"></FormText>
+    <FormText bind:value={entry.wine.containing} readonly={!edit} label="Contenance" placeholder="75" type="containing" datasource="containing"></FormText>
 
     <Color bind:value={entry.wine.color} readonly={!edit}></Color>
 

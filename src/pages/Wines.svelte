@@ -15,7 +15,7 @@ let lastSortField // name of the last field used for sorting
 let lastSortASC // whether last sort was in ascending order
 
 const defaultPageConfig = {
-  key: 'wines',
+  id: 'wines',
   sort: {
     field: 'year', orderAsc: false
   }
@@ -25,7 +25,6 @@ $: bottleCount = origEntries.reduce((cur, e)=> {return cur + e.count}, 0)
 
 onMount(async () => {
   await repo.open()
-  load()
 
   // getting these objects concurrently (with Promise.all) fails, both are undefined. IDB/indexedDB concurrency issue?
   syncConfig = await repo.findById('config', 'sync')
@@ -34,6 +33,8 @@ onMount(async () => {
   if (!pageConfig){
     pageConfig = defaultPageConfig
   }
+
+  load()
 })
 
 export async function load(){

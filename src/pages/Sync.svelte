@@ -10,7 +10,7 @@
   export let params = {}
 
   let config = {
-    key: 'sync',
+    id: 'sync',
     enabled: false, // whether sync is activate on this device
     email: 'a@a',
     userkey: '',
@@ -29,7 +29,7 @@
   onMount(async () => {
     try{
       await repo.open()
-      config = (await repo.findById('config', config.key)) || config
+      config = (await repo.findById('config', 'sync')) || config
     }
     catch(ex){
       console.error('Get sync config error')

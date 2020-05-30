@@ -95,6 +95,32 @@ async function updateDoc(table, doc, keepTime = false){
   await db.put(table, doc)
 }
 
+// Updates a document with given modifications.
+// Returns the full modified object.
+// TODO: handle editing sup-properties. eg. {'wine.appellation'}, instead of complete object
+async function updateOne(table, id, modifs, keepTime = false){
+  try{
+    const store = db.transaction(table).store
+    const doc = await store.get(id)
+    if (!doc)
+      throw new Error(`Document ${id} not found in table ${table}`)
+
+    Object.entries(modifs).forEach(([key, value]) => {
+      doc[key] = value
+    })
+
+    if (!keepTime)
+      doc.lastUpdateDate = (new Date()).toISOString()
+
+    await db.put(table, doc)
+    return getOne(table, id)
+  }
+  catch(ex){
+    console.error(ex)
+    throw new Error(`updateOne error: table ${table} id: ${id}`)
+  }
+}
+
 function deleteOne(table, id){
   return db.delete(table, id)
 }
@@ -114,7 +140,11 @@ export const repo = {
   getOne: getOne,
   findOne: findOne,
 
+  // updates doc by replacing it entirely
   updateDoc: updateDoc,
+
+  // updates doc by providing only modified fields
+  updateOne: updateOne,
 
   insertOne: insertOne,
 

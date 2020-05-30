@@ -3,7 +3,6 @@
   import { repo } from '../storage.js'
   import { resize } from '../imageEditor.js'
   import syncMgr from '../syncMgr.js'
-  import Utils from '../utils.js'
   import { v4 as uuid} from 'uuid'
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher()
@@ -24,23 +23,30 @@
 
   // returns true if everything is ok, false otherwise
   export async function save(entryId){
-    if (!file || !entryId) return true
+    if ((!file || !entryId) && refPic && refPic.rotation === rotation)
+      return true
 
     try{
-      const data = await file.arrayBuffer(),
-            imgBlob = new Blob([data])
-      let imgDoc
+      let data, imgBlob, imgDoc
+
+      if (file){
+        data = await file.arrayBuffer()
+        imgBlob = new Blob([data])
+      }
 
       if (refPic){
-        imgDoc = Utils.deepClone(refPic)
-        imgDoc.blob = imgBlob
-        repo.updateDoc('images', imgDoc)
+        const modifs = { rotation: rotation}
+        if (imgBlob)
+          modifs.blob = imgBlob
+
+        imgDoc = await repo.updateOne('images', refPic.id, modifs)
       }
       else{
         imgDoc = {
           id: uuid(),
           entryId: entryId,
-          blob: imgBlob
+          blob: imgBlob,
+          rotation: rotation
         }
         imgDoc = await repo.insertOne('images', imgDoc)
       }
@@ -73,6 +79,7 @@
         if (refPic){
           imageUrl = URL.createObjectURL(refPic.blob)
           filesize = refPic.blob.size
+          rotation = refPic.rotation || 0
         }
       }
       catch(ex){

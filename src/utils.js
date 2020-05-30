@@ -19,7 +19,7 @@ export default class Utils{
       if (ref[key] == null && value != null){ // key is new in obj
         diff = diff || {}
         if (value instanceof Blob)
-          diff[key] = await Utils.getBlobAsDataUrl(value)
+          diff[key] = await Utils.getBlobAsBase64(value)
         else
           diff[key] = value
       }

@@ -25,11 +25,13 @@
     switch(source){
       case 'appellation':
         origList = appellations
-      break
+        break
       case 'containing':
         origList = containings
+        break
       case 'cepage':
         origList = cepages
+        break
     }
   }
 
@@ -46,18 +48,17 @@
 
   export async function show(){
     hidden = false
-    await tick()
 
     // on first call, adjust element width and vertical position.
     if (verticalOffset === 0){
       const inputNd = root.parentElement.querySelector('input, textarea')
       if (inputNd){
+        await tick()
         const inputPosition = inputNd.getBoundingClientRect()
-        verticalOffset = inputPosition.bottom - root.getBoundingClientRect().top + 1
+        verticalOffset = inputPosition.bottom - root.getBoundingClientRect().top
         width = inputPosition.width
       }
     }
-
   }
 
   export function hide(e){
@@ -95,9 +96,6 @@
     font-size: .9em;
     max-height: 9.2em;
     overflow: hidden auto;
-  }
-  .containing{
-    width: 6.7em;
   }
 
   li{

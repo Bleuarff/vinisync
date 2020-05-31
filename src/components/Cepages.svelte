@@ -1,4 +1,5 @@
 <script>
+  import { onMount } from 'svelte'
   import Autocomplete from './Autocomplete.svelte'
   export let cepages = []
   export let readonly = true
@@ -6,6 +7,16 @@
   let cepValue // current entry
   let inputNd // ref new cepage input node
   let autocomplete // node ref
+
+  let inputPos
+  onMount(() => {
+    // Needs a delay to get correct value
+    setTimeout(() => {
+      inputPos = inputNd.getBoundingClientRect()
+    }, 2000)
+  })
+
+  // $: inputPos = inputNd ? inputNd.getBoundingClientRect() : undefined
 
   // adds cepage to list
   function addCepage(e){
@@ -44,7 +55,7 @@
     <input bind:this={inputNd} type="text" placeholder="Cabernet Franc" bind:value={cepValue}
       on:focus="{e => {autocomplete && autocomplete.show()}}"
       on:blur="{e => {autocomplete && autocomplete.hide()}}">
-    <Autocomplete source="cepage" bind:this={autocomplete} bind:value={cepValue}></Autocomplete>
+    <Autocomplete source="cepage" bind:this={autocomplete} bind:value={cepValue} parentPosition={inputPos}></Autocomplete>
 
     <button on:click={addCepage}>Ajouter</button>
   </div>

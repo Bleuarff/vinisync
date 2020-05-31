@@ -10,11 +10,14 @@
 
   export let source = ''
   export let value = ''
+  export let parentPosition = {}
 
   let hidden = true
 
   let origList
   let filteredList
+
+  $: {console.log(parentPosition)}
 
   // select datasource
   $: {
@@ -56,7 +59,7 @@
   }
 
 </script>
-  <ul class="{source}" class:hidden class:empty="{filteredList.length === 0}">
+  <ul class="{source}" class:hidden class:empty="{filteredList.length === 0}" style="width:{parentPosition.width}px;">
     {#each filteredList as elem}
     <li on:click={select} data-value={elem}>{elem}</li>
     {/each}
@@ -71,7 +74,7 @@
     border: 1px solid #a40e0e;
     border-top: none;
     background: white;
-    width: 100%;
+    /* width: 100%; */
     z-index: 10;
     margin-top: -.55em;
     font-size: .9em;

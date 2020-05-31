@@ -11,14 +11,14 @@
 
   export let source = ''
   export let value = ''
-  export let parentPosition = {}
 
   let hidden = true
 
   let root
   let origList
   let filteredList
-  let verticalOffset = 0
+  let verticalOffset = 0 // offset to adjust the position
+  let width
 
   // select datasource
   $: {
@@ -48,11 +48,13 @@
     hidden = false
     await tick()
 
-    if (parentPosition != null){
-      console.log(parentPosition)
-      if (parentPosition.bottom && verticalOffset === 0){
-        verticalOffset = parentPosition.bottom - root.getBoundingClientRect().top + 1
-        console.log(`verticalOffset = ${parentPosition.bottom} - ${root.getBoundingClientRect().top} + 1`)
+    // on first call, adjust element width and vertical position.
+    if (verticalOffset === 0){
+      const inputNd = root.parentElement.querySelector('input, textarea')
+      if (inputNd){
+        const inputPosition = inputNd.getBoundingClientRect()
+        verticalOffset = inputPosition.bottom - root.getBoundingClientRect().top + 1
+        width = inputPosition.width
       }
     }
 
@@ -71,7 +73,7 @@
 
 </script>
   <ul class="{source}" bind:this={root} class:hidden class:empty="{filteredList.length === 0}"
-    style="width:{parentPosition.width}px; margin-top:{verticalOffset}px;">
+    style="width:{width}px; margin-top:{verticalOffset}px;">
 
     {#each filteredList as elem}
     <li on:click={select} data-value={elem}>{elem}</li>

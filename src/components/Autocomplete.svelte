@@ -3,6 +3,7 @@
   // TODO: include custom values from db
   // TODO: keyboard navigation/selection
 
+  import {tick} from 'svelte'
   import appellations from '../data/appellations.js'
   import cepages from '../data/cepages.js'
 
@@ -14,10 +15,10 @@
 
   let hidden = true
 
+  let root
   let origList
   let filteredList
-
-  $: {console.log(parentPosition)}
+  let verticalOffset = 0
 
   // select datasource
   $: {
@@ -43,8 +44,18 @@
     }
   }
 
-  export function show(){
+  export async function show(){
     hidden = false
+    await tick()
+
+    if (parentPosition != null){
+      console.log(parentPosition)
+      if (parentPosition.bottom && verticalOffset === 0){
+        verticalOffset = parentPosition.bottom - root.getBoundingClientRect().top + 1
+        console.log(`verticalOffset = ${parentPosition.bottom} - ${root.getBoundingClientRect().top} + 1`)
+      }
+    }
+
   }
 
   export function hide(e){
@@ -59,7 +70,9 @@
   }
 
 </script>
-  <ul class="{source}" class:hidden class:empty="{filteredList.length === 0}" style="width:{parentPosition.width}px;">
+  <ul class="{source}" bind:this={root} class:hidden class:empty="{filteredList.length === 0}"
+    style="width:{parentPosition.width}px; margin-top:{verticalOffset}px;">
+
     {#each filteredList as elem}
     <li on:click={select} data-value={elem}>{elem}</li>
     {/each}
@@ -76,7 +89,7 @@
     background: white;
     /* width: 100%; */
     z-index: 10;
-    margin-top: -.55em;
+    /* margin-top: -.55em; */
     font-size: .9em;
     max-height: 9.2em;
     overflow: hidden auto;

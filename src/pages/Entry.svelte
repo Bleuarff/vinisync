@@ -340,7 +340,7 @@ async function decrement(){
     right: 0;
   }
   .buttons{
-    max-width: 700px;
+    max-width: var(--global-max-width);
     margin: auto;
     display: flex;
     flex-flow: row nowrap;

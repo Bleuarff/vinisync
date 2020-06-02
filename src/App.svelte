@@ -67,10 +67,16 @@
 <style>
 	@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap&subset=latin-ext');
 
+	:root{
+	  --main-color: #ba0e0e;
+		--main-color-light: #791a1a8a;
+		--global-max-width: 700px;
+	}
+
 	main {
 		padding: 2.5em 1em 1em 1em;
 		width: 100%;
-		max-width: 700px;
+		max-width: var(--global-max-width);
 		margin: 0 auto;
 		font-family: 'Roboto', sans-serif;
 		position: relative;

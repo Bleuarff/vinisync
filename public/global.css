@@ -2,11 +2,6 @@
 	box-sizing: border-box;
 }
 
-:root {
-  --main-color: #ba0e0e;
-	--main-color-light: #791a1a8a;
-}
-
 html, body {
 	position: relative;
 	width: 100%;

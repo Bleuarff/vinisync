@@ -47,7 +47,7 @@
   }
 
   #inner{
-    max-width: 700px;
+    max-width: var(--global-max-width);
     margin: auto;
   }
 

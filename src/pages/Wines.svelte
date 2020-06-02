@@ -309,6 +309,12 @@ function sortHandler(e){
   padding: .75em;
 }
 
+@media (min-width: 700px){
+  .btn-add{
+    left: 50%;
+  }
+}
+
 .btn-add img{
   height: 2em;
   width: 2em;

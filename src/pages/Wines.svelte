@@ -176,7 +176,7 @@ function sortHandler(e){
   <p>Votre cave est vide.</p>
 {/if}
 
-<a href="/entry">Ajouter un vin</a>
+<a href="/entry" class="btn-add"><img src="/img/addentry.svg"></a>
 {#if !syncConfig}
 <!-- Import is not possible when device is sync'ed with others -->
 <div>
@@ -188,11 +188,13 @@ function sortHandler(e){
   :root{
     --min-row-height: 3.2em;
     --vt-row-padding: 5px;
+    --btn-add-height: 3.8em;
   }
 
 #entries{
   display: flex;
   flex-flow: column nowrap;
+  margin-bottom: calc(var(--btn-add-height) + 1em);
 }
 
 /* .entry > * {
@@ -292,5 +294,23 @@ function sortHandler(e){
   padding: 1em;
   text-align: center;
   margin-bottom: 2em;
+}
+
+.btn-add{
+  position: fixed;
+  right: 1em;
+  bottom: 1em;
+
+  width: var(--btn-add-height);
+  height: var(--btn-add-height);
+  background: var(--main-color);
+  color: white;
+  border-radius: 50%;
+  padding: .75em;
+}
+
+.btn-add img{
+  height: 2em;
+  width: 2em;
 }
 </style>

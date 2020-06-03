@@ -5,6 +5,7 @@
 	import Entry from './pages/Entry.svelte'
 	import Import from './pages/Import.svelte'
 	import Sync from './pages/Sync.svelte'
+	import History from './pages/History.svelte'
 	import Notif from './components/Notif.svelte'
 	import TitleBar from './components/TitleBar.svelte'
 	import syncMgr from './syncMgr.js'
@@ -24,6 +25,10 @@
 	}, () => page = Entry)
 	router('/import', getPath, () => page = Import)
 	router('/sync', getPath, () => page = Sync)
+	router('/history/:id?', getPath, (ctx, next) => {
+		params = ctx.params
+		next()
+	}, () => page = History)
 	router.start()
 
 	function getPath(ctx, next){

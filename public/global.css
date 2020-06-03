@@ -54,6 +54,16 @@ a.back::before{
 	position: relative;
 	bottom: 1px;
 }
+a.forward{
+	padding: 2px 0 2px 2px;
+	text-decoration: none;
+}
+a.forward::after{
+	content: '\0000a0\025b6';
+	font-size: .8em;
+	position: relative;
+	bottom: 1px;
+}
 
 label {
 	display: block;

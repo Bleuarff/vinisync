@@ -150,7 +150,10 @@ async function decrement(){
 
 </script>
 
-<a href="/wines" class="back">liste</a>
+<div class="nav">
+  <a href="/wines" class="back">liste</a>
+  <a href="/history/{params.id}" class="forward">historique</a>
+</div>
 
 <div id="entry">
   {#if entry}
@@ -355,5 +358,10 @@ async function decrement(){
   }
   .edit{
     width: 25%;
+  }
+
+  .nav{
+    display: flex;
+    justify-content: space-between;
   }
 </style>

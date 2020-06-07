@@ -22,9 +22,7 @@ async function open(){
         db.createObjectStore('images', {keyPath: 'id', autoIncrement: false})
       }
       if (oldVersion < 2){
-        const store = db.createObjectStore('history', {keyPath: 'id', autoIncrement: false})
-        store.createIndex('creationDate', 'creationDate', {unique: false})
-        store.createIndex('entryId', 'entryId', {unique: false})
+        const store = db.createObjectStore('history', {keyPath: 'entryId', autoIncrement: false})
       }
     }
   })

@@ -39,7 +39,8 @@ let entry = {
 
 let edit = false,
     refEntry, // clone of the entry fresh out of db, to get diff of modifications
-    imageEditor
+    imageEditor,
+    history
 
 // $: serialized = JSON.stringify(entry)
 
@@ -107,6 +108,7 @@ async function save(){
       entry = await repo.insertOne('entries', entry)
       msg = 'Bouteille ajoutée'
       router(`/entry/${entry.id}`) // soft redirect: address bar updated but that's all
+      updateHistory('creation')
     }
 
     const imgOk = await imageEditor.save(entry.id)
@@ -141,11 +143,36 @@ function sanitizeEntry(){
 async function increment(){
   entry.count += 1
   await save()
+  updateHistory('+1')
 }
 
 async function decrement(){
   entry.count = Math.max(0, entry.count - 1)
   await save()
+  updateHistory('-1')
+}
+
+async function updateHistory(change){
+  let history = await repo.findById('history', entry.id)
+  if (!history)
+    history = {entryId: entry.id, edits: []}
+  else if (!history.edits)
+    history.edits = []
+
+  history.edits.unshift({
+    ts: (new Date()).toISOString(),
+    change: change || 'UNKNOWN'
+  })
+
+  try{
+    if (history.creationDate)
+      await repo.updateDoc('history', history)
+    else
+      await repo.insertOne('history', history)
+  }
+  catch(ex){
+    console.error(ex)
+  }
 }
 
 </script>
@@ -158,11 +185,7 @@ async function decrement(){
 <div id="entry">
   {#if entry}
     <div class="top">
-      <!-- {#if edit || hasPicture}
-        <div class="photo-ctnr"> -->
-        <ImageEdit entryId={params.id} edit={edit} bind:this={imageEditor}></ImageEdit>
-        <!-- </div>
-      {/if} -->
+      <ImageEdit entryId={params.id} edit={edit} bind:this={imageEditor}></ImageEdit>
       <div class="headers">
         {#if !edit}
           {#if entry.wine.name}<div class="big">{entry.wine.name}</div>{/if}

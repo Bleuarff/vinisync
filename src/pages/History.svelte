@@ -9,6 +9,7 @@
 
   let linkLbl = 'Fiche bouteille'
 
+  // set back to entry link with entry info
   $: if (entry && entry.wine){
     linkLbl = [entry.wine.name, entry.wine.producer].join(' - ')
     if (entry.wine.year)
@@ -25,12 +26,23 @@
     if (params.id){
       const doc = (await repo.findById('history', params.id))
       if (doc)
-        updates = doc.edits
+        updates = doc.edits.sort((a,b) => {
+          // sort by descending date
+          if (a.ts < b.ts) return 1
+          else if (a.ts > b.ts) return -1
+          return 0
+        })
       entry = await repo.findById('entries', params.id)
     }
-    // else{
-    //   updates = await repo.getAll('history')
-    // }
+  }
+
+  // TODO: display in text format instead of json
+  function formatChange(change){
+    const t = typeof change
+    if (t === 'string')
+      return change
+    else if (t === 'object')
+      return JSON.stringify(change)
   }
 </script>
 
@@ -47,7 +59,7 @@
         {#each updates as update}
           <tr>
             <td class="ts">{moment(update.ts).format('DD/MM/YYYY HH:mm')}</td>
-            <td class="change">{update.change}</td>
+            <td class="change">{formatChange(update.change)}</td>
           </tr>
         {/each}
       </tbody>
@@ -85,7 +97,7 @@
     padding-left: 6px;
   }
   td:last-child{
-    paddign-right: 6px;
+    padding-right: 6px;
   }
 
   .empty{

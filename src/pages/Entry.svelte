@@ -91,7 +91,8 @@ async function save(){
 
     if (params.id){ // update existing entry
       // compute diff with ref doc. Skip save & sync if no modification
-      hasModif = (await Utils.getDiff(entry, refEntry)) !== null
+      const diff = await Utils.getDiff(entry, refEntry)
+      hasModif = diff !== null
 
       if (hasModif){
         // timestamp validation: make sure the reference data before modification
@@ -101,6 +102,7 @@ async function save(){
           throw new Error('DB OBJECT EDITED SINCE YOU OPENED IT') // TODO:save for resolution?
         await repo.updateDoc('entries', entry)
         msg = 'Mise à jour OK'
+        updateHistory(diff)
       }
     }
     else{ // create new entry
@@ -108,7 +110,12 @@ async function save(){
       entry = await repo.insertOne('entries', entry)
       msg = 'Bouteille ajoutée'
       router(`/entry/${entry.id}`) // soft redirect: address bar updated but that's all
-      updateHistory('creation')
+
+      const diff = {count: entry.count, wine: {}}
+      if (entry.wine.name) diff.wine.name = entry.wine.name
+      if (entry.wine.producer) diff.wine.producer = entry.wine.producer
+      if (entry.wine.year) diff.wine.year = entry.wine.year
+      updateHistory(diff)
     }
 
     const imgOk = await imageEditor.save(entry.id)
@@ -143,15 +150,14 @@ function sanitizeEntry(){
 async function increment(){
   entry.count += 1
   await save()
-  updateHistory('+1')
 }
 
 async function decrement(){
   entry.count = Math.max(0, entry.count - 1)
   await save()
-  updateHistory('-1')
 }
 
+// get history doc for entry id, update it with change & save it
 async function updateHistory(change){
   let history = await repo.findById('history', entry.id)
   if (!history)

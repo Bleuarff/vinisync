@@ -23,7 +23,8 @@
 
   // returns true if everything is ok, false otherwise
   export async function save(entryId){
-    if ((!file || !entryId) && refPic && refPic.rotation === rotation)
+    const canSave = entryId && (file || (refPic && refPic.rotation !== rotation))
+    if (!canSave)
       return true
 
     try{

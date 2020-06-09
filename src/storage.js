@@ -95,7 +95,11 @@ async function insertOne(table, obj){
 async function updateDoc(table, doc, keepTime = false){
   if (!keepTime || !doc.lastUpdateDate)
     doc.lastUpdateDate = (new Date()).toISOString()
+
   await db.put(table, doc)
+
+  if (table === 'entries')
+    return findById(table, doc.id)
 }
 
 // Updates a document with given modifications.

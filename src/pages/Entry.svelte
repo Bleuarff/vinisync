@@ -100,9 +100,9 @@ async function save(){
         const dbRef = await repo.findById('entries', params.id)
         if (dbRef && (refEntry.lastUpdateDate < dbRef.lastUpdateDate))
           throw new Error('DB OBJECT EDITED SINCE YOU OPENED IT') // TODO:save for resolution?
-        await repo.updateDoc('entries', entry)
+        entry = await repo.updateDoc('entries', entry)
         msg = 'Mise à jour OK'
-        updateHistory(diff)
+        Utils.updateHistory(diff, entry.id, entry.lastUpdateDate)
       }
     }
     else{ // create new entry
@@ -115,7 +115,7 @@ async function save(){
       if (entry.wine.name) diff.wine.name = entry.wine.name
       if (entry.wine.producer) diff.wine.producer = entry.wine.producer
       if (entry.wine.year) diff.wine.year = entry.wine.year
-      updateHistory(diff)
+      Utils.updateHistory(diff, entry.id, entry.lastUpdateDate)
     }
 
     const imgOk = await imageEditor.save(entry.id)
@@ -155,30 +155,6 @@ async function increment(){
 async function decrement(){
   entry.count = Math.max(0, entry.count - 1)
   await save()
-}
-
-// get history doc for entry id, update it with change & save it
-async function updateHistory(change){
-  let history = await repo.findById('history', entry.id)
-  if (!history)
-    history = {entryId: entry.id, edits: []}
-  else if (!history.edits)
-    history.edits = []
-
-  history.edits.unshift({
-    ts: (new Date()).toISOString(),
-    change: change || 'UNKNOWN'
-  })
-
-  try{
-    if (history.creationDate)
-      await repo.updateDoc('history', history)
-    else
-      await repo.insertOne('history', history)
-  }
-  catch(ex){
-    console.error(ex)
-  }
 }
 
 </script>

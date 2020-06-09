@@ -155,7 +155,8 @@ class SyncMgr{
 
   async _mergeEntry(update){
     const remoteEntry = update.changes
-    let localEntry = await repo.findById('entries', remoteEntry.id)
+    let localEntry = await repo.findById('entries', remoteEntry.id),
+        diff // object saved in history
 
     if (localEntry){
       // compare local entry updateDate and timestamp the update was made at
@@ -168,12 +169,19 @@ class SyncMgr{
       // update is later than last local update, we can apply the change
       localEntry = this._deepAssign(localEntry, remoteEntry)
       await repo.updateDoc('entries', localEntry, true)
+      diff = remoteEntry
     }
     else{
       // entry id is unknown on this device, just create it
       await repo.insertOne('entries', remoteEntry)
       console.debug(`entry created from update ${update._id}`)
+
+      diff = {count: remoteEntry.count, wine: {}}
+      if (remoteEntry.wine.name) diff.wine.name = remoteEntry.wine.name
+      if (remoteEntry.wine.producer) diff.wine.producer = remoteEntry.wine.producer
+      if (remoteEntry.wine.year) diff.wine.year = remoteEntry.wine.year
     }
+    Utils.updateHistory(diff, remoteEntry.id, remoteEntry.lastUpdateDate)
   }
 
   async _mergePicture(update){

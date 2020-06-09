@@ -1,3 +1,4 @@
+import { repo } from './storage.js'
 
 export default class Utils{
 
@@ -101,5 +102,29 @@ export default class Utils{
         cp[key] = value
     })
     return cp
+  }
+
+  // get history doc for entry id, update it with change & save it
+  static async updateHistory(change, entryId, ts){
+    if (!entryId)
+      throw new Error('updateHistory needs entryId')
+
+    let history = await repo.findById('history', entryId)
+    if (!history)
+      history = {entryId: entryId, edits: []}
+    else if (!history.edits)
+      history.edits = []
+
+    history.edits.unshift({
+      ts: ts || (new Date()).toISOString(),
+      change: change || 'UNKNOWN'
+    })
+
+    try{
+      await repo.updateDoc('history', history)
+    }
+    catch(ex){
+      console.error(ex)
+    }
   }
 }

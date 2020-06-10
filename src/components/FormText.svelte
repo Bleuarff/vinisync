@@ -43,7 +43,9 @@ function resize(e){
     <textarea bind:value wrap="soft" bind:this={inputNd} rows="1" placeholder={placeholder}
       on:input={resize} on:focus={resize} on:change={resize} class="input"
       on:focus="{e => {autocomplete && autocomplete.show()}}"
-      on:blur="{e => {autocomplete && autocomplete.hide()}}"></textarea>
+      on:blur="{e => {autocomplete && autocomplete.hide(e)}}"
+      on:keyup="{autocomplete.navigate}"></textarea>
+      <!-- on:keyup="{e => {autocomplete && autocomplete.navigate(e)}}" -->
 
   {:else if type === 'year'}
     <input type="number" bind:value class="input">

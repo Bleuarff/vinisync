@@ -19,6 +19,7 @@
   let filteredList
   let verticalOffset = 0 // offset to adjust the position
   let width
+  let tempSelectionIdx = 0 // which item to highlight during keyboard nav
 
   // select datasource
   $: {
@@ -37,6 +38,8 @@
 
   // filter list based on value
   $: {
+    // remove new lines
+    value = value.replace(/[\r\n]/g, '')
     if (!value){
       filteredList = [] // disable list if no input
     }
@@ -48,6 +51,7 @@
 
   export async function show(){
     hidden = false
+    tempSelectionIdx = -1
 
     // on first call, adjust element width and vertical position.
     if (verticalOffset === 0){
@@ -65,19 +69,40 @@
     setTimeout(() => {
       // give time for elem 'select' handler to run. if hidden is set sync'ly, the handler doesn't run
       hidden = true
-    }, 80)
+    }, 100)
   }
 
   function select(e){
     value = e.currentTarget.dataset.value
   }
 
+  export async function navigate(e){
+    switch(e.code){
+      case 'ArrowUp':
+        tempSelectionIdx = Math.max(tempSelectionIdx - 1, 0)
+        break
+      case 'ArrowDown':
+        tempSelectionIdx = Math.min(tempSelectionIdx + 1, filteredList.length - 1)
+        break
+      case 'Enter':
+        const highlightedNd = root.getElementsByClassName('highlight')[0]
+        if (highlightedNd)
+          value = highlightedNd.dataset.value
+          await tick() // await before emptying list, so that value update handler runs before
+        filteredList = []
+        // console.debug('validate')
+        break
+      case 'Escape':
+        filteredList = []
+    }
+  }
+
 </script>
   <ul class="{source}" bind:this={root} class:hidden class:empty="{filteredList.length === 0}"
-    style="width:{width}px; margin-top:{verticalOffset}px;">
+    style="width:{width}px; margin-top:{verticalOffset}px;" tabindex="0">
 
-    {#each filteredList as elem}
-    <li on:click={select} data-value={elem}>{elem}</li>
+    {#each filteredList as elem, i}
+      <li on:click={select} data-value={elem} class:highlight="{tempSelectionIdx === i}" tabindex="0">{elem}</li>
     {/each}
   </ul>
 
@@ -101,7 +126,8 @@
   li{
     padding: 3px;
   }
-  li:hover{
+  li:hover,
+  li.highlight{
     background: #a40e0e;
     color: white;
   }

@@ -80,9 +80,11 @@
     switch(e.code){
       case 'ArrowUp':
         tempSelectionIdx = Math.max(tempSelectionIdx - 1, 0)
+        scroll('up')
         break
       case 'ArrowDown':
         tempSelectionIdx = Math.min(tempSelectionIdx + 1, filteredList.length - 1)
+        scroll('down')
         break
       case 'Enter':
         const highlightedNd = root.getElementsByClassName('highlight')[0]
@@ -94,6 +96,21 @@
         break
       case 'Escape':
         filteredList = []
+    }
+  }
+
+  // scroll suggestion list when need during keyboard navigation
+  async function scroll(dir){
+    await tick()
+    const highlightedNd = root.getElementsByClassName('highlight')[0]
+    if (highlightedNd){
+      const ndPos = highlightedNd && highlightedNd.getBoundingClientRect(),
+            rootPos = root.getBoundingClientRect()
+
+      const amount = dir === 'up' ? Math.min(0, ndPos.top - rootPos.top)
+                                  : Math.max(0, ndPos.bottom - rootPos.bottom)
+
+      root.scrollBy({left: 0, top: amount, behaviour: 'auto'})
     }
   }
 

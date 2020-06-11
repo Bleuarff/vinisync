@@ -44,7 +44,7 @@ function resize(e){
       on:input={resize} on:focus={resize} on:change={resize} class="input"
       on:focus="{e => {autocomplete && autocomplete.show()}}"
       on:blur="{e => {autocomplete && autocomplete.hide(e)}}"
-      on:keyup="{autocomplete.navigate}"></textarea>
+      on:keyup="{e => {autocomplete && autocomplete.navigate(e)}}"></textarea>
       <!-- on:keyup="{e => {autocomplete && autocomplete.navigate(e)}}" -->
 
   {:else if type === 'year'}

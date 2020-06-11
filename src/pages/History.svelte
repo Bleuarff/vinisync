@@ -11,7 +11,7 @@
 
   // set back to entry link with entry info
   $: if (entry && entry.wine){
-    linkLbl = [entry.wine.name, entry.wine.producer].join(' - ')
+    linkLbl = [entry.wine.name, entry.wine.producer].filter(x => !!x).join(' - ')
     if (entry.wine.year)
       linkLbl += ` (${entry.wine.year})`
   }

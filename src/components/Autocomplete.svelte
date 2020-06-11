@@ -1,7 +1,6 @@
 <script>
   // TODO: use normalization for item class names
   // TODO: include custom values from db
-  // TODO: keyboard navigation/selection
 
   import {tick} from 'svelte'
   import appellations from '../data/appellations.js'
@@ -38,6 +37,7 @@
 
   // filter list based on value
   $: {
+    // console.log('valuechanged: ' + value)
     // remove new lines
     value = value.replace(/[\r\n]/g, '')
     if (!value){
@@ -88,11 +88,14 @@
         break
       case 'Enter':
         const highlightedNd = root.getElementsByClassName('highlight')[0]
-        if (highlightedNd)
+        if (highlightedNd){
           value = highlightedNd.dataset.value
-          await tick() // await before emptying list, so that value update handler runs before
-        filteredList = []
-        // console.debug('validate')
+          // delay before emptying list, so that value update handler runs before
+          setTimeout(() => {
+            // console.debug('validate')
+            filteredList = []
+          }, 50)
+        }
         break
       case 'Escape':
         filteredList = []

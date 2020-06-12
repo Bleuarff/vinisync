@@ -1,35 +1,47 @@
 <!-- Noification bar -->
 
 <script>
-  export let msg = ''
   export let delay = 2500
 
-  let hidden = true
-  let error = false
+
+  let messages = []
 
   export function show({text, err}){
-    msg = text
-    error = !!err
-    hidden = false
+    const msg = {text: text, error: !!err, id: Math.random().toString(36).substring(2)}
+    messages = [...[msg], ...messages]
     setTimeout(() => {
-      hidden = true
-      msg = ''
+      const idx = messages.findIndex(x => x.id === msg.id)
+
+      if (idx !== -1){
+        messages = [...messages.slice(0, idx), ...messages.slice(idx+1)]
+      }
     }, delay)
   }
 </script>
 
-<div class="notif" class:hidden class:error>
-  <span class="msg">{msg}</span>
+<div id="notifs">
+  {#each messages as msg}
+    <div class="notif" class:error={msg.error}>
+      <span class="msg">{msg.text}</span>
+    </div>
+  {/each}
 </div>
 
 <style>
-  .notif{
+  #notifs{
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100vw;
-    padding: 5px 1em;
+    padding: 0;
+    margin: 0;
     color: white;
+  }
+
+  .notif{
+    padding: 5px 1px;
+    width: 100%;
+    padding: 5px 1em;
     background: #188630;
   }
 

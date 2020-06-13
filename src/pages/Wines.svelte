@@ -137,7 +137,7 @@ function sortHandler(e){
 </script>
 
 {#if origEntries.length > 0}
-  <a href="/history/{params.id}" class="forward">historique</a>
+  <a href="/history" class="forward">historique</a>
 
   <h2>Mes vins</h2>
   <p><span class="bold">{origEntries.length}</span> references et <span class="bold">{bottleCount}</span> bouteilles en cave.</p>

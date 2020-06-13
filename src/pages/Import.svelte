@@ -40,6 +40,9 @@ async function insert(entries){
   console.log(`${entries.length} entries in file`)
   await repo.open()
   await repo.deleteAll('entries')
+  await repo.deleteAll('images')
+  await repo.deleteAll('history')
+  await repo.deleteAll('updates')
   const proms = []
   entries.forEach(entry => {
     entry.id = uuid()

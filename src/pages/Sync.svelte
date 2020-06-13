@@ -61,6 +61,8 @@
     await repo.insertOne('config', config)
     await repo.deleteAll('entries') // delete all local entries
     await repo.deleteAll('images')
+    await repo.deleteAll('history')
+    await repo.deleteAll('updates')
 
     syncMgr.checkUpdates() // request updates from server
   }

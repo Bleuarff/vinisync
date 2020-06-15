@@ -9,15 +9,14 @@ export async function resize(file){
     return file
   }
 
-  const content  = new Uint8Array(await file.arrayBuffer())
-
-  let dimensions
+  let infos
   if (file.type === 'image/jpeg')
-    dimensions = getJpegSize(content, file.size)
+    infos = getJpegSize(new DataView(await file.arrayBuffer()), file.size)
   else
-    throw new Error('Image format not supported')
+    // TODO: png support
+    throw new Error('Image format resize not supported')
 
-  const targetSize = getDesiredSize(dimensions)
+  const targetSize = getDesiredSize(infos)
 
   const img = await getImage(file),
         canvas = document.createElement('canvas')
@@ -73,25 +72,41 @@ function getDesiredSize({height, width}){
   return {width: Math.round(dw), height: Math.round(dh)}
 }
 
-function getJpegSize(content, length){
-  let offset = 2
-  let dims
+function getJpegSize(raw, length){
+  let offset = 2 // offset of block address, from start of file
+  let info = {width: 0, height: 0, rotation: 0}
+  // let exifFound = false
 
   do{
-    const blockStart = content.slice(offset, offset + 4)
-    if (blockStart[0] === 0xff && (blockStart[1] === 0xc0 || blockStart[1] == 0xc2)){
-      // found block
-      const block = content.slice(offset + 5, offset + 9)
-      const height = (block[0] << 8) + block[1],
-            width = (block[2] << 8) + block[3]
-      dims = {width: width, height: height}
+    const header = raw.getUint16(offset, false), // block code
+          blockLength = raw.getUint16(offset+2, false) // block size
+
+    if (header === 0xffc0 || header === 0xffc2){
+      console.debug('size block at 0x' + offset.toString(16))
+      const height = raw.getUint16(offset + 5),
+            width = raw.getUint16(offset + 7)
+      info.width = width
+      info.height = height
+      console.debug(`w: ${width}   h: ${height}`)
     }
-    else{
-      const blockSize = (blockStart[2] << 8 ) + blockStart[3]
-      // console.log(`skip block ${blockSize} bytes`)
-      offset += 2 + blockSize
-    }
+    // exif block
+    // else if (header === 0xffe1 && !exifFound){
+    //   let soff = offset
+    //   exifFound = true
+    //   console.log(`exif at 0x${offset.toString(16)}. length: ${blockLength.toString(10)}bytes`)
+    //   if (raw.getUint32(soff+=4) !== 0x45786966){
+    //     console.log('Invalid exif header')
+    //   }
+    //   else{
+    //     const little = raw.getUint16(soff+=6) === 0x4949
+    //     console.debug('little endian: ' + little)
+    //
+    //   }
+    // }
+
+    // goto next block
+    offset += 2 + blockLength
   }
-  while(offset < length && !dims)
-  return dims
+  while(offset < length)
+  return info
 }

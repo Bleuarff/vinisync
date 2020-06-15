@@ -7,7 +7,9 @@
   let updates = []
   let entry = null
 
-  let linkLbl = 'Fiche bouteille'
+  let linkLbl = ''
+
+  let editEntryMap
 
   // set back to entry link with entry info
   $: if (entry && entry.wine){
@@ -24,15 +26,39 @@
 
   export async function load(){
     if (params.id){
-      const doc = (await repo.findById('history', params.id))
+      const doc = await repo.findById('history', params.id)
       if (doc)
-        updates = doc.edits.sort((a,b) => {
-          // sort by descending date
-          if (a.ts < b.ts) return 1
-          else if (a.ts > b.ts) return -1
-          return 0
-        })
+        updates = doc.edits.sort(sortByDate)
       entry = await repo.findById('entries', params.id)
+    }
+    else{
+      const docs = await repo.getAll('history'),
+            entries = await repo.getAll('entries')
+
+      editEntryMap = new WeakMap()
+      docs.forEach(doc => {
+        updates = updates.concat(doc.edits) // refresh global list of updates
+
+        let curr = (new Date()).toISOString(),
+            firstIdx = -1 // index of oldest element
+
+        // get index of oldest item
+        for (let i = 0; i < doc.edits.length; i++){
+          if (doc.edits[i].ts < curr){
+            firstIdx = i
+            curr = doc.edits[i].ts
+          }
+        }
+
+        for (let i = 0; i < doc.edits.length; i++){
+          const edit = doc.edits[i],
+                entry = entries.find(x => x.id === doc.entryId)
+
+          editEntryMap.set(edit.change, {entry: entry, isNew: i === firstIdx})
+        }
+
+      })
+      updates = updates.sort(sortByDate)
     }
   }
 
@@ -42,11 +68,53 @@
     if (t === 'string')
       return change
     else if (t === 'object')
-      return JSON.stringify(change)
+      return parseDiff(change)
+  }
+
+  function parseDiff(change){
+    let output = ''
+
+    const {entry, isNew} = editEntryMap.get(change)
+
+    output += isNew ? 'NEW' : 'EDIT'
+    //     entry
+    //     let names = [], year
+    // if (change){
+    //   if (change.wine){
+    //     names = [change.wine.name, change.wine.producer]
+    //     if (change.wine.year)
+    //       year = change.wine.year
+    //   }
+    //   else if (editEntryMap && (entry = editEntryMap.get(change))){
+    //     names = [entry.wine.name, entry.wine.producer]
+    //     if (entry.wine.year)
+    //       year = entry.wine.year
+    //   }
+    //
+    //   if (change.count){
+    //
+    //   }
+    // }
+    //
+    // output = `${names.filter(x => x).join(' - ')} (${year})`
+
+
+    output += JSON.stringify(change)
+    return output
+  }
+
+  // sort by descending date
+  function sortByDate(a, b){
+    if (a.ts < b.ts) return 1
+    else if (a.ts > b.ts) return -1
+    return 0
   }
 </script>
 
-<a href="/entry/{params.id}" class="back" title={linkLbl}>{linkLbl}</a>
+{#if linkLbl}
+  <a href="/entry/{params.id}" class="back" title={linkLbl}>{linkLbl}</a>
+{/if}
+
 <div id="history">
 
   {#if updates && updates.length > 0}
@@ -81,13 +149,14 @@
     border-collapse: collapse;
   }
   .ts{
-    width: 12em;
+    /* width: 12em; */
+    white-space: nowrap;
   }
   .change{
     padding-left: 1em;
-    text-align: center;
+    /* text-align: center; */
   }
-  tr:nth-child(2n){
+  tr:nth-child(2n+1){
     background: #eeeeee;
   }
   td{

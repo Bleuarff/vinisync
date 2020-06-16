@@ -5,18 +5,18 @@
   export let params
 
   let updates = []
-  let entry = null
+  // let entries = null
 
-  let linkLbl = ''
+  let linkLbl = 'Retour'
 
   let editEntryMap
 
   // set back to entry link with entry info
-  $: if (entry && entry.wine){
-    linkLbl = [entry.wine.name, entry.wine.producer].filter(x => !!x).join(' - ')
-    if (entry.wine.year)
-      linkLbl += ` (${entry.wine.year})`
-  }
+  // $: if (entries && entries[0].wine){
+  //   linkLbl = [entry.wine.name, entry.wine.producer].filter(x => !!x).join(' - ')
+  //   if (entry.wine.year)
+  //     linkLbl += ` (${entry.wine.year})`
+  // }
 
   onMount(async () => {
     console.debug('history mount')
@@ -25,41 +25,44 @@
   })
 
   export async function load(){
+    let entries
     if (params.id){
       const doc = await repo.findById('history', params.id)
-      if (doc)
-        updates = doc.edits.sort(sortByDate)
-      entry = await repo.findById('entries', params.id)
+      if (doc){
+        updates = analyze(doc.edits)
+        entries = [await repo.findById('entries', params.id)]
+      }
     }
     else{
-      const docs = await repo.getAll('history'),
-            entries = await repo.getAll('entries')
-
-      editEntryMap = new WeakMap()
+      const docs = await repo.getAll('history')
+      entries = await repo.getAll('entries')
       docs.forEach(doc => {
-        updates = updates.concat(doc.edits) // refresh global list of updates
-
-        let curr = (new Date()).toISOString(),
-            firstIdx = -1 // index of oldest element
-
-        // get index of oldest item
-        for (let i = 0; i < doc.edits.length; i++){
-          if (doc.edits[i].ts < curr){
-            firstIdx = i
-            curr = doc.edits[i].ts
-          }
-        }
-
-        for (let i = 0; i < doc.edits.length; i++){
-          const edit = doc.edits[i],
-                entry = entries.find(x => x.id === doc.entryId)
-
-          editEntryMap.set(edit.change, {entry: entry, isNew: i === firstIdx})
-        }
-
+        updates = updates.concat(analyze(doc.edits)) // populate global list of updates
       })
       updates = updates.sort(sortByDate)
     }
+  }
+
+  // adds metadata from a list of changes for a single entry.
+  function analyze(changeList){
+    changeList = changeList.sort(sortByDate)
+
+    for (let i = 0; i < changeList.length; i++){
+      const change = changeList[i].change
+      if (change.count != null){ // can be 0
+        // find previous element with count
+        const prev = changeList.slice(i+1).find(x => x.change.count != null)
+        // const previous = changeList.slice(0, i).reverse(),
+        //       prevCount = previous.find(x => x.count != null)
+        if (prev){
+          change.countDiff = change.count - prev.change.count
+          console.log(change)
+        }
+
+      }
+
+    }
+    return changeList
   }
 
   // TODO: display in text format instead of json
@@ -74,9 +77,9 @@
   function parseDiff(change){
     let output = ''
 
-    const {entry, isNew} = editEntryMap.get(change)
+    // const {entry, isNew} = editEntryMap.get(change)
 
-    output += isNew ? 'NEW' : 'EDIT'
+    // output += isNew ? 'NEW' : 'EDIT'
     //     entry
     //     let names = [], year
     // if (change){
@@ -127,7 +130,15 @@
         {#each updates as update}
           <tr>
             <td class="ts">{moment(update.ts).format('DD/MM/YYYY HH:mm')}</td>
-            <td class="change">{formatChange(update.change)}</td>
+            <td class="change">
+              {#if update.change.creationDate}<span>NEW</span>{/if}
+              {#if update.change.countDiff}
+                <span class="count-diff">{update.change.countDiff}</span>
+              {/if}
+              <span class="count">[{update.change.count}]</span>
+
+              {formatChange(update.change)}
+            </td>
           </tr>
         {/each}
       </tbody>
@@ -154,6 +165,7 @@
   }
   .change{
     padding-left: 1em;
+    width: 100%;
     /* text-align: center; */
   }
   tr:nth-child(2n+1){

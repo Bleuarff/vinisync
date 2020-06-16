@@ -111,7 +111,7 @@ async function save(){
       msg = 'Bouteille ajoutée'
       router(`/entry/${entry.id}`) // soft redirect: address bar updated but that's all
 
-      const diff = {count: entry.count, wine: {}}
+      const diff = {count: entry.count, wine: {}, creationDate: entry.creationDate}
       if (entry.wine.name) diff.wine.name = entry.wine.name
       if (entry.wine.producer) diff.wine.producer = entry.wine.producer
       if (entry.wine.year) diff.wine.year = entry.wine.year
@@ -161,7 +161,9 @@ async function decrement(){
 
 <div class="nav">
   <a href="/wines" class="back">liste</a>
-  <a href="/history/{params.id}" class="forward">historique</a>
+  {#if params.id}
+    <a href="/history/{params.id}" class="forward">historique</a>
+  {/if}
 </div>
 
 <div id="entry">

@@ -74,39 +74,73 @@ function getDesiredSize({height, width}){
 
 function getJpegSize(raw, length){
   let offset = 2 // offset of block address, from start of file
-  let info = {width: 0, height: 0, rotation: 0}
-  // let exifFound = false
+  let info = {width: 0, height: 0, orientation: 0, rotation: 0}
+  let exifFound = false
 
   do{
     const header = raw.getUint16(offset, false), // block code
           blockLength = raw.getUint16(offset+2, false) // block size
 
+    // SOF0 or SOF2 block
     if (header === 0xffc0 || header === 0xffc2){
       console.debug('size block at 0x' + offset.toString(16))
-      const height = raw.getUint16(offset + 5),
-            width = raw.getUint16(offset + 7)
+      const height = raw.getUint16(offset + 5, false),
+            width = raw.getUint16(offset + 7, false)
       info.width = width
       info.height = height
-      console.debug(`w: ${width}   h: ${height}`)
+      // console.debug(`w: ${width}   h: ${height}`)
     }
     // exif block
-    // else if (header === 0xffe1 && !exifFound){
-    //   let soff = offset
-    //   exifFound = true
-    //   console.log(`exif at 0x${offset.toString(16)}. length: ${blockLength.toString(10)}bytes`)
-    //   if (raw.getUint32(soff+=4) !== 0x45786966){
-    //     console.log('Invalid exif header')
-    //   }
-    //   else{
-    //     const little = raw.getUint16(soff+=6) === 0x4949
-    //     console.debug('little endian: ' + little)
-    //
-    //   }
-    // }
+    else if (header === 0xffe1 && !exifFound){
+      exifFound = true
+      let soff = offset
+      console.debug(`exif at 0x${offset.toString(16)}. length: ${blockLength.toString(10)}bytes`)
+      if (raw.getUint32(soff+=4, false) !== 0x45786966){
+        console.log('Invalid exif header')
+      }
+      else{
+        const little = raw.getUint16(soff+=6, false) === 0x4949
+        // console.debug('little endian: ' + little)
+
+        soff += raw.getUint32(soff + 4, little)
+        const tagsCount = raw.getUint16(soff, little)
+        soff += 2
+        for (let i = 0; i < tagsCount; i++){
+          if (raw.getUint16(soff + (i * 12), little) == 0x0112){
+            info.orientation = raw.getUint16(soff + (i * 12) + 8, little)
+            break
+          }
+        }
+      }
+    }
 
     // goto next block
     offset += 2 + blockLength
   }
   while(offset < length)
+
+  // 1 = Horizontal (normal)
+  // 2 = Mirror horizontal
+  // 3 = Rotate 180
+  // 4 = Mirror vertical
+  // 5 = Mirror horizontal and rotate 270 CW
+  // 6 = Rotate 90 CW
+  // 7 = Mirror horizontal and rotate 90 CW
+  // 8 = Rotate 270 CW
+  switch (info.orientation){
+    case 6:
+    case 8:
+      info.rotation = info.rotation === 6 ?-90 : -270;
+      [info.width, info.height] = [info.height, info.width] // quarter-turn rotation: switch height & width
+      break
+    case 3:
+      info.rotation = 180
+      break
+    case 1:
+    default:
+      info.rotation = 0
+  }
+
+  console.debug(info)
   return info
 }

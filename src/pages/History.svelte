@@ -5,10 +5,22 @@
   export let params
 
   let updates = []
+  let entry
 
-  let linkLbl = 'Retour'
-
-  let editEntryMap
+  let link = {href: '/wines', title: 'Retour'}
+  $: {
+    if (params.id)
+      link.href = '/entry/' + params.id
+    if (entry && entry.wine){
+      link.title = entry.wine.name
+      if (entry.wine.name && entry.wine.producer)
+        link.title += ' - '
+      if (entry.wine.producer)
+        link.title += entry.wine.producer
+      if (entry.wine.year)
+        link.title += ` (${entry.wine.year})`
+    }
+  }
 
   onMount(async () => {
     console.debug('history mount')
@@ -17,12 +29,11 @@
   })
 
   export async function load(){
-
     if (params.id){
       const doc = await repo.findById('history', params.id)
       if (doc){
         updates = analyze(doc.edits)
-        let entry = await repo.findById('entries', params.id)
+        entry = await repo.findById('entries', params.id)
       }
     }
     else{
@@ -47,9 +58,11 @@
         const prev = changeList.slice(i+1).find(x => x.change.count != null)
         if (prev){
           change.countDiff = change.count - prev.change.count
-          console.log(change)
+          // console.log(change)
         }
       }
+
+      // populate with entry data (in global view)
       if (refEntry){
         change.wine = change.wine || {}
         change.wine.name = change.wine.name || refEntry.wine.name
@@ -77,8 +90,8 @@
   }
 </script>
 
-{#if linkLbl}
-  <a href="/entry/{params.id ? params.id:''}" class="back" title={linkLbl}>{linkLbl}</a>
+{#if link}
+  <a href={link.href} class="back" title={link.title}>{link.title}</a>
 {/if}
 
 <div id="history">

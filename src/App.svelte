@@ -6,6 +6,7 @@
 	import Import from './pages/Import.svelte'
 	import Sync from './pages/Sync.svelte'
 	import History from './pages/History.svelte'
+	import Err404 from './pages/Err404.svelte'
 	import Notif from './components/Notif.svelte'
 	import TitleBar from './components/TitleBar.svelte'
 	import syncMgr from './syncMgr.js'
@@ -29,6 +30,7 @@
 		params = ctx.params
 		next()
 	}, () => page = History)
+	router('*', () => page = Err404)
 	router.start()
 
 	function getPath(ctx, next){

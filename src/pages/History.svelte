@@ -5,18 +5,10 @@
   export let params
 
   let updates = []
-  // let entries = null
 
   let linkLbl = 'Retour'
 
   let editEntryMap
-
-  // set back to entry link with entry info
-  // $: if (entries && entries[0].wine){
-  //   linkLbl = [entry.wine.name, entry.wine.producer].filter(x => !!x).join(' - ')
-  //   if (entry.wine.year)
-  //     linkLbl += ` (${entry.wine.year})`
-  // }
 
   onMount(async () => {
     console.debug('history mount')
@@ -25,26 +17,27 @@
   })
 
   export async function load(){
-    let entries
+
     if (params.id){
       const doc = await repo.findById('history', params.id)
       if (doc){
         updates = analyze(doc.edits)
-        entries = [await repo.findById('entries', params.id)]
+        let entry = await repo.findById('entries', params.id)
       }
     }
     else{
       const docs = await repo.getAll('history')
-      entries = await repo.getAll('entries')
+      const entries = await repo.getAll('entries')
       docs.forEach(doc => {
-        updates = updates.concat(analyze(doc.edits)) // populate global list of updates
+        const refEntry = entries.find(x => x.id === doc.entryId)
+        updates = updates.concat(analyze(doc.edits, refEntry)) // populate global list of updates
       })
       updates = updates.sort(sortByDate)
     }
   }
 
   // adds metadata from a list of changes for a single entry.
-  function analyze(changeList){
+  function analyze(changeList, refEntry){
     changeList = changeList.sort(sortByDate)
 
     for (let i = 0; i < changeList.length; i++){
@@ -52,15 +45,17 @@
       if (change.count != null){ // can be 0
         // find previous element with count
         const prev = changeList.slice(i+1).find(x => x.change.count != null)
-        // const previous = changeList.slice(0, i).reverse(),
-        //       prevCount = previous.find(x => x.count != null)
         if (prev){
           change.countDiff = change.count - prev.change.count
           console.log(change)
         }
-
       }
-
+      if (refEntry){
+        change.wine = change.wine || {}
+        change.wine.name = change.wine.name || refEntry.wine.name
+        change.wine.producer = change.wine.producer || refEntry.wine.producer
+        change.wine.year = change.wine.year || refEntry.wine.year
+      }
     }
     return changeList
   }
@@ -71,39 +66,7 @@
     if (t === 'string')
       return change
     else if (t === 'object')
-      return parseDiff(change)
-  }
-
-  function parseDiff(change){
-    let output = ''
-
-    // const {entry, isNew} = editEntryMap.get(change)
-
-    // output += isNew ? 'NEW' : 'EDIT'
-    //     entry
-    //     let names = [], year
-    // if (change){
-    //   if (change.wine){
-    //     names = [change.wine.name, change.wine.producer]
-    //     if (change.wine.year)
-    //       year = change.wine.year
-    //   }
-    //   else if (editEntryMap && (entry = editEntryMap.get(change))){
-    //     names = [entry.wine.name, entry.wine.producer]
-    //     if (entry.wine.year)
-    //       year = entry.wine.year
-    //   }
-    //
-    //   if (change.count){
-    //
-    //   }
-    // }
-    //
-    // output = `${names.filter(x => x).join(' - ')} (${year})`
-
-
-    output += JSON.stringify(change)
-    return output
+      return JSON.stringify(change)
   }
 
   // sort by descending date
@@ -115,7 +78,7 @@
 </script>
 
 {#if linkLbl}
-  <a href="/entry/{params.id}" class="back" title={linkLbl}>{linkLbl}</a>
+  <a href="/entry/{params.id ? params.id:''}" class="back" title={linkLbl}>{linkLbl}</a>
 {/if}
 
 <div id="history">
@@ -131,13 +94,31 @@
           <tr>
             <td class="ts">{moment(update.ts).format('DD/MM/YYYY HH:mm')}</td>
             <td class="change">
-              {#if update.change.creationDate}<span>NEW</span>{/if}
-              {#if update.change.countDiff}
-                <span class="count-diff">{update.change.countDiff}</span>
-              {/if}
-              <span class="count">[{update.change.count}]</span>
+              <div class="diff-ctnr">
+                {#if update.change.creationDate}<span>NEW</span>{/if}
+                {#if update.change.countDiff}
+                  <span class="count-diff">{update.change.countDiff > 0 ? '+' :''}{update.change.countDiff}</span>
+                  <span class="count">[{update.change.count}]</span>
+                {:else if update.change.count}
+                  <span class="count">[{update.change.count}]</span>
+                {/if}
+                {#if update.change.wine}
+                  {#if update.change.wine.name}
+                    <span class="name">{update.change.wine.name}</span>
+                  {/if}
 
-              {formatChange(update.change)}
+                  {#if (update.change.wine.producer && update.change.wine.name)}<span> - </span>{/if}
+
+                  {#if update.change.wine.producer}
+                    <span class="producer">{update.change.wine.producer}</span>
+                  {/if}
+                  {#if update.change.wine.year}
+                    <span class="year">({update.change.wine.year})</span>
+                  {/if}
+                {/if}
+
+                <!-- {formatChange(update.change)} -->
+              </div>
             </td>
           </tr>
         {/each}
@@ -156,17 +137,16 @@
   }
   table{
     width: 100%;
-    font-size: .85em;
+    font-size: .844em;
     border-collapse: collapse;
   }
   .ts{
-    /* width: 12em; */
     white-space: nowrap;
+    vertical-align: top;
   }
   .change{
     padding-left: 1em;
     width: 100%;
-    /* text-align: center; */
   }
   tr:nth-child(2n+1){
     background: #eeeeee;

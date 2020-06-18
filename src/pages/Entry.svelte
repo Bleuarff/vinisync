@@ -15,6 +15,8 @@ import { createEventDispatcher } from 'svelte'
 const dispatch = createEventDispatcher();
 
 export let params
+const COUNT_CHANGE_DELAY = 800 // delay before saving after a +/- 1, but still accepting count updates
+
 let entry = {
   wine: {
     appellation: '',
@@ -40,7 +42,7 @@ let entry = {
 let edit = false,
     refEntry, // clone of the entry fresh out of db, to get diff of modifications
     imageEditor,
-    history
+    countChangeTimeoutId // shared timeout id for increment/decrement operations
 
 // $: serialized = JSON.stringify(entry)
 
@@ -149,12 +151,24 @@ function sanitizeEntry(){
 
 async function increment(){
   entry.count += 1
-  await save()
+
+  if (!countChangeTimeoutId){
+    countChangeTimeoutId = setTimeout(async () => {
+      countChangeTimeoutId = null
+      await save()
+    }, COUNT_CHANGE_DELAY)
+  }
 }
 
 async function decrement(){
   entry.count = Math.max(0, entry.count - 1)
-  await save()
+
+  if (!countChangeTimeoutId){
+    countChangeTimeoutId = setTimeout(async () => {
+      countChangeTimeoutId = null
+      await save()
+    }, COUNT_CHANGE_DELAY)
+  }
 }
 
 </script>

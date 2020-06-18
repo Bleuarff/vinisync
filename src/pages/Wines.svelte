@@ -3,6 +3,7 @@ import { onMount } from 'svelte'
 import {repo } from '../storage.js'
 import syncMgr from '../syncMgr.js'
 import Filters from '../components/Filters.svelte'
+const CONFIG_SORT_KEY = 'config.page.wines.sort'
 export let params = {}
 
 // IDEA: show sort order in sort icon. Use an overlay with vertical gradient opacity background to hide icon top/bottom.
@@ -10,28 +11,22 @@ export let params = {}
 let origEntries = [] // db data, may be sorted
 let entries = [] // subset of entries
 let syncConfig
-let pageConfig
+let sortConfig
 let lastSortField // name of the last field used for sorting
 let lastSortASC // whether last sort was in ascending order
 
-const defaultPageConfig = {
-  id: 'wines',
-  sort: {
-    field: 'year', orderAsc: false
-  }
-}
+const defaultSortConfig = { field: 'year', orderAsc: false }
 
 $: bottleCount = origEntries.reduce((cur, e)=> {return cur + e.count}, 0)
 
 onMount(async () => {
   await repo.open()
 
-  // getting these objects concurrently (with Promise.all) fails, both are undefined. IDB/indexedDB concurrency issue?
+  sortConfig = JSON.parse(window.localStorage.getItem(CONFIG_SORT_KEY))
   syncConfig = await repo.findById('config', 'sync')
-  pageConfig =  await repo.findById('config', 'wines')
 
-  if (!pageConfig){
-    pageConfig = defaultPageConfig
+  if (!sortConfig){
+    sortConfig = defaultSortConfig
   }
 
   load()
@@ -52,18 +47,18 @@ export async function load(){
 function sort(list, field){
   const manual = !!field // whether sort is due to user action
   let asc // sort order true: ascending, false: descending
-  field = field || pageConfig.sort.field
+  field = field || sortConfig.field
 
   switch(field){
     // numbers defaut to descending order
     case 'year':
     case 'count':
-      asc = (lastSortField === field && manual) ? !lastSortASC : pageConfig.sort.orderAsc
+      asc = (lastSortField === field && manual) ? !lastSortASC : sortConfig.orderAsc
     break
     // strings default to ascending order
     case 'appellation':
     case 'producer':
-      asc = (lastSortField === field && manual) ? !lastSortASC : pageConfig.sort.orderAsc
+      asc = (lastSortField === field && manual) ? !lastSortASC : sortConfig.orderAsc
     break
   }
 
@@ -126,12 +121,12 @@ function filterList(e){
 }
 
 function sortHandler(e){
-  pageConfig.sort.field = e.currentTarget.dataset.name
-  entries = sort(entries, pageConfig.sort.field)
-  pageConfig.sort.orderAsc = lastSortASC
+  sortConfig.field = e.currentTarget.dataset.name
+  entries = sort(entries, sortConfig.field)
+  sortConfig.orderAsc = lastSortASC
 
   // on each sort, store field & order as the new defaults
-  repo.updateDoc('config', pageConfig)
+  window.localStorage.setItem(CONFIG_SORT_KEY, JSON.stringify(sortConfig))
 }
 
 </script>

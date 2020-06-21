@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import { repo } from '../storage.js'
   import moment from 'moment'
+  import Chart from 'chart.js'
   export let params
 
   let updates = []
@@ -34,6 +35,7 @@
       if (doc){
         updates = analyze(doc.edits)
         entry = await repo.findById('entries', params.id)
+        createChart()
       }
     }
     else{
@@ -73,7 +75,80 @@
     return changeList
   }
 
-  // TODO: display in text format instead of json
+  function createChart(){
+    var ctx = document.getElementById('chart')
+    const datapoints = updates.filter(x => x.change.count != null).reverse().map(x => {return {
+      x: moment(x.ts),
+      y: x.change.count
+    }})
+    // add last point with current time and same value as initial last point
+    datapoints.push({
+      x: moment(),
+      y: datapoints[datapoints.length-1].y
+    })
+
+    let color = '#ba0e0e',
+        fillColor = '#ba0e0e40'
+    if (entry && entry.wine && entry.wine.color){
+      if (entry.wine.color === 'white'){
+        color = '#f1d125'
+        fillColor = '#f1d12540'
+      }
+      else if (entry.wine.color === 'rose'){
+        color = '#e46289'
+        fillColor = '#e4628940'
+      }
+    }
+
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [{
+                label: false,
+                data: datapoints,
+                steppedLine: 'before',
+                borderWidth: 2,
+                borderColor: color,
+                backgroundColor: fillColor,
+                pointRadius: 2
+            }]
+        },
+        options: {
+          legend: {
+            display: false
+          },
+          scales: {
+            xAxes: [{
+              type: 'time',
+              time: {
+                displayFormats:
+                {
+                  millisecond: 'DD/MM/YYYY',
+                  second: 'DD/MM/YYYY',
+                  minute: 'DD/MM/YYYY',
+                  hour: 'DD/MM/YYYY',
+                  day: 'DD/MM/YYYY',
+                  week: 'DD/MM/YYYY',
+                  month: 'DD/MM/YYYY',
+                  quarter: 'DD/MM/YYYY',
+                  year: 'DD/MM/YYYY',
+                },
+                tooltipFormat: 'DD/MM/YYYY',
+              },
+              ticks: {
+                source: 'data'
+              },
+            }],
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+          }
+        },
+    })
+  }
+
   function formatChange(change){
     const t = typeof change
     if (t === 'string')
@@ -95,6 +170,12 @@
 {/if}
 
 <div id="history">
+
+  {#if params.id}
+    <div id="chart-ctnr">
+      <canvas id="chart" width="400" height="100"></canvas>
+    </div>
+  {/if}
 
   {#if updates && updates.length > 0}
     <table>
@@ -129,9 +210,8 @@
                     <span class="year">({update.change.wine.year})</span>
                   {/if}
                 {/if}
-
-                <!-- {formatChange(update.change)} -->
               </div>
+              <!-- {formatChange(update.change)} -->
             </td>
           </tr>
         {/each}
@@ -187,5 +267,11 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  #chart-ctnr{
+    width: 100%;
+    /* height: 220px; */
+    margin-bottom: 3em;
   }
 </style>

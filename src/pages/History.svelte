@@ -35,7 +35,6 @@
       if (doc){
         updates = analyze(doc.edits)
         entry = await repo.findById('entries', params.id)
-        createChart()
       }
     }
     else{
@@ -47,6 +46,7 @@
       })
       updates = updates.sort(sortByDate)
     }
+    createChart()
   }
 
   // adds metadata from a list of changes for a single entry.
@@ -70,20 +70,28 @@
         change.wine.name = change.wine.name || refEntry.wine.name
         change.wine.producer = change.wine.producer || refEntry.wine.producer
         change.wine.year = change.wine.year || refEntry.wine.year
+        changeList[i]._entryId = refEntry.id
       }
     }
     return changeList
   }
 
   function createChart(){
-    var ctx = document.getElementById('chart')
-    const datapoints = updates.filter(x => x.change.count != null).reverse().map(x => {return {
-      x: moment(x.ts),
-      y: x.change.count
-    }})
+    const ctx = document.getElementById('chart')
+    let datapoints
+    if (params.id){
+      datapoints = updates.filter(x => x.change.count != null).reverse().map(x => {return {
+        t: moment(x.ts),
+        y: x.change.count
+      }})
+    }
+    else {
+      datapoints = getGlobalCounts()
+    }
+
     // add last point with current time and same value as initial last point
     datapoints.push({
-      x: moment(),
+      t: moment(),
       y: datapoints[datapoints.length-1].y
     })
 
@@ -149,6 +157,29 @@
     })
   }
 
+  // returns data for global history with bottle counts.
+  function getGlobalCounts(){
+    const changes = updates.filter(x => x.change.count != null).reverse(),
+          map = new Map(), // store count by entryId
+          datapoints = []
+
+    changes.forEach(change => {
+      // udpate map with count for entry, whether new or update,
+      // then iterates over map to get total count at this point.
+      map.set(change._entryId, change.change.count)
+      let count = 0
+      for (const c of map.values())
+        count += c
+
+      datapoints.push({
+        t: moment(change.ts),
+        y: count
+      })
+    })
+
+    return datapoints
+  }
+
   function formatChange(change){
     const t = typeof change
     if (t === 'string')
@@ -171,11 +202,9 @@
 
 <div id="history">
 
-  {#if params.id}
-    <div id="chart-ctnr">
-      <canvas id="chart" width="400" height="100"></canvas>
-    </div>
-  {/if}
+  <div id="chart-ctnr">
+    <canvas id="chart" width="400" height="120"></canvas>
+  </div>
 
   {#if updates && updates.length > 0}
     <table>

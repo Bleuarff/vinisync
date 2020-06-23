@@ -24,7 +24,7 @@
   }
 
   onMount(async () => {
-    console.debug('history mount')
+    // console.debug('history mount')
     await repo.open()
     load()
   })

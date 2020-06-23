@@ -27,6 +27,7 @@
       <a href="/">V</a>
       <a href="/stats" class="icon-chart-bar"></a>
       <a href="/sync" class="icon-cog-outline" title="Synchronisation"></a>
+      <a href="/conflicts" class="icon-bomb" title="Conflits"></a>
       <button class="icon-arrows-cw force-sync" title="Forcer la synchro" on:click="{()=>{dispatch('sync-request')}}"></button>
     </div>
   </div>

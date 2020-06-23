@@ -6,6 +6,7 @@
 	import Import from './pages/Import.svelte'
 	import Sync from './pages/Sync.svelte'
 	import History from './pages/History.svelte'
+	import Conflicts from './pages/Conflicts.svelte'
 	import Err404 from './pages/Err404.svelte'
 	import Notif from './components/Notif.svelte'
 	import TitleBar from './components/TitleBar.svelte'
@@ -30,6 +31,7 @@
 		params = ctx.params
 		next()
 	}, () => page = History)
+	router('/conflicts', getPath, () => page = Conflicts)
 	router('*', () => page = Err404)
 	router.start()
 

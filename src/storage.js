@@ -1,6 +1,6 @@
 import { openDB, deleteDB, wrap, unwrap } from 'idb'
 
-const DB_VERSION = 3,
+const DB_VERSION = 1,
       DB_NAME = 'vinisync'
 
 let db
@@ -20,9 +20,8 @@ async function open(){
         db.createObjectStore('config', {keyPath: 'id', autoIncrement: false})
         db.createObjectStore('updates', {keyPath: 'id', autoIncrement: false})
         db.createObjectStore('images', {keyPath: 'id', autoIncrement: false})
-      }
-      if (oldVersion < 2){
-        const store = db.createObjectStore('history', {keyPath: 'entryId', autoIncrement: false})
+        db.createObjectStore('history', {keyPath: 'entryId', autoIncrement: false})
+        db.createObjectStore('conflicts', {keyPath: 'id', autoIncrement: false})
       }
     }
   })

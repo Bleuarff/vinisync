@@ -3,11 +3,14 @@ import { send } from './fetch.js'
 import Utils from './utils.js'
 import { v4 as uuid} from 'uuid'
 import moment from 'moment'
+import { createEventDispatcher } from 'svelte'
+let dispatch
 
 const SYNC_INTERVAL = 1, // minimum interval between 2 update checks, in minutes
       PENDING_RETRY_INTERVAL = 3600 * 1000 // interval at which we check for pending updates to sync, in milliseconds
 
 class SyncMgr{
+
   constructor(){}
 
   // initiate sync: send all existing local data
@@ -161,8 +164,22 @@ class SyncMgr{
     if (localEntry){
       // compare local entry updateDate and timestamp the update was made at
       if (localEntry.lastUpdateDate > update.ts){
-        // TODO: store in db. Show cta in UI. UI to resolve conflicts.
         console.log('Houston we have a conflict')
+
+        // store in db
+        dispatch = dispatch || createEventDispatcher()
+        try{
+          const conflict = {...update}
+          conflict.id = conflict._id
+          delete conflict._id
+          await repo.insertOne('conflicts', conflict)
+          dispatch('notif', {text: 'Conflit de synchro', err: true})
+          // TODO: trigger menu item in title bar
+        }
+        catch(ex){
+          console.error(ex)
+          dispatch('notif', {text: 'Conflit non conservé', err: true, confirm: true})
+        }
         return
       }
 

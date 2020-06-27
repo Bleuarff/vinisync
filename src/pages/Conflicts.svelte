@@ -39,19 +39,22 @@
     conflicts = temp
   }
 
-  // returns an array of changes for given conflict
-  function parseConflictChanges(conflict){
+  // returns an array of changes for given change object
+  // obj: initial value is conflict change object
+  // ref: initial value is local entry
+  function _parseChanges(obj, ref){
     let changes = []
-    Object.entries(conflict.changes).filter(x => !['id', 'lastUpdateDate'].includes(x[0])).forEach(([key, value]) => {
-      if (key ==='wine'){
-        // TODO: recursive parsing
-        // e.g. changes = [...changes, ...parseConflictChanges(value)]
-      }
+
+    // loop filtered list of entries
+    Object.entries(obj).filter(x => !['id', 'lastUpdateDate'].includes(x[0])).forEach(([key, value]) => {
+      if (key === 'wine')
+        changes = [...changes, ..._parseChanges(value, ref && ref.wine)]
       else{
+        // push an item with key, local & remote values.
         changes.push({
           key: key,
-          local: conflict._entry && conflict._entry[key],
-          remote: value
+          remote: value,
+          local: ref && ref[key]
         })
       }
     })
@@ -89,7 +92,7 @@
             </tr>
           </thead>
           <tbody>
-            {#each parseConflictChanges(conflict) as prop}
+            {#each _parseChanges(conflict.changes, conflict._entry) as prop}
               <tr>
                 <td>{prop.key}:</td>
                 <td class="remote">{prop.remote}</td>
@@ -136,11 +139,11 @@
 
   .remote{
     text-align: right;
-    width: 50%;
+    width: 40%;
   }
   .local{
     text-align: left;
-    width: 50%;
+    width: 40%;
   }
 
   .empty{

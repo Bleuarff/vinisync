@@ -60,6 +60,19 @@
     })
     return changes
   }
+
+  function formatValue(value){
+    if (value == null)
+      return ''
+
+    if (Array.isArray(value))
+      return value.join(', ')
+
+    if (typeof value === 'boolean')
+      return value ? 'Oui' : 'Non'
+
+    return value
+  }
 </script>
 
 <h2>Conflits</h2>
@@ -97,9 +110,10 @@
             {#each _parseChanges(conflict.changes, conflict._entry) as prop}
               <tr>
                 <td>{prop.key}:</td>
-                <td class="remote">{prop.remote}</td>
+                <td class="remote">{formatValue(prop.remote)}</td>
                 <td>&nbsp;</td>
-                <td class="local">{prop.local}</td>
+                <td class="local">{formatValue(prop.local)}</td>
+
               </tr>
             {/each}
             <tr>

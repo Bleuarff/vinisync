@@ -13,15 +13,21 @@ async function open(){
       console.debug(`Upgrade needed, ${oldVersion} → ${newVersion}`)
 
       if (oldVersion < 1){
-        const store = db.createObjectStore('entries', {keyPath: 'id', autoIncrement: false})
-        store.createIndex('creationDate', 'creationDate', {unique: false})
-        store.createIndex('lastUpdateDate', 'lastUpdateDate', {unique: false})
+        try{
+          const store = db.createObjectStore('entries', {keyPath: 'id', autoIncrement: false})
+          store.createIndex('creationDate', 'creationDate', {unique: false})
+          store.createIndex('lastUpdateDate', 'lastUpdateDate', {unique: false})
 
-        db.createObjectStore('config', {keyPath: 'id', autoIncrement: false})
-        db.createObjectStore('updates', {keyPath: 'id', autoIncrement: false})
-        db.createObjectStore('images', {keyPath: 'id', autoIncrement: false})
-        db.createObjectStore('history', {keyPath: 'entryId', autoIncrement: false})
-        db.createObjectStore('conflicts', {keyPath: 'id', autoIncrement: false})
+          db.createObjectStore('config', {keyPath: 'id', autoIncrement: false})
+          db.createObjectStore('updates', {keyPath: 'id', autoIncrement: false})
+          db.createObjectStore('images', {keyPath: 'id', autoIncrement: false})
+          db.createObjectStore('history', {keyPath: 'entryId', autoIncrement: false})
+          db.createObjectStore('conflicts', {keyPath: 'id', autoIncrement: false})
+        }
+        catch(ex){
+          console.error('Update Error')
+          console.error(ex)
+        }
       }
     }
   })

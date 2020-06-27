@@ -55,14 +55,14 @@
   }
 
   [data-color="red"]{
-    background: #a40e0e;
+    background: var(--wine-red);
     color: white;
   }
   [data-color="white"]{
-    background: #ffea7a;
+    background: var(--wine-white);
   }
   [data-color="rose"]{
-    background: #f78dad;
+    background: var(--wine-rose);
   }
 
   .selected::after{

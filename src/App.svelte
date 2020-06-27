@@ -80,6 +80,10 @@
 	  --main-color: #ba0e0e;
 		--main-color-light: #791a1a8a;
 		--global-max-width: 700px;
+
+		--wine-red: #a40e0e;
+		--wine-white: #ffea7a;
+		--wine-rose: #f78dad;
 	}
 
 	main {

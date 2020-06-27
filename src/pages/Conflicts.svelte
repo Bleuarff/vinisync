@@ -74,10 +74,12 @@
   </p>
   <div id="conflicts">
     {#each conflicts as conflict}
-      <div class="conflict">
+      <div class="conflict {conflict._entry && conflict._entry.wine && conflict._entry.wine.color}">
         <div class="name">
           {#if conflict._entry}
-            {conflict._entry.wine.name} - {conflict._entry.wine.producer}
+            {conflict._entry.wine.name}
+            {#if (conflict._entry.wine.name && conflict._entry.wine.producer)} - {/if}
+            {conflict._entry.wine.producer}
             {#if conflict._entry.wine.year}[{conflict._entry.wine.year}]{/if}
           {/if}
         </div>
@@ -96,10 +98,16 @@
               <tr>
                 <td>{prop.key}:</td>
                 <td class="remote">{prop.remote}</td>
-                <td>&#x27A1;</td>
+                <td>&nbsp;</td>
                 <td class="local">{prop.local}</td>
               </tr>
             {/each}
+            <tr>
+              <td></td>
+              <td class="remote"><button>Prendre</button></td>
+              <td></td>
+              <td class="local"><button>Prendre</button></td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -126,15 +134,29 @@
   .ts{
     text-align: center;
     width: 100%;
-    border-bottom: 1px solid black;
     padding: 4px 8px;
+  }
+
+
+  .red .name, .red .ts{
+    background: var(--wine-red);
+    color: white;
+  }
+
+  .white .name, .white .ts{
+    background: var(--wine-white);
+  }
+
+  .rose .name, .rose .ts{
+    background: var(--wine-rose);
   }
 
   .name{
   }
 
   .ts{
-    font-size: .85em;
+    border-bottom: 1px solid black;
+    font-size: .8em;
   }
 
   .remote{
@@ -144,6 +166,12 @@
   .local{
     text-align: left;
     width: 40%;
+  }
+
+  .remote button,
+  .local button{
+    font-size: .85em;
+    padding: 2px 4px;
   }
 
   .empty{

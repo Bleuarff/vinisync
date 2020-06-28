@@ -109,7 +109,7 @@
           <tbody>
             {#each _parseChanges(conflict.changes, conflict._entry) as prop}
               <tr>
-                <td>{prop.key}:</td>
+                <td class="chg-key">{i18n.getString(prop.key)}</td>
                 <td class="remote">{formatValue(prop.remote)}</td>
                 <td>&nbsp;</td>
                 <td class="local">{formatValue(prop.local)}</td>
@@ -171,6 +171,11 @@
   .ts{
     border-bottom: 1px solid black;
     font-size: .8em;
+  }
+
+  .chg-key{
+    white-space: nowrap;
+    font-size: .92em;
   }
 
   .remote{

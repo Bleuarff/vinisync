@@ -10,6 +10,7 @@
 	import Err404 from './pages/Err404.svelte'
 	import Notif from './components/Notif.svelte'
 	import TitleBar from './components/TitleBar.svelte'
+	import I18n from './i18n.js'
 	import syncMgr from './syncMgr.js'
 
 	let page,
@@ -39,6 +40,8 @@
 		path = ctx.path
 		next()
 	}
+
+	window.i18n = new I18n()
 
 	onMount(async () => {
 		console.log('app mount ')

@@ -116,12 +116,12 @@
 
               </tr>
             {/each}
-            <tr>
+            <!-- <tr>
               <td></td>
               <td class="remote"><button>Prendre</button></td>
               <td></td>
               <td class="local"><button>Prendre</button></td>
-            </tr>
+            </tr> -->
           </tbody>
         </table>
       </div>

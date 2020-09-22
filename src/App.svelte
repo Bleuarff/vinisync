@@ -7,6 +7,7 @@
 	import Sync from './pages/Sync.svelte'
 	import History from './pages/History.svelte'
 	import Conflicts from './pages/Conflicts.svelte'
+	import Signup from './pages/Signup.svelte'
 	import Err404 from './pages/Err404.svelte'
 	import Notif from './components/Notif.svelte'
 	import TitleBar from './components/TitleBar.svelte'
@@ -18,9 +19,8 @@
 	let path // url pathname
 	let params // router path parameters
 	let notif // notif child component
-	// let name // page name
 
-	router('/', getPath, () => page = Wines)
+	router('/', getPath, () => page = Signup)
 	router('/wines', getPath, () => page = Wines)
 	router('/entry/:id?', getPath, (ctx, next) => {
 		params = ctx.params
@@ -33,6 +33,7 @@
 		next()
 	}, () => page = History)
 	router('/conflicts', getPath, () => page = Conflicts)
+	router('/signup', getPath, () => page = Signup)
 	router('*', () => page = Err404)
 	router.start()
 

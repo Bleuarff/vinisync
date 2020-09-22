@@ -1,6 +1,6 @@
 // Wrapper around fetch
 
-const host = '//192.168.1.37:5002',
+const host = '//127.0.0.1:5002',
       TIMEOUT = 30 * 1e3
 
 function LogicException(data) {
@@ -38,7 +38,7 @@ export async function send(path, method = 'GET', data = {}){
     if (res.status !== 204)
       data = await res.json()
 
-    if (res.status > 400)
+    if (res.status >= 400)
       throw new LogicException({status: res.status, data: data})
 
     return data

@@ -6,8 +6,7 @@ const restify = require('restify'),
 
 const dbConnectionString = 'mongodb://localhost:27017'
 
-let server,
-    Sync
+let server
 
 void async function(){
   server = restify.createServer({
@@ -26,7 +25,8 @@ void async function(){
   }
 
   /************************ Configure server ***************************/
-  Sync = require('./sync.js')
+  const Sync = require('./sync.js'),
+        User = require('./user.js')
 
   server.use(restify.plugins.acceptParser(server.acceptable))
   server.use((req, res, next) => {
@@ -67,6 +67,8 @@ void async function(){
   server.post('/api/sync', Sync.enableSync)
   server.post('/api/update', Sync.checkCredentials, Sync.insertUpdate) // TODO rename endpoint
   server.get('/api/updates', Sync.checkCredentials, Sync.getUpdates)
+
+  server.put('/api/user', User.create)
 
   /************************ end routes ***************************/
 

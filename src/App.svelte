@@ -4,7 +4,7 @@
 	import Wines from './pages/Wines.svelte'
 	import Entry from './pages/Entry.svelte'
 	import Import from './pages/Import.svelte'
-	import Sync from './pages/Sync.svelte'
+	// import Sync from './pages/Sync.svelte'
 	import History from './pages/History.svelte'
 	import Conflicts from './pages/Conflicts.svelte'
 	import Signup from './pages/Signup.svelte'
@@ -20,14 +20,27 @@
 	let params // router path parameters
 	let notif // notif child component
 
-	router('/', getPath, () => page = Signup)
+	router('/', getPath, () => {
+		try{
+
+			const user = JSON.parse(localStorage.getItem('user'))
+			if (user && user.email && user.id && user.key)
+				page = Wines
+			else
+				page = Signup
+		}
+		catch(ex){
+			console.error(ex)
+			page = Signup
+		}
+	})
 	router('/wines', getPath, () => page = Wines)
 	router('/entry/:id?', getPath, (ctx, next) => {
 		params = ctx.params
 		next()
 	}, () => page = Entry)
 	router('/import', getPath, () => page = Import)
-	router('/sync', getPath, () => page = Sync)
+	// router('/sync', getPath, () => page = Sync)
 	router('/history/:id?', getPath, (ctx, next) => {
 		params = ctx.params
 		next()

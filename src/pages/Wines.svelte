@@ -10,7 +10,6 @@ export let params = {}
 
 let origEntries = [] // db data, may be sorted
 let entries = [] // subset of entries
-let syncConfig
 let sortConfig
 let lastSortField // name of the last field used for sorting
 let lastSortASC // whether last sort was in ascending order
@@ -23,7 +22,6 @@ onMount(async () => {
   await repo.open()
 
   sortConfig = JSON.parse(window.localStorage.getItem(CONFIG_SORT_KEY))
-  syncConfig = await repo.findById('config', 'sync')
 
   if (!sortConfig){
     sortConfig = defaultSortConfig
@@ -170,15 +168,12 @@ function sortHandler(e){
 
 {:else}
   <p>Votre cave est vide.</p>
+  <div>
+    <a href="/import">Importer</a>
+  </div>
 {/if}
 
 <a href="/entry" class="btn-add"><img src="/img/addentry.svg"></a>
-{#if !syncConfig}
-<!-- Import is not possible when device is sync'ed with others -->
-<div>
-  <a href="/import">Importer</a>
-</div>
-{/if}
 
 <style>
   :root{

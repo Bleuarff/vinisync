@@ -34,11 +34,13 @@
     }
 
     try{
-      const res =  await send('/api/user', 'PUT', {
+      const user =  await send('/api/user', 'PUT', {
         email: email,
         pwd: pwd
       })
       dispatch('notif', {text: 'Compte créé'})
+
+      localStorage.setItem('user', JSON.stringify(user))
       return router('/wines')
     }
     catch(ex){

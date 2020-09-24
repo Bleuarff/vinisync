@@ -40,7 +40,17 @@
       })
       dispatch('notif', {text: 'Compte créé'})
 
+      localStorage.clear()
       localStorage.setItem('user', JSON.stringify(user))
+      localStorage.setItem('lastSync', '1900-01-01T00:00:01.000Z')
+      localStorage.setItem('devid', uuid())
+
+      await repo.open()
+      await repo.deleteAll('entries')
+      await repo.deleteAll('images')
+      await repo.deleteAll('history')
+      await repo.deleteAll('conflicts')
+      await repo.deleteAll('updates')
       return router('/wines')
     }
     catch(ex){

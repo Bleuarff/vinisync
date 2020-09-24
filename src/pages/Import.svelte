@@ -42,6 +42,7 @@ async function insert(entries){
   await repo.deleteAll('entries')
   await repo.deleteAll('images')
   await repo.deleteAll('history')
+  await repo.deleteAll('conflicts')
   await repo.deleteAll('updates')
   const proms = []
   entries.forEach(entry => {

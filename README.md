@@ -10,6 +10,8 @@ Chrome and Firefox only. Not even tested once on other browsers.
 
 ## Run dev
 
+Needs node.js >=14. Run `nvm use` first
+
 bundler:
 ````
 npm run dev

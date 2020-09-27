@@ -42,7 +42,7 @@
 
       localStorage.clear()
       localStorage.setItem('user', JSON.stringify(user))
-      localStorage.setItem('lastSync', '1900-01-01T00:00:01.000Z')
+      localStorage.setItem('lastSync', '1900-01-01T00:00:00.000Z')
       localStorage.setItem('devid', uuid())
 
       await repo.open()

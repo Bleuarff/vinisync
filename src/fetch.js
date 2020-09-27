@@ -10,25 +10,40 @@ function LogicException(data) {
   this.toString = () => { return `[${this.status}] ${this.message}` }
 }
 
-export async function send(path, method = 'GET', data = {}){
+let cryptoKey
+
+export async function send(path, method = 'GET', data = {}, key){
+  const ts = (new Date()).toISOString()
   const options = {
     method: method,
     mode: 'cors',
-    headers: {}
+    headers: {
+      ['X-Date']: ts
+    }
   }
 
+  let qs = ''
   if (['POST', 'PUT'].includes(method)){
     options.headers['Content-Type'] = 'application/json'
     options.body = JSON.stringify(data)
   }
   else{
-    const qs = '?' + Object.entries(data).map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join('&')
-    path += qs
+    qs = '?' + Object.entries(data).map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join('&')
+  }
+
+  // if key is provided, use it to sign the request:
+  // compute hmac digest for requet,
+  // and add it as Authorization header
+  if (key){
+    const input = [method, path, ts, options.body || '', qs.substring(1)].join('\n')
+    console.log(`input: ${input}`)
+    const signature = await sign(key, input)
+    options.headers['Authorization'] = signature
   }
 
   try{
     const res = await Promise.race([
-      fetch(host + path, options),
+      fetch(host + path + qs, options),
       new Promise((resolve, reject) => {
         setTimeout(() => {reject('TIMEOUT')}, TIMEOUT)
       })
@@ -51,6 +66,32 @@ export async function send(path, method = 'GET', data = {}){
     else
       throw ex
   }
+}
 
+// sign the request if the user key
+async function sign(key, input){
+  const encoder = new TextEncoder()
 
+  // createy key only once
+  if (!cryptoKey){
+    cryptoKey = await crypto.subtle.importKey('raw', encoder.encode(key), {
+      name: 'HMAC', hash: 'SHA-384'
+    }, false, ['sign'])
+  }
+
+  const buf_signature = await crypto.subtle.sign('HMAC', cryptoKey, encoder.encode(input)),
+        signature = _arrayBufferToBase64(buf_signature)
+
+  return signature
+}
+
+// convert buffer to base 64
+function _arrayBufferToBase64(buffer){
+  var binary = ''
+  const bytes = new Uint8Array(buffer),
+        len = bytes.byteLength
+  for (let i = 0; i < len; i++){
+    binary += String.fromCharCode(bytes[i])
+  }
+  return window.btoa(binary)
 }

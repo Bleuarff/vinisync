@@ -26,7 +26,8 @@ void async function(){
 
   /************************ Configure server ***************************/
   const Sync = require('./sync.js'),
-        User = require('./user.js')
+        User = require('./user.js'),
+        Security = require('./security.js')
 
   server.use(restify.plugins.acceptParser(server.acceptable))
   server.use((req, res, next) => {
@@ -53,7 +54,7 @@ void async function(){
   server.opts('/api/:whatever', (req, res, next) => {
     res.set({
       'Access-Control-Allow-Methods': 'GET, HEAD, POST, PUT, DELETE',
-      'Access-Control-Allow-Headers': 'Date, X-Date, Authorization, Content-Type'
+      'Access-Control-Allow-Headers': 'Date, X-Date, Authorization, Content-Type, X-Auth'
     })
     res.send(200)
     return next()
@@ -64,9 +65,9 @@ void async function(){
     return next()
   });
 
-  server.post('/api/sync', Sync.enableSync)
-  server.post('/api/update', Sync.checkCredentials, Sync.insertUpdate) // TODO rename endpoint
-  server.get('/api/updates', Sync.checkCredentials, Sync.getUpdates)
+  // server.post('/api/sync', Sync.enableSync)
+  server.post('/api/update', Security.verify, Sync.insertUpdate) // TODO rename endpoint
+  server.get('/api/updates', Security.verify, Sync.getUpdates)
 
   server.put('/api/user', User.create)
 

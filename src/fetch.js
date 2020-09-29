@@ -1,7 +1,6 @@
 // Wrapper around fetch
 
-const host = '//127.0.0.1:5002',
-      TIMEOUT = 30 * 1e3
+const TIMEOUT = 30 * 1e3
 
 function LogicException(data) {
   this.status = data.status
@@ -43,7 +42,7 @@ export async function send(path, method = 'GET', data = {}, key){
 
   try{
     const res = await Promise.race([
-      fetch(host + path + qs, options),
+      fetch(path + qs, options),
       new Promise((resolve, reject) => {
         setTimeout(() => {reject('TIMEOUT')}, TIMEOUT)
       })

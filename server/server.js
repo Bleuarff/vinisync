@@ -63,13 +63,13 @@ void async function(){
   server.get('/ping', function (req, res, next) {
     res.send(200, 'pong')
     return next()
-  });
+  })
 
-  // server.post('/api/sync', Sync.enableSync)
   server.post('/api/update', Security.verify, Sync.insertUpdate) // TODO rename endpoint
   server.get('/api/updates', Security.verify, Sync.getUpdates)
 
   server.put('/api/user', User.create)
+  server.post('/api/signin', User.signin)
 
   /************************ end routes ***************************/
 

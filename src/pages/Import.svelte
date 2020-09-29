@@ -1,8 +1,9 @@
 <script>
 import { repo } from '../storage.js'
 import router from 'page'
-import { createEventDispatcher } from 'svelte'
+import syncMgr from '../syncMgr.js'
 import { v4 as uuid} from 'uuid'
+import { createEventDispatcher } from 'svelte'
 const dispatch = createEventDispatcher()
 export let params
 
@@ -48,6 +49,7 @@ async function insert(entries){
   entries.forEach(entry => {
     entry.id = uuid()
     proms.push(repo.insertOne('entries', entry))
+    syncMgr.syncIt(entry, null, 'entry', 'entries')
   })
   await Promise.all(proms)
   router('/wines')

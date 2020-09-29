@@ -8,6 +8,7 @@
 	import History from './pages/History.svelte'
 	import Conflicts from './pages/Conflicts.svelte'
 	import Signup from './pages/Signup.svelte'
+	import Signin from './pages/Signin.svelte'
 	import Err404 from './pages/Err404.svelte'
 	import Notif from './components/Notif.svelte'
 	import TitleBar from './components/TitleBar.svelte'
@@ -47,6 +48,7 @@
 	}, () => page = History)
 	router('/conflicts', getPath, () => page = Conflicts)
 	router('/signup', getPath, () => page = Signup)
+	router('/signin', getPath, () => page = Signin)
 	router('*', () => page = Err404)
 	router.start()
 

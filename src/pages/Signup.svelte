@@ -61,6 +61,7 @@
 
 </script>
 
+<a href="/signin">Se connecter</a>
 <h2>Création d'un compte</h2>
 
 <form>

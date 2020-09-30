@@ -2,7 +2,7 @@
 
 const restify = require('restify'),
       db = require('./db.js'),
-      moment = require('moment')
+      { DateTime } = require('luxon')
 
 const dbConnectionString = 'mongodb://localhost:27017'
 
@@ -31,7 +31,7 @@ void async function(){
 
   server.use(restify.plugins.acceptParser(server.acceptable))
   server.use((req, res, next) => {
-    console.log(`[${moment().format('HH:mm:ss')}]${req.method} ${req.getPath()}`)
+    console.log(`[${DateTime.local().toFormat('HH:mm:ss')}] ${req.method} ${req.getPath()}`)
     return next()
   })
 

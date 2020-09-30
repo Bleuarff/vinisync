@@ -1,8 +1,8 @@
 'use strict'
 const db = require('./db.js').db,
-      moment = require('moment'),
       bcrypt = require('bcrypt'),
-      uuid = require('uuid')
+      uuid = require('uuid'),
+      { DateTime } = require('luxon')
 
 const BCRYPT_SALT_ROUNDS = 10,
       COLLECTION_NAME = 'users'
@@ -24,7 +24,7 @@ class UserController{
       }
 
       const hash = await bcrypt.hash(req.params.pwd, BCRYPT_SALT_ROUNDS),
-            now = moment.utc().toDate()
+            now = DateTime.utc().toBSON()
 
       user = {
         _id: uuid.v4(),

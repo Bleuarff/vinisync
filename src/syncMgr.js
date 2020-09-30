@@ -7,51 +7,45 @@ import { createEventDispatcher } from 'svelte'
 let dispatch
 
 const SYNC_INTERVAL = 1, // minimum interval between 2 update checks, in minutes
-      PENDING_RETRY_INTERVAL = 3600 * 1000 // interval at which we check for pending updates to sync, in milliseconds
+      PENDING_RETRY_INTERVAL = 3600 * 1e3 // interval at which we check for pending updates to sync, in milliseconds
 
 class SyncMgr{
 
-  constructor(){}
+  constructor(){
+    this._devid = null
+    this._user = null
+  }
 
-  // initiate sync: send all existing local data
-  // TODO: how to show progress to sync page?
-  async start(){
+  // device id. This is immutable, so we can cache it on first retrieval
+  get devid(){
+    if (!this._devid)
+      this._devid = localStorage.getItem('devid')
+    return this._devid
+  }
+
+  get lastSync(){
+    return localStorage.getItem('lastSync')
+  }
+  set lastSync(val){
+    localStorage.setItem('lastSync', val)
+  }
+
+  // user is immutable (at least regarding properties used for sync), so it's cacheable.
+  get user(){
     try{
-      const config = await this._getConfig()
-
-      // get all entries, send each one to server. On failure, save to dedicated table in db
-      const entries = await repo.getAll('entries')
-      await entries.reduce(async (prom, entry) => {
-        await prom
-        return this._sendDiff('entry', entry, config)
-      }, Promise.resolve())
-
-      const images = await repo.getAll('images')
-      await images.reduce(async (prom, img) => {
-        await prom
-        img.blob = await new Promise(resolve => {
-          const fr = new FileReader()
-          fr.addEventListener('load', e => {
-            resolve(fr.result.split(',')[1])
-          }, false)
-          fr.readAsDataURL(img.blob)
-        })
-        return this._sendDiff('picture', img, config)
-      }, Promise.resolve())
-
+      if (!this._user)
+        this._user = JSON.parse(localStorage.getItem('user'))
+      return this._user
     }
     catch(ex){
-      if (ex.message === 'SYNC_NOT_CONFIGURED')
-        console.warn(ex.message)
-      else
-        throw ex
+      console.error(ex)
+      throw new Error('USER_ERROR')
     }
   }
 
   // generic method to send a diff to server
-  async syncIt(obj, ref, type, table){
+  async syncIt(obj, ref, type){
     try{
-      const config = await this._getConfig()
       let diff
       if (ref != null){
         diff = await Utils.getDiff(obj, ref)
@@ -67,7 +61,7 @@ class SyncMgr{
         diff = obj // no reference object means new document, send all
       }
 
-      await this._sendDiff(type, diff, config)
+      await this._sendDiff(type, diff)
 
     }
     catch(ex){
@@ -84,11 +78,10 @@ class SyncMgr{
   // forced: (boolean) set to true to perform a check even if sync time interval is not elapsed.
   async checkUpdates(notifyId = null, forced = false){
     try{
-      // get sync info
-      const config = await this._getConfig()
+      let lastSync = this.lastSync
 
       // sync only if forced or last sync is older than minimum time interval between syncs
-      if (!forced && moment().utc().diff(moment(config.lastSync), 'minute') < SYNC_INTERVAL)
+      if (!forced && moment().utc().diff(moment(lastSync), 'minute') < SYNC_INTERVAL)
         return false
 
       let updates = [] // updates received for this sync request
@@ -97,16 +90,15 @@ class SyncMgr{
       // query server for updates
       do{
         const data = await send('/api/updates', 'GET', {
-          lastSync: config.lastSync,
+          lastSync: lastSync,
           ids: updates.map(x => x.id),
-          email: config.email,
-          userkey: config.userkey,
-          devid: config.devid
-        })
+          userid: this.user.id,
+          devid: this.devid
+        }, this.user.key)
 
         updates = [...updates, ...data.updates]
         paginated = data.total > updates.length
-        config.lastSync = data.lastSync // update lastSync for next iteration: pagination
+        lastSync = data.lastSync // update lastSync for next iteration: pagination
       }
       while(paginated)
 
@@ -126,7 +118,8 @@ class SyncMgr{
         }
       }, Promise.resolve())
 
-      await repo.updateDoc('config', config) // save config w/ last sync date after confirmation everything is saved
+      // save last sync date after confirmation everything is saved
+      this.lastSync = lastSync
 
       // if notif id set: return whether the given id was in the list of updates.
       // otherwise return whether there were some updates
@@ -144,16 +137,6 @@ class SyncMgr{
       else
         throw ex
     }
-  }
-
-  // helper to retrieve config from db
-  async _getConfig(){
-    const config = await repo.findById('config', 'sync')
-    if (!config)
-      throw new Error('SYNC_NOT_CONFIGURED')
-    if (!config.enabled)
-      throw new Error('SYNC_DISABLED')
-    return config
   }
 
   async _mergeEntry(update){
@@ -238,19 +221,18 @@ class SyncMgr{
   }
 
   // returns nothing (empty promise) if server db update goes well
-  async _sendDiff(type, diff, config){
+  async _sendDiff(type, diff){
     const payload = {
       id: uuid(),
       changes: diff,
       ts: diff.lastUpdateDate,
-      email: config.email,
-      userkey: config.userkey,
+      userid: this.user.id,
       type: type,
-      devid: config.devid
+      devid: this.devid
     }
 
     try{ // send update to server
-      await send('/api/update', 'POST', payload)
+      await send('/api/update', 'POST', payload, this.user.key)
     }
     catch(ex){ // on failure, save to db
       try{
@@ -271,11 +253,6 @@ class SyncMgr{
 
   // checks if there are pending updates, and send them
   async _sendPending(){
-    let config
-    try{
-      config = await this._getConfig()
-    }
-    catch(ex){ return } // swallow error, not interested if config is not setup or disabled
 
     try{
       const updates = await repo.getAll('updates')

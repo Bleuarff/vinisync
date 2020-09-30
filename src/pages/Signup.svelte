@@ -66,7 +66,7 @@
 
 <form>
   <label>Email</label>
-  <input type="text" bind:value={email}>
+  <input type="email" bind:value={email}>
 
   <label>Mot de passe</label>
   <input type="password" bind:value={pwd}>

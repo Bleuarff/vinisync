@@ -4,6 +4,7 @@ import router from 'page'
 import syncMgr from '../syncMgr.js'
 import { v4 as uuid} from 'uuid'
 import { createEventDispatcher } from 'svelte'
+import Utils from '../utils.js'
 const dispatch = createEventDispatcher()
 export let params
 
@@ -50,6 +51,12 @@ async function insert(entries){
     entry.id = uuid()
     proms.push(repo.insertOne('entries', entry))
     syncMgr.syncIt(entry, null, 'entry', 'entries')
+
+    const diff = {count: entry.count, wine: {}, creationDate: entry.creationDate}
+    if (entry.wine.name) diff.wine.name = entry.wine.name
+    if (entry.wine.producer) diff.wine.producer = entry.wine.producer
+    if (entry.wine.year) diff.wine.year = entry.wine.year
+    Utils.updateHistory(diff, entry.id, entry.lastUpdateDate)
   })
   await Promise.all(proms)
   router('/wines')

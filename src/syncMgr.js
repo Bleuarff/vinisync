@@ -195,7 +195,8 @@ class SyncMgr{
         return
       }
       console.debug(`Update picture ${remotePicture.id} at ${update.ts}`)
-      remotePicture.blob = await Utils.getBlobFromBase64(remotePicture.blob)
+      if (remotePicture.blob)
+        remotePicture.blob = await Utils.getBlobFromBase64(remotePicture.blob)
       localPicture = this._deepAssign(localPicture, remotePicture)
       await repo.updateDoc('images', localPicture, true)
     }

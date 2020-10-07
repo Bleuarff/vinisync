@@ -263,7 +263,7 @@ class SyncMgr{
       await updates.reduce(async (prom, update) => {
         await prom
         try{
-          await send('/api/update', 'POST', update)
+          await send('/api/update', 'POST', update, this.user.key)
           await repo.deleteOne('updates', update.id)
           return Promise.resolve()
         }

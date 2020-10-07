@@ -38,7 +38,7 @@ class Sync{
       }
       const count = await db.collection('updates').countDocuments(query)
       const lastSync = DateTime.utc()
-      const docs = await db.collection('updates').find(query, {userkey: 0}).sort({ts: 1}).limit(PAGE_SIZE).toArray()
+      const docs = await db.collection('updates').find(query).sort({ts: 1}).limit(PAGE_SIZE).toArray()
       res.send(200, {
         count: count,
         updates: docs,

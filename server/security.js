@@ -4,7 +4,7 @@ const { DateTime } = require('luxon'),
       db = require('./db.js').db,
       { createHmac } = require('crypto')
 
-const MAX_DATE_OFFSET = 15 * 60 // Max offset between request date and server time
+const MAX_DATE_OFFSET = 15 * 60 // Max offset between request date and server time, in seconds
 
 class Security{
   // checks date & auth are valid:

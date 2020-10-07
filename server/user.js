@@ -36,6 +36,8 @@ class UserController{
       }
 
       await db.collection(COLLECTION_NAME).insertOne(user)
+
+      // prepare response object
       user.id = user._id
       delete user.pwd
       delete user._id
@@ -63,6 +65,8 @@ class UserController{
         res.send(401, {reason: 'INVALID_CREDENTIALS'})
         return next()
       }
+
+      // verify password
       const pwdOk = await bcrypt.compare(req.params.pwd, user.pwd)
 
       if (!pwdOk){
@@ -70,6 +74,7 @@ class UserController{
         return next()
       }
 
+      // prepare response object
       user.id = user._id
       delete user.pwd
       delete user._id

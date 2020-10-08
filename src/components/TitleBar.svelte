@@ -1,6 +1,7 @@
 <script>
   import { fly } from 'svelte/transition'
   import { createEventDispatcher } from 'svelte'
+  import {download} from './download.js'
   const dispatch = createEventDispatcher()
 
   let visible = true
@@ -28,6 +29,8 @@
       <a href="/stats" class="icon-chart-bar"></a>
       <!-- <a href="/sync" class="icon-cog-outline" title="Synchronisation"></a> -->
       <a href="/conflicts" class="icon-bomb" title="Conflits"></a>
+      <a href="#" class="icon-download" title="Télécharger un backup" on:click={download} download="backup.json"></a>
+
       <button class="icon-arrows-cw force-sync" title="Forcer la synchro" on:click="{()=>{dispatch('sync-request')}}"></button>
     </div>
   </div>

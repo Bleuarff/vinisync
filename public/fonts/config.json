@@ -53,6 +53,12 @@
       "css": "bomb",
       "code": 61922,
       "src": "fontawesome"
+    },
+    {
+      "uid": "815576dccc008afcfd83a38378a4fdde",
+      "css": "download",
+      "code": 59395,
+      "src": "iconic"
     }
   ]
 }

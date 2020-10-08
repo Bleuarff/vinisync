@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'vinisync';
-  src: url('../font/vinisync.eot?79936542');
-  src: url('../font/vinisync.eot?79936542#iefix') format('embedded-opentype'),
-       url('../font/vinisync.woff2?79936542') format('woff2'),
-       url('../font/vinisync.woff?79936542') format('woff'),
-       url('../font/vinisync.ttf?79936542') format('truetype'),
-       url('../font/vinisync.svg?79936542#vinisync') format('svg');
+  src: url('../font/vinisync.eot?39553627');
+  src: url('../font/vinisync.eot?39553627#iefix') format('embedded-opentype'),
+       url('../font/vinisync.woff2?39553627') format('woff2'),
+       url('../font/vinisync.woff?39553627') format('woff'),
+       url('../font/vinisync.ttf?39553627') format('truetype'),
+       url('../font/vinisync.svg?39553627#vinisync') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -15,7 +15,7 @@
 @media screen and (-webkit-min-device-pixel-ratio:0) {
   @font-face {
     font-family: 'vinisync';
-    src: url('../font/vinisync.svg?79936542#vinisync') format('svg');
+    src: url('../font/vinisync.svg?39553627#vinisync') format('svg');
   }
 }
 */
@@ -58,6 +58,7 @@
 .icon-camera:before { content: '\e800'; } /* '' */
 .icon-cog-outline:before { content: '\e801'; } /* '' */
 .icon-cancel:before { content: '\e802'; } /* '' */
+.icon-download:before { content: '\e803'; } /* '' */
 .icon-chart-bar:before { content: '\e804'; } /* '' */
 .icon-arrows-cw:before { content: '\e805'; } /* '' */
 .icon-sort:before { content: '\f0dc'; } /* '' */

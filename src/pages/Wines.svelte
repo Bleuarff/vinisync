@@ -173,7 +173,7 @@ function sortHandler(e){
   </div>
 {/if}
 
-<a href="/entry" class="btn-add"><img src="/img/addentry.svg"></a>
+<a href="/entry" class="btn-add"><img src="/img/addentry.svg" alt="create an entry"></a>
 
 <style>
   :root{

@@ -27,14 +27,25 @@ async function download(e){
   }
 
   // serializes & base64 encodes data object
-  const output = 'data:application/json;charset=utf-8;base64,' + btoa(JSON.stringify(data))
+  // encode in utf-8
+  const encoder = new TextEncoder()
+  const uint8 = encoder.encode(JSON.stringify(data))
+
+  // convert each byte into a char
+  let output = ''
+  for (let i= 0; i < uint8.byteLength; i++){
+    output += String.fromCharCode(uint8[i])
+  }
+
+  // base-64 encoding
+  output = btoa(output)
+  const dataUrl = 'data:application/json;charset=utf-8;base64,' + output
 
   ready = true
-  // await tick() // waits for download link to appear
 
   // assign url to new node & click it for immediate download
   const target = document.getElementById('download-link')
-  target.href = output
+  target.href = dataUrl
   const ts = DateTime.local().toFormat('yyyyMddHHmm') // to string
   filename = `vinisync_backup_${ts}.json `
   await tick()

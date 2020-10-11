@@ -28,11 +28,7 @@
       localStorage.setItem('devid', uuid())
 
       await repo.open()
-      await repo.deleteAll('entries')
-      await repo.deleteAll('images')
-      await repo.deleteAll('history')
-      await repo.deleteAll('conflicts')
-      await repo.deleteAll('updates')
+      await repo.deleteAllTables()
       return router('/wines')
     }
     catch(ex){

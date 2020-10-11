@@ -144,6 +144,14 @@ async function deleteAll(table){
   return Promise.all(proms)
 }
 
+async function deleteAllTables(){
+  const tables = ['entries', 'images', 'history', 'conflicts', 'updates']
+  return tables.reduce(async (prom, table) => {
+    await prom
+    return repo.deleteAll(table)
+  }, Promise.resolve())
+}
+
 
 export const repo = {
   open: open,
@@ -165,5 +173,6 @@ export const repo = {
   insertOne: insertOne,
 
   deleteOne: deleteOne,
-  deleteAll: deleteAll
+  deleteAll: deleteAll,
+  deleteAllTables: deleteAllTables
 }

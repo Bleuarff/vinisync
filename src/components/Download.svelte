@@ -54,12 +54,12 @@ async function download(e){
 }
 </script>
 
-<a href="#" class="icon-download" title="Télécharger un backup" on:click={download}> </a>
+<a href="#" title="Télécharger un backup" on:click={download}>Exporter la cave</a>
 
 <a href="#" id="download-link" class="hidden" download={filename}>backup link</a>
 
 <style>
-  a{
+  /* a{
     color: white;
-  }
+  } */
 </style>

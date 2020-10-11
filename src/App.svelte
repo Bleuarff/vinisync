@@ -7,6 +7,7 @@
 	// import Sync from './pages/Sync.svelte'
 	import History from './pages/History.svelte'
 	import Conflicts from './pages/Conflicts.svelte'
+	import Settings from './pages/Settings.svelte'
 	import Signup from './pages/Signup.svelte'
 	import Signin from './pages/Signin.svelte'
 	import Err404 from './pages/Err404.svelte'
@@ -47,6 +48,7 @@
 		next()
 	}, () => page = History)
 	router('/conflicts', getPath, () => page = Conflicts)
+	router('/settings', getPath, () => page = Settings)
 	router('/signup', getPath, () => page = Signup)
 	router('/signin', getPath, () => page = Signin)
 	router('*', () => page = Err404)

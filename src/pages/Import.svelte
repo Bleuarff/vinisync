@@ -25,6 +25,7 @@ async function importUrl(e){
   try{
     const res = await fetch(url),
           dataset = await res.json()
+
     if (!Array.isArray(dataset))
       throw new Error('Dataset is not valid json array')
 
@@ -38,19 +39,28 @@ async function importUrl(e){
 }
 
 // delete existing data & insert new ones
-async function insert(entries){
-  console.log(`${entries.length} entries in file`)
+async function insert(backup){
   await repo.open()
-  await repo.deleteAll('entries')
-  await repo.deleteAll('images')
-  await repo.deleteAll('history')
-  await repo.deleteAll('conflicts')
-  await repo.deleteAll('updates')
+  await repo.deleteAllTables()
+
+  if (Array.isArray(backup))
+    await importEntries(backup) // old basic format
+  else{
+    // new, complete format as exported
+    await importEntries(backup.entries)
+    await importImages(backup.images)
+  }
+  router('/wines')
+}
+
+async function importEntries(entries){
+  console.log(`${entries.length} entries in file`)
   const proms = []
+
   entries.forEach(entry => {
-    entry.id = uuid()
+    entry.id = entry.id || uuid()
     proms.push(repo.insertOne('entries', entry))
-    syncMgr.syncIt(entry, null, 'entry', 'entries')
+    syncMgr.syncIt(entry, null, 'entry')
 
     const diff = {count: entry.count, wine: {}, creationDate: entry.creationDate}
     if (entry.wine.name) diff.wine.name = entry.wine.name
@@ -59,7 +69,21 @@ async function insert(entries){
     Utils.updateHistory(diff, entry.id, entry.lastUpdateDate)
   })
   await Promise.all(proms)
-  router('/wines')
+}
+
+async function importImages(images){
+  console.log(`${images.length} images in file`)
+  const proms = []
+  images.forEach(async image => {
+    image.id = image.id || uuid()
+
+    if (image.blob)
+      image.blob = await Utils.getBlobFromBase64(image.blob)
+
+    proms.push(repo.insertOne('images', image))
+    syncMgr.syncIt(image, null, 'image')
+  })
+  await Promise.all(proms)
 }
 
 function importFile(e){
@@ -69,10 +93,11 @@ function importFile(e){
   const file = e.currentTarget.files[0]
   const reader = new FileReader()
   reader.onload = async () => {
+    // debugger
     const content = reader.result
     try{
-      const entries = JSON.parse(content)
-      insert(entries)
+      const backup = JSON.parse(content)
+      insert(backup)
     }
     catch(ex){
       console.error(ex)

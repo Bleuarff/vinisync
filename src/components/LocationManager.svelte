@@ -18,6 +18,7 @@
     }
   })
 
+  // TODO: sync (review storage)
   async function save(e){
     e.preventDefault()
     try{
@@ -47,43 +48,69 @@
     locations = [...locations.slice(0, idx), loc, ...locations.slice(idx + 1)]
      e.currentTarget.previousElementSibling.value = ''
   }
+
+  function remove(e, locIdx, subIdx){
+    const loc = locations[locIdx]
+
+    if (!loc) return
+
+    if (subIdx === undefined)
+      locations = [...locations.slice(0, locIdx), ...locations.slice(locIdx + 1)]
+    else{
+      loc.subLocations.splice(subIdx, 1)
+      locations = locations
+    }
+  }
 </script>
 
-<h3>Emplacements</h3>
+<h2>Emplacements</h2>
+<div id="loc-mgr">
 
-{#if locations && locations.length}
-  {#each locations as loc, locIdx}
-    <div>
-      <span class="name">{loc.name}</span>
-      <div class="subloc-ctnr">
-        {#each loc.subLocations as subLoc}
-          <span>{subLoc}</span>
-        {/each}
-          <span><input type="text" placeholder="étagère 1"><button class="add" on:click="{(e)=>{addSubLoc(e, locIdx)}}">+</span>
+  {#if locations && locations.length}
+    {#each locations as loc, locIdx}
+      <div>
+        <span class="name">{loc.name}<span on:click="{e => {remove(e, locIdx)}}" class="delete-main">delete</span></span>
+        <div class="subloc-ctnr">
+          {#each loc.subLocations as subLoc, subIdx}
+            <span><button on:click="{e => {remove(e, locIdx, subIdx)}}" class="delete">&#215;</button>{subLoc}</span>
+          {/each}
+            <span><input type="text" placeholder="étagère 1"><button class="add" on:click="{e=>{addSubLoc(e, locIdx)}}">+</span>
+        </div>
       </div>
-    </div>
-  {/each}
-{/if}
+    {/each}
+  {/if}
 
-<div id="newloc-ctnr">
-  <label>Nouvel emplacement</label>
-  <input type="text" placeholder="Armoire" bind:value={newLocName}>
-  <button class="add" on:click={addLocation}>+</button>
+  <div id="newloc-ctnr">
+    <label>Nouvel emplacement</label>
+    <input type="text" placeholder="Armoire" bind:value={newLocName}>
+    <button class="add" on:click={addLocation}>+</button>
+  </div>
+
+  <button on:click={save} class="save">Sauvegarder</button>
 </div>
-
-<!-- TODO: add new loc & sublocs to list, save -->
-<button on:click={save}>Sauvegarder</button>
-
 <style>
+  #loc-mgr{
+      border-radius: 5px;
+      border: 1px solid var(--dark-blue);
+      padding-left: .7em;
+      padding-top: 1.5em;
+      margin-left: -.5em;
+      margin-right: -.5em;
+  }
 
   #newloc-ctnr{
     margin: 1em 0;
   }
   #newloc-ctnr input{
-    max-width: 380px;
+    max-width: 350px;
   }
   label{
     font-size: .9em;
+  }
+
+  h2{
+    font-size: 1.1em;
+    margin: 2em 0 .5em 0;
   }
 
   .name{
@@ -107,6 +134,9 @@
     align-items: stretch;
     margin-bottom: .2em;
   }
+  .subloc-ctnr > span {
+    margin-bottom: 5px;
+  }
 
   .add{
     font-weight: bold;
@@ -119,6 +149,27 @@
     margin-left: 5px;
     cursor: pointer;
   }
+  .delete{
+    font-weight: bold;
+    background: var(--dark-blue);
+    color: white;
+    cursor: pointer;
+    border: none;
+    border-radius: 3px;
+    padding: 0 3px;
+    margin-right: .5em;
+    font-size: .8em;
+  }
+  .delete-main{
+    color: var(--main-color);
+    position: absolute;
+    right: 2em;
+    font-size: .8em;
+    cursor: pointer;
+  }
+  .delete-main::focus{
+    color: var(--dark-blue);
+  }
 
   input[type="text"]{
     width: 100%;
@@ -126,4 +177,13 @@
     border-width: 0 0 1px 0;
 
   }
+
+  .save{
+    color: white;
+    background: #ba0e0e;
+    border: 1px solid white;
+    border-radius: 4px;
+    font-size: 1.3em;
+  }
+
 </style>

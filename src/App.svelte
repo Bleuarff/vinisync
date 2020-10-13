@@ -99,12 +99,14 @@
 
 	:root{
 	  --main-color: #ba0e0e;
-		--main-color-light: #791a1a8a;
+		--main-color-light: #791a1a;
 		--global-max-width: 700px;
 
 		--wine-red: #a40e0e;
 		--wine-white: #ffea7a;
 		--wine-rose: #f78dad;
+
+		--dark-blue: #11151f;
 	}
 
 	main {

@@ -29,12 +29,12 @@ async function download(e){
   // serializes & base64 encodes data object
   // encode in utf-8
   const encoder = new TextEncoder()
-  const uint8 = encoder.encode(JSON.stringify(data))
+  const rawUtf8Data = encoder.encode(JSON.stringify(data))
 
   // convert each byte into a char
   let output = ''
-  for (let i= 0; i < uint8.byteLength; i++){
-    output += String.fromCharCode(uint8[i])
+  for (let i= 0; i < rawUtf8Data.byteLength; i++){
+    output += String.fromCharCode(rawUtf8Data[i])
   }
 
   // base-64 encoding

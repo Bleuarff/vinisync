@@ -72,9 +72,9 @@
         <span class="name">{loc.name}<span on:click="{e => {remove(e, locIdx)}}" class="delete-main">delete</span></span>
         <div class="subloc-ctnr">
           {#each loc.subLocations as subLoc, subIdx}
-            <span><button on:click="{e => {remove(e, locIdx, subIdx)}}" class="delete">&#215;</button>{subLoc}</span>
+            <span><button on:click="{e => {remove(e, locIdx, subIdx)}}" class="small-btn-before-item">&#215;</button>{subLoc}</span>
           {/each}
-            <span><input type="text" placeholder="étagère 1"><button class="add" on:click="{e=>{addSubLoc(e, locIdx)}}">+</span>
+            <span><input type="text" placeholder="étagère 1"><button class="btn-blue" on:click="{e=>{addSubLoc(e, locIdx)}}">+</span>
         </div>
       </div>
     {/each}
@@ -138,7 +138,7 @@
     margin-bottom: 5px;
   }
 
-  .add{
+  /* .add{
     font-weight: bold;
     background: var(--main-color);
     color: white;
@@ -148,18 +148,7 @@
     width: calc(1em + 10px + 3px);
     margin-left: 5px;
     cursor: pointer;
-  }
-  .delete{
-    font-weight: bold;
-    background: var(--dark-blue);
-    color: white;
-    cursor: pointer;
-    border: none;
-    border-radius: 3px;
-    padding: 0 3px;
-    margin-right: .5em;
-    font-size: .8em;
-  }
+  } */
   .delete-main{
     color: var(--main-color);
     position: absolute;

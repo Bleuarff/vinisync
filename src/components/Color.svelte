@@ -85,7 +85,7 @@
     display: inline-block;
     padding: 1em;
     border-radius: 4px;
-    margin-bottom: 10px
+    margin-bottom: 20px
   }
 
   @media (min-width: 450px){

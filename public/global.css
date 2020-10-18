@@ -109,3 +109,27 @@ button:focus {
 .wide{
   margin: 0 -.8em 1.5em;
 }
+
+
+.small-btn-before-item{
+	font-weight: bold;
+	background: var(--dark-blue);
+	color: white;
+	cursor: pointer;
+	border: none;
+	border-radius: 3px;
+	padding: 0 3px;
+	margin-right: .5em;
+	font-size: .8em;
+}
+
+.btn-blue{
+	font-weight: bold;
+	background: var(--dark-blue);
+	color: white;
+	cursor: pointer;
+	border: none;
+	border-radius: 3px;
+	padding: 3px 8px;
+	font-size: 1.1em;
+}

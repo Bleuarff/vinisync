@@ -19,6 +19,10 @@
     catch(ex){
       console.error(ex)
     }
+    finally{
+      if (!refData)
+        refData = []
+    }
   })
 
   // adds a location for the entry
@@ -36,6 +40,9 @@
     if (sub)
        newLocation += SEPARATOR + sub
 
+   if (!Array.isArray(value))
+    value = []
+
     if (!value.includes(newLocation)) // reject duplicates
       value = [...value, newLocation]
 
@@ -52,8 +59,10 @@
   }
 </script>
 
+{#if value && value.length || !readonly}
 <div class="location-ctnr">
   <label>Emplacement</label>
+
 
     <div class="locs">
       {#each value as loc, idx}
@@ -63,7 +72,7 @@
       {/each}
     </div>
 
-    {#if !readonly}
+    {#if !readonly && refData.length > 0}
       <div id="loc-edit">
         <select bind:value={newLocIdx}>
           <option value="-1">&mdash;N/A&mdash;</option>
@@ -83,12 +92,15 @@
 
         <button on:click={addLocation} class="btn-blue">+</button>
       </div>
+    {:else if !readonly}
+      <a href="/settings" class="no-loc-notif">Gérer les emplacements</a>
     {/if}
 </div>
+{/if}
 
 <style>
   .location-ctnr{
-    margin-bottom: 10px;
+    margin-bottom: 20px;
   }
   label{
     font-size: .9em;
@@ -107,5 +119,10 @@
   #loc-edit{
     margin-top: 8px;
     padding-left: 1em;
+  }
+
+  .no-loc-notif{
+    display: block;
+    margin: 6px 0 0 1em;
   }
 </style>

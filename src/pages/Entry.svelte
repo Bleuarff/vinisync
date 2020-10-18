@@ -5,6 +5,7 @@ import Apogee from '../components/Apogee.svelte'
 import Cepages from '../components/Cepages.svelte'
 import Color from '../components/Color.svelte'
 import ImageEdit from '../components/ImageEdit.svelte'
+import Location from '../components/Location.svelte'
 import { repo } from '../storage.js'
 import syncMgr from '../syncMgr.js'
 import Utils from '../utils.js'
@@ -33,7 +34,7 @@ let entry = {
     sparkling: false
   },
   count: 6,
-  location: '',
+  location: [],
   offeredBy: '',
   creationDate: '',
   lastUpdateDate: ''
@@ -235,8 +236,10 @@ async function decrement(){
       </div>
     {/if}
 
-    <FormText bind:value={entry.location} readonly={!edit} label="Emplacement" placeholder="Cave 1, etagère 3" type="text"></FormText>
+    <Location readonly={!edit} bind:value={entry.location}></Location>
+    <!-- <FormText bind:value={entry.location} readonly={!edit} label="Emplacement" placeholder="Cave 1, etagère 3" type="text"></FormText> -->
     <FormText bind:value={entry.offeredBy} readonly={!edit} label="Offert par" placeholder="Robert Parker" type="text"></FormText>
+
 
   {:else}
     <p>Cannot retrieve entry {params.id}</p>

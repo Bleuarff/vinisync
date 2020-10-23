@@ -213,7 +213,9 @@ class SyncMgr{
     Object.entries(changes).forEach(([key, value]) => {
       if (value instanceof Blob)
         target[key] = value
-      if (typeof value === 'object')
+      else if (Array.isArray(value))
+        target[key] = value // overwrite array with entire new array
+      else if (typeof value === 'object')
         target[key] = this._deepAssign(target[key], value)
       else
         target[key] = value

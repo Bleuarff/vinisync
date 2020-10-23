@@ -127,4 +127,14 @@ export default class Utils{
       console.error(ex)
     }
   }
+
+  // thanks to https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest#Examples
+  static async computeHash(input, algo = 'SHA-256'){
+    const msgUint8 = new TextEncoder().encode(input),
+          hashBuffer = await crypto.subtle.digest(algo, msgUint8),
+          hashArray = Array.from(new Uint8Array(hashBuffer)),
+          hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+
+    return hashHex
+  }
 }

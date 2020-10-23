@@ -1,16 +1,18 @@
 <script>
   import { onMount } from 'svelte'
-  import FormText from './FormText.svelte'
+  import Utils from '../utils.js'
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher();
 
   let locations
   let newLocName
+  let refHash // hash of data as retrieved from storage
 
   onMount(async () => {
     try{
-      locations = JSON.parse(localStorage.getItem('locations')) || []
-
+      const rawJson = localStorage.getItem('locations')
+      locations = JSON.parse( rawJson || [])
+      refHash = await Utils.computeHash(rawJson)
     }
     catch(ex){
       console.error(ex)
@@ -21,8 +23,19 @@
   // TODO: sync (review storage)
   async function save(e){
     e.preventDefault()
+
+    const jsonData = JSON.stringify(locations)
+    const hash = await Utils.computeHash(jsonData)
+    if (hash != refHash){
+      console.debug('Sync locations needed !')
+      // TODO: sync
+      refHash = hash // finally, reset ref hash with new value
+    }
+    else
+      console.debug('No location update')
+
     try{
-      localStorage.setItem('locations', JSON.stringify(locations))
+      localStorage.setItem('locations', jsonData)
       dispatch('notif', {text: 'OK'})
     }
     catch(ex){

@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte'
   import Utils from '../utils.js'
+  import syncMgr from '../syncMgr.js'
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher();
 
@@ -11,7 +12,9 @@
   onMount(async () => {
     try{
       const rawJson = localStorage.getItem('locations')
-      locations = JSON.parse( rawJson || [])
+      locations = rawJson ? JSON.parse(rawJson) : []
+
+      // get hash of object before any modification
       refHash = await Utils.computeHash(rawJson)
     }
     catch(ex){
@@ -20,22 +23,21 @@
     }
   })
 
-  // TODO: sync (review storage)
   async function save(e){
     e.preventDefault()
 
     const jsonData = JSON.stringify(locations)
     const hash = await Utils.computeHash(jsonData)
-    if (hash != refHash){
-      console.debug('Sync locations needed !')
-      // TODO: sync
-      refHash = hash // finally, reset ref hash with new value
-    }
-    else
-      console.debug('No location update')
+
+    if (hash === refHash) // no modification, nothing to save
+      return
 
     try{
+      // save & sync
       localStorage.setItem('locations', jsonData)
+      syncMgr.syncIt(locations, null, 'locations')
+
+      refHash = hash // finally, reset ref hash with new value
       dispatch('notif', {text: 'OK'})
     }
     catch(ex){

@@ -113,6 +113,9 @@ class SyncMgr{
           case 'picture':
             await this._mergePicture(update)
             break
+          case 'locations':
+            localStorage.setItem('locations', JSON.stringify(update.changes))
+            break
           default:
             console.error(`"${update.type}" type of update is not supported`)
         }

@@ -28,7 +28,7 @@ node server/server.js
 payload has random id, diff as changes, ts (+ userid, type, devid)
 
 ### server insertUpdate
-ts is payload ts, uploadedDate is insertion time
+ts is payload ts (or current time if not provided), uploadedDate is insertion time
 
 ### server getUpdates
 get updates uploaded after the requesting device last sync.  

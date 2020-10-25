@@ -3,6 +3,7 @@
   import Download from '../components/Download.svelte'
   import LocationManager from '../components/LocationManager.svelte'
   import { createEventDispatcher } from 'svelte'
+  import router from 'page'
   const dispatch = createEventDispatcher();
   import { DateTime } from 'luxon'
 
@@ -11,7 +12,11 @@
 
   onMount(() => {
     try{
-      const user = JSON.parse(localStorage.getItem('user'));
+      const user = JSON.parse(localStorage.getItem('user'))
+
+      if (!user){
+        return router('/')
+
       email = user.email
 
       createDate = DateTime.fromISO(user.createDate).setLocale(document.documentElement.lang)

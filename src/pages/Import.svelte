@@ -5,10 +5,12 @@ import syncMgr from '../syncMgr.js'
 import { v4 as uuid} from 'uuid'
 import { createEventDispatcher } from 'svelte'
 import Utils from '../utils.js'
+import Loader from '../components/Loader.svelte'
 const dispatch = createEventDispatcher()
 export let params
 
 let fileUrl = ""
+let loader
 
 // load data from url
 async function importUrl(e){
@@ -40,6 +42,7 @@ async function importUrl(e){
 
 // delete existing data & insert new ones
 async function insert(backup){
+  loader.show()
   await repo.open()
   await repo.deleteAllTables()
 
@@ -50,6 +53,8 @@ async function insert(backup){
     await importEntries(backup.entries)
     await importImages(backup.images)
   }
+
+  loader.hide()
   router('/wines')
 }
 
@@ -123,6 +128,8 @@ function importFile(e){
 <label for="url">Importer un fichier web:</label>
 <input type="text" id="url" placeholder="https://example.com/monbackup.json" bind:value={fileUrl}>
 <button on:click={importUrl} disabled={!fileUrl}>Importer le lien</button>
+
+<Loader bind:this={loader}></Loader>
 
 <style>
   .wng{

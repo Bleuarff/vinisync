@@ -14,11 +14,10 @@
     try{
       const user = JSON.parse(localStorage.getItem('user'))
 
-      if (!user){
+      if (!user)
         return router('/')
 
       email = user.email
-
       createDate = DateTime.fromISO(user.createDate).setLocale(document.documentElement.lang)
     }
     catch(ex){

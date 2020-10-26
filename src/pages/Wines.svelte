@@ -194,6 +194,11 @@ function sortHandler(e){
     <div class="err">Pas de résultat.</div>
   {/if}
 
+{:else if mode === 'old'}
+  <p>
+    Vous n'avez pas encore de référence épuisée.
+    <a href="/wines">Voir toutes les références.</a>
+  </p>
 {:else}
   <p>Votre cave est vide.</p>
   <div>

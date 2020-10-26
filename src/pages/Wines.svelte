@@ -26,7 +26,7 @@ $: {
   const newMode = params.type === 'oldref' ? 'old' : 'default',
         reload = mode && mode !== newMode // trigger reload not needed on first exec
   mode = newMode
-  
+
   if (reload)
     load()
 }
@@ -155,7 +155,12 @@ function sortHandler(e){
 
   <h2>Mes vins</h2>
   <p><span class="bold">{origEntries.length}</span> références et <span class="bold">{bottleCount}</span> bouteilles en cave.<br>
-    <a href="{mode === 'old' ? '/wines' : '/wines/oldref'}" class="old-link">Voir les anciennes références</a>
+
+    {#if mode === 'default'}
+      <a href="/wines/oldref" class="old-link">Voir les anciennes références</a>
+    {:else}
+      <a href="/wines" class="old-link">Voir les références actuelles</a>
+    {/if}
   </p>
 
   <Filters source="{origEntries.map(x => {return {year: x.wine.year, appellation: x.wine.appellation, producer: x.wine.producer}})}"

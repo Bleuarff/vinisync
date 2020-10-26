@@ -175,7 +175,7 @@ async function decrement(){
 </script>
 
 <div class="nav">
-  <a href="/wines" class="back">liste</a>
+  <a href="/wines{entry.count <= 0 ? '/oldref' : ''}" class="back">liste</a>
   {#if params.id}
     <a href="/history/{params.id}" class="forward">historique</a>
   {/if}

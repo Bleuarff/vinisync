@@ -36,7 +36,10 @@
 			page = Signup
 		}
 	})
-	router('/wines', getPath, () => page = Wines)
+	router('/wines/:type?', getPath, (ctx, next) => {
+		params = ctx.params
+		next()
+	}, () => page = Wines)
 	router('/entry/:id?', getPath, (ctx, next) => {
 		params = ctx.params
 		next()

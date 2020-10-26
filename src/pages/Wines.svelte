@@ -16,7 +16,20 @@ let lastSortASC // whether last sort was in ascending order
 
 const defaultSortConfig = { field: 'year', orderAsc: false }
 
-$: bottleCount = origEntries.reduce((cur, e)=> {return cur + e.count}, 0)
+$: bottleCount = origEntries.reduce((cur, e) => {return cur + e.count}, 0)
+
+// Display mode
+// old: show only entries with count 0.
+// default: show entries with count > 0.
+let mode
+$: {
+  const newMode = params.type === 'oldref' ? 'old' : 'default',
+        reload = mode && mode !== newMode // trigger reload not needed on first exec
+  mode = newMode
+  
+  if (reload)
+    load()
+}
 
 onMount(async () => {
   await repo.open()
@@ -31,7 +44,13 @@ onMount(async () => {
 })
 
 export async function load(){
-  entries = origEntries = await repo.getAll('entries')
+  let filterFunc
+  if (mode === 'default')
+    filterFunc = (x) => x.count > 0
+  else
+    filterFunc = (x) => x.count <= 0
+
+  entries = origEntries = (await repo.getAll('entries')).filter(filterFunc)
   entries = sort(entries) // origEntries is also sorted, since sort is in-place and both variables refer to the same array
   syncMgr.checkUpdates()
   .then(async updated => {
@@ -130,10 +149,14 @@ function sortHandler(e){
 </script>
 
 {#if origEntries.length > 0}
-  <a href="/history" class="forward">historique</a>
+  {#if mode === "default"}
+    <a href="/history" class="forward">historique</a>
+  {/if}
 
   <h2>Mes vins</h2>
-  <p><span class="bold">{origEntries.length}</span> references et <span class="bold">{bottleCount}</span> bouteilles en cave.</p>
+  <p><span class="bold">{origEntries.length}</span> références et <span class="bold">{bottleCount}</span> bouteilles en cave.<br>
+    <a href="{mode === 'old' ? '/wines' : '/wines/oldref'}" class="old-link">Voir les anciennes références</a>
+  </p>
 
   <Filters source="{origEntries.map(x => {return {year: x.wine.year, appellation: x.wine.appellation, producer: x.wine.producer}})}"
     on:filter={filterList}>
@@ -313,5 +336,9 @@ function sortHandler(e){
 
 .forward{
   float: right;
+}
+
+a.old-link{
+  font-size: .9em;
 }
 </style>

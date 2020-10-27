@@ -1,9 +1,10 @@
 <script>
-import { onMount } from 'svelte'
+import { onMount, onDestroy } from 'svelte'
 import {repo } from '../storage.js'
 import syncMgr from '../syncMgr.js'
 import Filters from '../components/Filters.svelte'
 const CONFIG_SORT_KEY = 'config.page.wines.sort'
+const CONFIG_FILTER_KEY = 'config.pages.wines.filter'
 export let params = {}
 
 // IDEA: show sort order in sort icon. Use an overlay with vertical gradient opacity background to hide icon top/bottom.
@@ -13,6 +14,8 @@ let entries = [] // subset of entries
 let sortConfig
 let lastSortField // name of the last field used for sorting
 let lastSortASC // whether last sort was in ascending order
+
+let filterField, filterValue // field and value to filter on, when set. Used for serialization
 
 const defaultSortConfig = { field: 'year', orderAsc: false }
 
@@ -40,7 +43,17 @@ onMount(async () => {
     sortConfig = defaultSortConfig
   }
 
-  load()
+  await load()
+
+  // use filter config if it exists
+  const filterConfig = window[CONFIG_FILTER_KEY]
+  if (filterConfig)
+    filterList({
+      detail: {
+        filter: filterConfig.field,
+        value: filterConfig.value
+      }
+    })
 })
 
 export async function load(){
@@ -52,12 +65,11 @@ export async function load(){
 
   entries = origEntries = (await repo.getAll('entries')).filter(filterFunc)
   entries = sort(entries) // origEntries is also sorted, since sort is in-place and both variables refer to the same array
-  syncMgr.checkUpdates()
-  .then(async updated => {
-    if (updated)
-      entries = origEntries  = await repo.getAll('entries')
-      entries = sort(entries) // origEntries also sorted.
-  })
+
+  const updated = await syncMgr.checkUpdates()
+  if (updated)
+    entries = origEntries  = await repo.getAll('entries')
+    entries = sort(entries) // origEntries also sorted.
 }
 
 // sort entries on given field
@@ -126,19 +138,21 @@ function filterList(e){
     // Since field will be same as lastSortField, switch lastSortASC to have the same order as previous sort on filtered items.
     lastSortASC = !lastSortASC
     entries = sort(origEntries, lastSortField)
+    filterField = null
+    filterValue = null
     return
   }
   // console.log(`filter ${e.detail.filter}=${e.detail.value}`)
-  const filter = e.detail.filter,
-        value = e.detail.value
+  filterField = e.detail.filter
+  filterValue = e.detail.value
   let filterFn // filter function to filter by
 
-  if (!!value)
+  if (!!filterValue)
     // truthy value provided: non-strict equality check
-    filterFn = x => x.wine[filter] == value
+    filterFn = x => x.wine[filterField] == filterValue
   else
     // filter for all falsy values
-    filterFn = x => !x.wine[filter]
+    filterFn = x => !x.wine[filterField]
 
   entries = origEntries.filter(filterFn)
 }
@@ -151,6 +165,20 @@ function sortHandler(e){
   // on each sort, store field & order as the new defaults
   window.localStorage.setItem(CONFIG_SORT_KEY, JSON.stringify(sortConfig))
 }
+
+// if destination is an entry page and some filter is set, save it for when we come back
+onDestroy(() => {
+  console.debug(location.href)
+  if (!filterField || !filterValue)
+    return
+
+  const toEntry = /\/entry\/[\da-f\-]+\/?$/i.test(location.pathname) // whether we go to an entry page
+
+  window[CONFIG_FILTER_KEY] = toEntry ? {
+    field: filterField,
+    value: filterValue
+  } : null
+})
 
 </script>
 

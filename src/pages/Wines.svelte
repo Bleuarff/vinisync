@@ -97,6 +97,12 @@ function sort(list, field){
         valB = b.count
         break
     }
+
+    if (typeof valA === 'string')
+      valA = valA.toLowerCase()
+    if (typeof valB === 'string')
+      valB = valB.toLowerCase()
+
     // falsy values should be at the bottom in default sort.
     // for string fields, that means reversing the sort order for false values
     if (['appellation', 'producer'].includes(field) && (!valA || !valB)){

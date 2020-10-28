@@ -47,13 +47,15 @@ onMount(async () => {
 
   // use filter config if it exists
   const filterConfig = window[CONFIG_FILTER_KEY]
-  if (filterConfig)
+  if (filterConfig){
     filterList({
       detail: {
         filter: filterConfig.field,
         value: filterConfig.value
       }
     })
+    window[CONFIG_FILTER_KEY] = null
+  }
 })
 
 export async function load(){
@@ -168,13 +170,10 @@ function sortHandler(e){
 
 // if destination is an entry page and some filter is set, save it for when we come back
 onDestroy(() => {
-  console.debug(location.href)
-  if (!filterField || !filterValue)
-    return
+  // console.debug('to: ' + location.href)
+  const toEntry = /\/entry\/[\da-f\-]+\/?/i.test(location.pathname) // whether we go to an entry page
 
-  const toEntry = /\/entry\/[\da-f\-]+\/?$/i.test(location.pathname) // whether we go to an entry page
-
-  window[CONFIG_FILTER_KEY] = toEntry ? {
+  window[CONFIG_FILTER_KEY] = toEntry && filterField && filterValue ? {
     field: filterField,
     value: filterValue
   } : null

@@ -15,8 +15,8 @@ let sortConfig
 let lastSortField // name of the last field used for sorting
 let lastSortASC // whether last sort was in ascending order
 
-let filterField, filterValue // field and value to filter on, when set. Used for serialization
-let filtersNd
+let filterConfig // filters' selected field & value
+let filtersNd // filter component
 
 const defaultSortConfig = { field: 'year', orderAsc: false }
 
@@ -33,8 +33,7 @@ $: {
 
   if (reload){
     load()
-    window[CONFIG_FILTER_KEY] = null
-    filterField = filterValue = null
+    filterConfig = window[CONFIG_FILTER_KEY] = null
   }
 }
 
@@ -50,7 +49,7 @@ onMount(async () => {
   await load()
 
   // use filter config if it exists
-  const filterConfig = window[CONFIG_FILTER_KEY]
+  filterConfig = window[CONFIG_FILTER_KEY]
   if (filterConfig){
     filterList({
       detail: {
@@ -145,21 +144,23 @@ function filterList(e){
     // Since field will be same as lastSortField, switch lastSortASC to have the same order as previous sort on filtered items.
     lastSortASC = !lastSortASC
     entries = sort(origEntries, lastSortField)
-    filterField = null
-    filterValue = null
+    filterConfig = null
     return
   }
   // console.log(`filter ${e.detail.filter}=${e.detail.value}`)
-  filterField = e.detail.filter
-  filterValue = e.detail.value
+  filterConfig = {
+    field: e.detail.filter,
+    value: e.detail.value
+  }
+
   let filterFn // filter function to filter by
 
-  if (!!filterValue)
+  if (!!filterConfig.value)
     // truthy value provided: non-strict equality check
-    filterFn = x => x.wine[filterField] == filterValue
+    filterFn = x => x.wine[filterConfig.field] == filterConfig.value
   else
     // filter for all falsy values
-    filterFn = x => !x.wine[filterField]
+    filterFn = x => !x.wine[filterConfig.field]
 
   entries = origEntries.filter(filterFn)
 }
@@ -178,9 +179,9 @@ onDestroy(() => {
   // console.debug('to: ' + location.href)
   const toEntry = /\/entry\/[\da-f\-]+\/?/i.test(location.pathname) // whether we go to an entry page
 
-  window[CONFIG_FILTER_KEY] = toEntry && filterField && filterValue ? {
-    field: filterField,
-    value: filterValue
+  window[CONFIG_FILTER_KEY] = toEntry && filterConfig && filterConfig.field && filterConfig.value ? {
+    field: filterConfig.field,
+    value: filterConfig.value
   } : null
 })
 

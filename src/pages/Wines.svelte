@@ -31,8 +31,11 @@ $: {
         reload = mode && mode !== newMode // trigger reload not needed on first exec
   mode = newMode
 
-  if (reload)
+  if (reload){
     load()
+    window[CONFIG_FILTER_KEY] = null
+    filterField = filterValue = null
+  }
 }
 
 onMount(async () => {

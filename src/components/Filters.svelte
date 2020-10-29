@@ -37,9 +37,17 @@
   onMount(() => {
   })
 
-  async function toggle(e){
-    const field = e.currentTarget.dataset.name
+  // set filter field and value from outside
+  export async function preset(field, value){
+    await toggle(field)
+    selectNd.value = value
+  }
 
+  function toggleHandler(e){
+    toggle(e.currentTarget.dataset.name)
+  }
+
+  async function toggle(field){
     if (selected === field){
       // hide selector, notify parent to clear filters
       selected = null
@@ -64,9 +72,9 @@
   <div class="filters-ctnr">
     <label>Filtres:</label>
     <div class="selector">
-      <span data-name="year" on:click="{toggle}" class:selected="{selected==='year'}">Année</span>
-      <span data-name="producer" on:click="{toggle}" class:selected="{selected==='producer'}">Producteur</span>
-      <span data-name="appellation" on:click="{toggle}" class:selected="{selected==='appellation'}">Appellation</span>
+      <span data-name="year" on:click="{toggleHandler}" class:selected="{selected==='year'}">Année</span>
+      <span data-name="producer" on:click="{toggleHandler}" class:selected="{selected==='producer'}">Producteur</span>
+      <span data-name="appellation" on:click="{toggleHandler}" class:selected="{selected==='appellation'}">Appellation</span>
     </div>
 
     {#if selected}

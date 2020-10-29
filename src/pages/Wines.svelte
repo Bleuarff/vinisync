@@ -16,6 +16,7 @@ let lastSortField // name of the last field used for sorting
 let lastSortASC // whether last sort was in ascending order
 
 let filterField, filterValue // field and value to filter on, when set. Used for serialization
+let filtersNd
 
 const defaultSortConfig = { field: 'year', orderAsc: false }
 
@@ -54,6 +55,7 @@ onMount(async () => {
         value: filterConfig.value
       }
     })
+    filtersNd.preset(filterConfig.field, filterConfig.value)
     window[CONFIG_FILTER_KEY] = null
   }
 })
@@ -197,7 +199,7 @@ onDestroy(() => {
   </p>
 
   <Filters source="{origEntries.map(x => {return {year: x.wine.year, appellation: x.wine.appellation, producer: x.wine.producer}})}"
-    on:filter={filterList}>
+    on:filter={filterList} bind:this={filtersNd}>
   </Filters>
 
   {#if entries.length > 0}

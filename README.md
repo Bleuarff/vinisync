@@ -22,6 +22,10 @@ server:
 node server/server.js
 ````
 
+## Run prod
+`npm run build`  
+Then use nginx to server files
+
 ## Sync reference
 
 ### client sendDiff

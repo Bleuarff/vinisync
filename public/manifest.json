@@ -1,0 +1,21 @@
+{
+  "name": "Vinisync",
+  "short_name": "Vinisync",
+  "decription": "A simple cellar management.",
+  "display": "standalone",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "img/logo_48.png",
+      "sizes": "48x48"
+    },
+    {
+      "src": "img/logo_64.png",
+      "sizes": "64x64"
+    },
+    {
+      "src": "img/logo_96.png",
+      "sizes": "96x96"
+    }
+  ]
+}

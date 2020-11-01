@@ -66,7 +66,12 @@
 
 	onMount(async () => {
 		console.log('app mount ')
-		syncMgr.pendingMonitor()
+		setTimeout(() => {
+			syncMgr.pendingMonitor()
+			if ('serviceWorker' in navigator){
+				navigator.serviceWorker.register('/sw.js')
+			}
+		}, 1e3)
 	})
 
 	async function forceSync(){

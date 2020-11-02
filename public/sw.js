@@ -2,10 +2,10 @@
 
 // service worker
 
-const cacheName = '20201102.4'
+const cacheName = '20201102.7'
 const assets = [
   '/',
-  '/manifest.json',
+  '/vinisync.webmanifest',
   '/build/bundle.js',
   '/build/bundle.css',
   '/global.css',

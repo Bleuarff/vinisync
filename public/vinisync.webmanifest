@@ -2,8 +2,9 @@
   "name": "Vinisync",
   "short_name": "Vinisync",
   "decription": "A simple cellar management.",
-  "display": "standalone",
+  "display": "fullscreen",
   "start_url": "/",
+  "background_color": "#791a1a",
   "icons": [
     {
       "src": "img/logo_48.png",

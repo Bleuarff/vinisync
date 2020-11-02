@@ -2,9 +2,10 @@
 
 // service worker
 
-const cacheName = '20201101.1 '
+const cacheName = '20201102.4'
 const assets = [
   '/',
+  '/manifest.json',
   '/build/bundle.js',
   '/build/bundle.css',
   '/global.css',
@@ -46,7 +47,16 @@ self.addEventListener('fetch', e => {
       return resolve(cachedResponse)
     }
 
-    const response = await fetch(e.request)
+    let response = null
+    try{
+      response = await fetch(e.request)
+      const cache = await caches.open(cacheName)
+      await cache.add(e.request)
+      console.debug(`[Service Worker] Added ${e.request.url} to cache`)
+    }
+    catch(ex){
+      console.log(`Fetch error for ${e.request.url}`)
+    }
     resolve(response)
   }))
 })

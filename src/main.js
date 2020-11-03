@@ -7,4 +7,10 @@ const app = new App({
 	}
 });
 
+window.vni = {
+	env: '__ENVIRONMENT__',
+	build: '__BUILD__',
+	date: '__BUILDDATE__'
+}
+
 export default app;

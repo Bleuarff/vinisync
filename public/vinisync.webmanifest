@@ -21,6 +21,10 @@
     {
       "src": "img/logo_144.png",
       "sizes": "144x144"
+    },
+    {
+      "src": "img/logo_192.png",
+      "sizes": "192x192"
     }
   ]
 }

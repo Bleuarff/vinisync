@@ -70,6 +70,8 @@ export async function load(){
           imageEditor.load(entry.id)
         }
       })
+
+      document.title = `${entry.wine.name || entry.wine.producer}${entry.wine.year ?  ' ' + entry.wine.year : ''} [${entry.count}]`
     }
     else{
       dispatch('notif', {text: `L'entrée n'existe pas`, err: true})

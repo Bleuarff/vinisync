@@ -60,6 +60,7 @@
 
 	function getPath(ctx, next){
 		path = ctx.path
+		document.title = 'Vinisync'
 		next()
 	}
 

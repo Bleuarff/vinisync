@@ -24,7 +24,7 @@
   }
 
   onMount(async () => {
-    // console.debug('history mount')
+    document.title = "Historique"
     await repo.open()
     load()
   })
@@ -35,6 +35,7 @@
       if (doc){
         updates = analyze(doc.edits)
         entry = await repo.findById('entries', params.id)
+        document.title += ` ${entry.wine.name || entry.wine.producer}${entry.wine.year ?  ' ' + entry.wine.year : ''}`
       }
     }
     else{

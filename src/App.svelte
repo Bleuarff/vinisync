@@ -21,6 +21,7 @@
 	let path // url pathname
 	let params // router path parameters
 	let notif // notif child component
+	const env = '__ENVIRONMENT__'
 
 	router('/', getPath, () => {
 		try{
@@ -100,6 +101,12 @@
 	<svelte:component this={page} bind:this={currentComponent} params={params} on:notif="{e => {notif.show(e.detail)}}"/>
 
 	<Notif bind:this={notif}></Notif>
+
+	{#if env === 'dev'}
+		<div id="env-banner">
+			<div>DEV</div>
+		</div>
+	{/if}
 </main>
 
 <style>
@@ -124,6 +131,29 @@
 		margin: 0 auto;
 		font-family: 'Roboto', sans-serif;
 		position: relative;
+	}
+
+	#env-banner{
+		position: fixed;
+    right: 0;
+    top: 0;
+		width: 170px;
+		height: 170px;
+		z-index: 100;
+	}
+
+	#env-banner div{
+		background: #0c546b;
+		color: white;
+    position: relative;
+    text-align: center;
+    font-weight: 1000;
+		padding: 4px;
+    opacity: .9;
+    border: 1px solid white;
+		top: 50%;
+		left: 0;
+    transform: translateY(-50%) rotate(45deg) translateY(-5em);
 	}
 
 </style>

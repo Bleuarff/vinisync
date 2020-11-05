@@ -149,7 +149,8 @@
             }],
             yAxes: [{
                 ticks: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    stepSize: params.id ? 1 : 20
                 }
             }]
           }
@@ -203,7 +204,7 @@
 <div id="history">
 
   <div id="chart-ctnr">
-    <canvas id="chart" width="400" height="120"></canvas>
+    <canvas id="chart" width="400" height="250"></canvas>
   </div>
 
   {#if updates && updates.length > 0}

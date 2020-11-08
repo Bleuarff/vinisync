@@ -57,7 +57,10 @@
 
 </script>
 
-<a href="/signin">Se connecter</a>
+<div class="nav">
+  <a href="/signin">Se connecter</a>
+</div>
+
 <h2>Création d'un compte</h2>
 
 <form>
@@ -78,8 +81,36 @@
 
   <p class="rgpd-notif">Promis on ne fait rien de vos information, elle ne seront pas vendues.</p>
 
-  <button on:click={createUser} disabled={!isValidPwd || !email}>Créer</button>
+  <button on:click={createUser} disabled={!isValidPwd || !email}>Créer mon compte</button>
 </form>
 
 <style>
+  input{
+    width: 100%;
+    max-width: 25em;
+  }
+
+  label, button{
+    margin-top: 1.2em;
+  }
+
+  .pwd-err{
+    display: block;
+    font-size: .8em;
+    position: realtive;
+  }
+
+  button{
+    color: white;
+    background: #ba0e0e;
+    border: 1px solid white;
+    border-radius: 4px;
+    font-size: 1.3em;
+  }
+
+  .nav{
+    display: flex;
+    flex-direction: row-reverse;
+  }
+
 </style>

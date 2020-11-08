@@ -39,7 +39,10 @@
 
 </script>
 
-<a href="/signup">Créer un compte</a>
+<div class="nav">
+  <a href="/signup">Créer un compte</a>
+</div
+>
 <h2>Connexion</h2>
 
 <form>
@@ -52,3 +55,27 @@
   <div></div>
   <button on:click={signin} disabled="{!email || !pwd}">Connexion</button>
 </form>
+
+<style>
+  input{
+    width: 100%;
+    max-width: 25em;
+  }
+
+  label, button{
+    margin-top: 1.2em;
+  }
+
+  button{
+    color: white;
+    background: #ba0e0e;
+    border: 1px solid white;
+    border-radius: 4px;
+    font-size: 1.3em;
+  }
+
+  .nav{
+    display: flex;
+    flex-direction: row-reverse;
+  }
+</style>

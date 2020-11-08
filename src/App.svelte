@@ -4,12 +4,12 @@
 	import Wines from './pages/Wines.svelte'
 	import Entry from './pages/Entry.svelte'
 	import Import from './pages/Import.svelte'
-	// import Sync from './pages/Sync.svelte'
 	import History from './pages/History.svelte'
 	import Conflicts from './pages/Conflicts.svelte'
 	import Settings from './pages/Settings.svelte'
 	import Signup from './pages/Signup.svelte'
 	import Signin from './pages/Signin.svelte'
+	import Home from './pages/Home.svelte'
 	import Err404 from './pages/Err404.svelte'
 	import Notif from './components/Notif.svelte'
 	import TitleBar from './components/TitleBar.svelte'
@@ -30,7 +30,7 @@
 			if (user && user.email && user.id && user.key)
 				page = Wines
 			else
-				page = Signup
+				page = Home
 		}
 		catch(ex){
 			console.error(ex)

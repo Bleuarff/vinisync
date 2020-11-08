@@ -2,6 +2,7 @@
 /public/build/
 /build
 /temp
+/dist/
 
 .DS_Store
 

@@ -10,7 +10,7 @@ let server
 
 void async function(){
   server = restify.createServer({
-    name: 'vinisync',
+    name: '__HOST__',
     version: '1.0.0'
   })
 

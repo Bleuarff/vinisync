@@ -142,10 +142,10 @@
 </script>
 
 {#if imageUrl || edit}
-  <div class="image-editor" class:fullSize={fullSizeImg} style="--fullsizeMaxWidth: 85{!!(rotation % 180) ? 'vh' : 'vw'}; --fullsizeMaxHeight: 85{!!(rotation % 180) ? 'vw' : 'vh'};">
+  <div class="image-editor" class:fullSize={fullSizeImg} class:quarter-rotation="{rotation % 180}" style="--fullsizeMaxWidth: 85{!!(rotation % 180) ? 'vh' : 'vw'}; --fullsizeMaxHeight: 85{!!(rotation % 180) ? 'vw' : 'vh'};">
     {#if imageUrl}
       <img src={imageUrl} class="centered" class:fullSize={fullSizeImg} on:click="{toggleOrRotate}" on:dblclick="{changeImage}"
-        style={imgStyle}>
+        style={imgStyle} alt="image pour cette entrée">
       {#if edit}<span class="filesize">{(filesize / 1e3).toFixed(0)}kb</span>{/if}
       <div class="img-background" class:fullSize={fullSizeImg} on:click="{resetFullsize}"></div>
     {:else if edit}
@@ -161,13 +161,6 @@
     height: 150px;
     margin-right: 1em;
     position: relative;
-  }
-
-  @media(min-width: 500px){
-    .image-editor{
-      flex-basis: 140px;
-      height: 210px;
-    }
   }
 
   .centered{
@@ -188,6 +181,11 @@
   img{
     max-width: 100%;
     max-height: 100%;
+  }
+
+  .quarter-rotation img:not(.fullSize){
+    max-height: calc(100px + 1em);
+    transform-origin: calc(50% + .5em) center;
   }
 
   img.fullSize{
@@ -224,5 +222,17 @@
     border-radius: 2px;
     font-size: .8em;
     padding: .1em .2em;
+  }
+
+  @media(min-width: 500px){
+    .image-editor{
+      flex-basis: 140px;
+      height: 210px;
+    }
+
+    .quarter-rotation img:not(.fullSize){
+      max-height: calc(140px + 1em);
+      transform-origin: calc(50% + .5em) center;
+    }
   }
 </style>

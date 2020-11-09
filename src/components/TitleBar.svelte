@@ -1,4 +1,6 @@
 <script>
+  import {onMount} from 'svelte'
+  import {repo} from '../storage.js'
   import { fly } from 'svelte/transition'
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher()
@@ -6,6 +8,12 @@
   let visible = true
   let debouncer = 0
   let lastScrollY = 0
+  let showConflicts = false
+
+  onMount(async () => {
+    await repo.open()
+    showConflicts = !!(await repo.findOne('conflicts', x => !!x)) // returns first document
+  })
 
   window.addEventListener('scroll', e => {
     const ts = Date.now()
@@ -27,7 +35,10 @@
       <a href="/">V</a>
       <a href="/stats" class="icon-chart-bar"></a>
       <a href="/settings" class="icon-cog-outline" title="Paramètres"></a>
-      <a href="/conflicts" class="icon-bomb" title="Conflits"></a>
+
+      {#if showConflicts}
+        <a href="/conflicts" class="icon-bomb" title="Conflits"></a>
+      {/if}
 
       <button class="icon-arrows-cw force-sync" title="Forcer la synchro" on:click="{()=>{dispatch('sync-request')}}"></button>
     </div>

@@ -32,7 +32,7 @@
 {#if visible}
   <div id="top" transition:fly="{{y: -40}}">
     <div id="inner">
-      <a href="/">V</a>
+      <a href="/">&nbsp;</a>
       <a href="/stats" class="icon-chart-bar"></a>
       <a href="/settings" class="icon-cog-outline" title="Paramètres"></a>
 
@@ -71,6 +71,13 @@
     padding-left: var(--link-space);
     padding-right: var(--link-space);
 	}
+
+  a[href="/"]{
+    display: inline-block;
+    width: 29px;
+    padding-left: 0;
+    background: url('/img/logo_23.png') no-repeat;
+  }
 
   .force-sync{
     color: white;

@@ -47,6 +47,8 @@
     <span>{createDate && createDate.toLocaleString(DateTime.DATE_HUGE)} à {createDate && createDate.toLocaleString(DateTime.TIME_24_SIMPLE)}</span>
 </div>
 
+<div id="version">build __BUILD__@__BUILDDATE__</div>
+
 <style>
   #profile{
     margin: 4em -.5em 2em -.5em;
@@ -66,5 +68,11 @@
   }
   h2{
     margin-bottom: .8em;
+  }
+
+  #version{
+    font-size: .8em;
+    text-align: center;
+    margin-top: 10rem;
   }
 </style>

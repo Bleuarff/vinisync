@@ -11,6 +11,9 @@ const config = {
 	dev: {
 		host: 'dev.vinisync.fr'
 	},
+  stg: {
+		host: 'stg.vinisync.fr'
+	},
 	prod: {
 		host: 'vinisync.fr'
 	}

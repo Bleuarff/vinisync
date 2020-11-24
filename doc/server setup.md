@@ -28,3 +28,12 @@ open `/etc/mongod.config`
 
 ## Node
 Install https://github.com/nvm-sh/nvm then latest node 14.X
+
+# Nginx
+- Copy `config/nginx.prod.conf` to `/etc/nginx/sites-available/vinisync.conf`
+- Create symbolic link in `sites-enabled/` & restart
+
+TODO:
+- SSL config (zerossl, letsencrypt ?)
+- build & upload script
+- server install script (after upload & unpack)

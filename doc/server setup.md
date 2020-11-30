@@ -27,11 +27,15 @@ open `/etc/mongod.config`
 
 
 ## Node
-Install https://github.com/nvm-sh/nvm then latest node 14.X
+Install https://github.com/nvm-sh/nvm for easy mgmt, then  node >= 14
 
-# Nginx
+## Nginx
 - Copy `config/nginx.prod.conf` to `/etc/nginx/sites-available/vinisync.conf`
 - Create symbolic link in `sites-enabled/` & restart
+
+## TLS config
+`sudo certbot certonly --webroot -w /var/www/vinisync/ -d stg.vinisync.fr --preferred-challenges http`
+
 
 TODO:
 - SSL config (zerossl, letsencrypt ?)

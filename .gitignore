@@ -1,8 +1,9 @@
 /node_modules/
-/public/build/
-/build
+
+/dist/public/build/
+/dist/server/
+
 /temp
-/dist/
 
 .DS_Store
 
@@ -12,5 +13,6 @@ spikes/
 TODO.md
 
 cert/
+releases/
 
 credentials

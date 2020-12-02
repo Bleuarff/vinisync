@@ -36,8 +36,6 @@ Install https://github.com/nvm-sh/nvm for easy mgmt, then  node >= 14
 ## TLS config
 `sudo certbot certonly --webroot -w /var/www/vinisync/ -d stg.vinisync.fr --preferred-challenges http`
 
-
 TODO:
-- SSL config (zerossl, letsencrypt ?)
 - build & upload script
 - server install script (after upload & unpack)

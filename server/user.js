@@ -2,7 +2,8 @@
 const db = require('./db.js').db,
       bcrypt = require('bcrypt'),
       uuid = require('uuid'),
-      { DateTime } = require('luxon')
+      { DateTime } = require('luxon'),
+      logger = require('./logger.js')
 
 const BCRYPT_SALT_ROUNDS = 10,
       COLLECTION_NAME = 'users'
@@ -46,7 +47,7 @@ class UserController{
       return next()
     }
     catch(ex){
-      console.error(ex)
+      logger.error(ex)
       res.send(500)
       return next(false)
     }
@@ -83,7 +84,7 @@ class UserController{
       return next()
     }
     catch(ex){
-      console.error(ex)
+      logger.error(ex)
       res.send(500)
       return next(false)
     }

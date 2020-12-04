@@ -1,6 +1,7 @@
 'use strict'
 const db = require('./db.js').db,
-      { DateTime } = require('luxon')
+      { DateTime } = require('luxon'),
+      logger = require('./logger.js')
 
 const PAGE_SIZE = 50
 
@@ -22,7 +23,7 @@ class Sync{
       return next()
     }
     catch(ex){
-      console.error(ex)
+      logger.error(ex)
       res.send(500)
       return next(false)
     }
@@ -48,7 +49,7 @@ class Sync{
       return next()
     }
     catch(ex){
-      console.error(ex)
+      logger.error(ex)
       res.send(500)
       return next(false)
     }

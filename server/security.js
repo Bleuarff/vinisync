@@ -2,7 +2,8 @@
 
 const { DateTime } = require('luxon'),
       db = require('./db.js').db,
-      { createHmac } = require('crypto')
+      { createHmac } = require('crypto'),
+      logger = require('./logger.js')
 
 const MAX_DATE_OFFSET = 15 * 60 // Max offset between request date and server time, in seconds
 
@@ -21,7 +22,7 @@ class Security{
     const ts = DateTime.fromISO(date),
           offset = ts.diffNow().as('seconds')
 
-    // console.debug(`${date}\t${offset}`)
+    // logger.debug(`${date}\t${offset}`)
     if (Math.abs(offset) > MAX_DATE_OFFSET){
       res.send(400, {reason: 'invalid INVALID_DATE_HEADER header'})
       return next(false)
@@ -49,14 +50,14 @@ class Security{
         return next(false)
       }
 
-      // console.debug(`user: ${user._id}\nkey: ${user.key}\nAuth: ${signature}`)
+      // logger.debug(`user: ${user._id}\nkey: ${user.key}\nAuth: ${signature}`)
 
       const input = [req.method, req.getPath(), date, req._body || req.body, req.getQuery()].join('\n')
-      // console.debug(input)
+      // logger.debug(input)
       const hmac = createHmac('sha384', user.key)
       hmac.update(input)
       const computedSignature = hmac.digest('base64')
-      // console.debug(`sign: ${computedSignature}`)
+      // logger.debug(`sign: ${computedSignature}`)
 
       if (computedSignature === signature)
         return next()
@@ -66,7 +67,7 @@ class Security{
       }
     }
     catch(ex){
-      console.error(ex)
+      logger.error(ex)
       res.send(500, {reason: 'SIGNATURE_VERIFICATION_ERROR'})
       return next(false)
     }

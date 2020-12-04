@@ -9,7 +9,8 @@ const { series, parallel, src, dest } = require('gulp'),
       {DateTime} = require('luxon')
 
 const env = argv.e || argv.env || 'dev' // environment to build.
-const buildTime = DateTime.local().toFormat('yyyyMMddHHmm')
+const buildTime = DateTime.local().toFormat('yyyyMMddHHmm'),
+      archiveName = `vinisync_${env}_${buildTime}.zip`
 
 const config = {
 	dev: {
@@ -51,8 +52,8 @@ function rollup(){
 }
 
 function archive(){
-  return src('dist/**')
-    .pipe(zip(`archive_${env}_${buildTime}.zip`))
+  return src(['dist/**', 'package.json'])
+    .pipe(zip(archiveName))
     .pipe(dest('releases/'))
 }
 

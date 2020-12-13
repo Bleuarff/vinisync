@@ -10,15 +10,14 @@ then
 fi
 
 # build app
-# gulp build --e $env
+gulp build --e $env
 
 # get archive name
 zipName=$(ls -t releases/vin* | head -n 1 | cut -d / -f2)
 echo "Deploying archive $zipName..."
 
 # upload it
-# rsync "releases/$zipName" "scripts/install.sh" "ubuntu@gigondas:~/vinisync/"
-rsync "scripts/install.sh" "ubuntu@gigondas:~/vinisync/"
+rsync "releases/$zipName" "scripts/install.sh" "ubuntu@gigondas:~/vinisync/"
 
 # on server: install & run
 ssh "ubuntu@gigondas" "chmod 744 ~/vinisync/install.sh && ~/vinisync/install.sh $zipName;"

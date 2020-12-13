@@ -12,12 +12,16 @@ const env = argv.e || argv.env || 'dev' // environment to build.
 const buildTime = DateTime.local().toFormat('yyyyMMddHHmm'),
       archiveName = `vinisync_${env}_${buildTime}.zip`
 
+// Config settings grouped by env.
+// Mongo credentials are in environment variables.
 const config = {
 	dev: {
-		host: 'dev.vinisync.fr'
+		host: 'dev.vinisync.fr',
+    connectionString: 'mongodb://localhost:27017'
 	},
   stg: {
-		host: 'stg.vinisync.fr'
+		host: 'stg.vinisync.fr',
+    connectionString: `mongodb://${process.env['MONGO_CREDS_STG']}@localhost:27017/vinisync`
 	},
 	prod: {
 		host: 'vinisync.fr'
@@ -30,7 +34,8 @@ if (!config[env]){
 }
 
 const replacements = {
-	__HOST__: config[env].host
+	__HOST__: config[env].host,
+  __DBCONNEXIONSTRING__: config[env].connectionString
 }
 
 function make(){

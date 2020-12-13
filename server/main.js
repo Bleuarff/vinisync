@@ -5,7 +5,7 @@ const restify = require('restify'),
       { DateTime } = require('luxon'),
       logger = require('./logger.js')
 
-const dbConnectionString = 'mongodb://localhost:27017'
+const dbConnectionString = '__DBCONNEXIONSTRING__'
 
 let server
 
@@ -61,7 +61,7 @@ void async function(){
     return next()
   })
 
-  server.get('/ping', function (req, res, next) {
+  server.get('/api/ping', function (req, res, next) {
     res.send(200, 'pong')
     return next()
   })

@@ -8,7 +8,7 @@ zipName="$1"
 # sudo chown -R ubuntu:ubuntu /var/log/vinisync
 
 # decompress archive
-# unzip -o ~/vinisync/${zipName} -d /var/www/vinisync
+unzip -o ~/vinisync/${zipName} -d /var/www/vinisync
 
 # install dependencies
 cd /var/www/vinisync

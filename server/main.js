@@ -20,7 +20,7 @@ void async function(){
     logger.log('db connection ok')
   }
   catch(ex){
-    logger.error('DB Connection error')
+    logger.error('DB Connection error: ')
     logger.error(ex)
     return
   }

@@ -99,7 +99,14 @@
         dispatch('notif', {text: 'Le fichier selectionné n\'est pas une image' , err: true})
         return
       }
+      console.debug('Resize image')
       file = await resize(rawFile)
+
+      if (file == null){
+        dispatch('notif', {text: 'Erreur de redimensionnement de l\'image' , err: true})
+        return
+      }
+
       console.debug(`Resized image size: ${file.size}`)
       imageUrl = URL.createObjectURL(file)
       filesize = file.size

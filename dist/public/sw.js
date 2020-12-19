@@ -18,7 +18,7 @@ const assets = [
 
 // cache assets
 self.addEventListener('install', event => {
-  console.log('[service Worker] Install...')
+  console.log(`[service Worker] Install ${cacheName}...`)
   event.waitUntil(new Promise(async (resolve, reject) => {
     console.log('[Service Worker] Caching assets')
     try{

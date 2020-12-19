@@ -17,16 +17,27 @@ export async function resize(file){
     throw new Error('Image format resize not supported')
 
   const targetSize = getDesiredSize(infos)
+  console.debug(targetSize)
 
-  const img = await getImage(file),
-        canvas = document.createElement('canvas')
+  try{
+    const img = await getImage(file),
+          canvas = document.createElement('canvas')
 
-  canvas.width = targetSize.width
-  canvas.height = targetSize.height
-  const ctx = canvas.getContext('2d')
-  ctx.drawImage(img, 0, 0, targetSize.width, targetSize.height)
-  const newFile = await getBlob(ctx, file.type)
-  return newFile
+    console.debug('set canvas dimensions')
+    canvas.width = targetSize.width
+    canvas.height = targetSize.height
+
+    console.debug('get context')
+    const ctx = canvas.getContext('2d')
+    ctx.drawImage(img, 0, 0, targetSize.width, targetSize.height)
+    const newFile = await getBlob(ctx, file.type)
+    URL.revokeObjectURL(img.src)
+    return newFile
+  }
+  catch(ex){
+    console.error(ex)
+    return null
+  }
 }
 
 function getBlob(ctx, mime){
@@ -37,21 +48,13 @@ function getBlob(ctx, mime){
   })
 }
 
-function getDataUrl(file){
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.addEventListener('load', e => {
-      resolve(e.target.result)
-    }, false)
-    reader.readAsDataURL(file)
-  })
-}
-
 function getImage(file){
   return new Promise(async (resolve, reject) => {
     const img = new Image()
-    img.addEventListener('load', e => { resolve(img) })
-    img.src = await getDataUrl(file)
+    img.addEventListener('load', e => {
+      resolve(img)
+    })
+    img.src = URL.createObjectURL(file)
   })
 }
 
@@ -130,7 +133,7 @@ function getJpegSize(raw, length){
   switch (info.orientation){
     case 6:
     case 8:
-      info.rotation = info.rotation === 6 ?-90 : -270;
+      info.rotation = info.orientation === 6 ?-90 : -270;
       [info.width, info.height] = [info.height, info.width] // quarter-turn rotation: switch height & width
       break
     case 3:

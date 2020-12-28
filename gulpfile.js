@@ -1,6 +1,6 @@
 'use strict'
 
-const { series, parallel, src, dest } = require('gulp'),
+const { series, parallel, src, dest, watch } = require('gulp'),
       nodemon = require('gulp-nodemon'),
       replace = require('gulp-replace'),
       argv = require('yargs').argv,
@@ -39,14 +39,14 @@ const replacements = {
 }
 
 function make(){
-  return replaceAll(src('server/*.js'))
+  return replaceAll(src('server/**/*.js'))
     .pipe(dest('dist/server/'))
 }
 
-function watch(cb){
+function startNodemon(cb){
   nodemon({
     script: 'dist/server/main.js',
-    watch: 'server/',
+    watch: 'dist/server/',
     env: { 'NODE_ENV': 'development' },
     done: cb
   })
@@ -70,7 +70,12 @@ function replaceAll(stream){
   return stream
 }
 
-exports.default = series(make, watch)
+watch(['server/**'], cb => {
+  make()
+  cb()
+})
+
+exports.default = series(make, startNodemon)
 exports.make = make
 exports.build = series(
   // make files (server & client), then archive the lot

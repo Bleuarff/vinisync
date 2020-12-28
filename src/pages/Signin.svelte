@@ -54,6 +54,7 @@
 
   <div></div>
   <button on:click={signin} disabled="{!email || !pwd}">Connexion</button>
+  <a href="/pwd-reset">Mot de passe oublié ?</a>
 </form>
 
 <style>

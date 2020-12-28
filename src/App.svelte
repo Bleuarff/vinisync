@@ -9,6 +9,7 @@
 	import Settings from './pages/Settings.svelte'
 	import Signup from './pages/Signup.svelte'
 	import Signin from './pages/Signin.svelte'
+	import PwdReset from './pages/PwdReset.svelte'
 	import Home from './pages/Home.svelte'
 	import Err404 from './pages/Err404.svelte'
 	import Notif from './components/Notif.svelte'
@@ -55,6 +56,7 @@
 	router('/settings', getPath, () => page = Settings)
 	router('/signup', getPath, () => page = Signup)
 	router('/signin', getPath, () => page = Signin)
+	router('/pwd-reset', getPath, () => page = PwdReset)
 	router('*', () => page = Err404)
 	router.start()
 

@@ -34,6 +34,9 @@
     }
   }
 
+  function forward(event) {
+		dispatch('notif', event.detail);
+	}
 </script>
 
 <div class="nav">
@@ -42,7 +45,9 @@
 
 <h2>Création d'un compte</h2>
 
-<Credentials on:submit={createUser}></Credentials>
+<Credentials on:submit={createUser} on:notif={forward}></Credentials>
+
+<p class="rgpd-notif">Promis on ne fait rien de vos information, elle ne seront pas vendues.</p>
 
 <style>
   .nav{

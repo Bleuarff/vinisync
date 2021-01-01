@@ -56,7 +56,10 @@
 	router('/settings', getPath, () => page = Settings)
 	router('/signup', getPath, () => page = Signup)
 	router('/signin', getPath, () => page = Signin)
-	router('/pwd-reset', getPath, () => page = PwdReset)
+	router('/pwd-reset/:id?', getPath, (ctx, next) => {
+		params = ctx.params
+		next()
+	}, () => page = PwdReset)
 	router('*', () => page = Err404)
 	router.start()
 

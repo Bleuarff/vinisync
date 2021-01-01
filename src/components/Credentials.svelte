@@ -1,7 +1,9 @@
 <script>
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher()
-  const PWD_MIN_LENGTH = 10
+  const PWD_MIN_LENGTH = 12
+
+  export let mode = 'create'
 
   let email = '', pwd, pwd2
   let isValidPwd = false,
@@ -9,10 +11,12 @@
 
   $: isValidPwd = pwd && pwd2 && pwd.length >= PWD_MIN_LENGTH && pwd === pwd2
   $: isValidEmail = email && email.match(/.+@.+/)
+  $: disabled = mode === 'create' ? !isValidEmail || !isValidPwd : !isValidPwd
+  $: ctaText = mode === 'create' ? 'Créer mon compte': 'Réinitialiser'
 
   function submit(e){
     e.preventDefault()
-    if (!isValidEmail){
+    if (mode === 'create' && !isValidEmail){
       dispatch('notif', {text: `Email invalide`, err: true})
       return
     }
@@ -26,8 +30,10 @@
 </script>
 
 <form>
-  <label>Email</label>
-  <input type="email" bind:value={email}>
+  {#if mode === 'create'}
+    <label>Email</label>
+    <input type="email" bind:value={email}>
+  {/if}
 
   <label>Mot de passe</label>
   <input type="password" bind:value={pwd}>
@@ -41,9 +47,7 @@
     <span class="pwd-err">Confirmation incorrecte</span>
   {/if}
 
-  <p class="rgpd-notif">Promis on ne fait rien de vos information, elle ne seront pas vendues.</p>
-
-  <button on:click={submit} disabled={!isValidPwd || !email}>Créer mon compte</button>
+  <button on:click={submit} disabled={disabled}>{ctaText}</button>
 </form>
 <style>
 input{
@@ -66,6 +70,7 @@ label, button{
 }
 
 button{
+  display: block;
   color: white;
   background: #ba0e0e;
   border: 1px solid white;

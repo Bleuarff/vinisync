@@ -32,7 +32,7 @@ void async function(){
 
   server.use(restify.plugins.acceptParser(server.acceptable))
   server.use((req, res, next) => {
-    logger.log(`[${DateTime.local().toFormat('HH:mm:ss')}] ${req.method} ${req.getPath()}`)
+    console.log(`[${DateTime.local().toFormat('HH:mm:ss')}] ${req.method} ${req.getPath()}`)
     return next()
   })
 
@@ -71,6 +71,10 @@ void async function(){
 
   server.put('/api/user', User.create)
   server.post('/api/signin', User.signin)
+  server.post('/api/user/pwd', User.setPwd)
+
+  server.post('/api/pwdreset', User.createPwdReset)
+  server.get('/api/pwdreset/:id', User.getPwdReset)
 
   /************************ end routes ***************************/
 

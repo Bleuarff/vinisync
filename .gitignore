@@ -16,3 +16,4 @@ cert/
 releases/
 
 credentials
+sendgrid.env

@@ -7,6 +7,8 @@ function getTime(){
 
 module.exports = exports = {
   log: function(msg, ...args){
+    if (typeof msg === 'object')
+      msg = JSON.stringify(msg)
     console.log(getTime() + msg, ...args)
   },
 

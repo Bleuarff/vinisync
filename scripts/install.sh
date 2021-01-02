@@ -10,13 +10,15 @@ zipName="$1"
 # decompress archive
 unzip -o ~/vinisync/${zipName} -d /var/www/vinisync
 
+source ~/vinisync/sendgrid.env
+
 # install dependencies
 cd /var/www/vinisync
-# /usr/local/bin/npm install
+/usr/local/bin/npm install
 
 # find existing process
 # TODO: Cannot run other processes with same script. Need more foolproof way.
-curpid=$(ps aux | grep -e "[n]ode.*server/main.js" | head -1 | cut -d " " -f7)
+curpid=$(pgrep -f "node server/main.js")
 
 #echo "curpid $curpid"
 

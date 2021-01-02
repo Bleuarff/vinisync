@@ -70,12 +70,14 @@ function replaceAll(stream){
   return stream
 }
 
-watch(['server/**'], cb => {
-  make()
-  cb()
-})
+function watchers(){
+  watch(['server/**'], cb => {
+    make()
+    cb()
+  })
+}
 
-exports.default = series(make, startNodemon)
+exports.default = series(make, startNodemon, watchers)
 exports.make = make
 exports.build = series(
   // make files (server & client), then archive the lot

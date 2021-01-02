@@ -27,7 +27,13 @@ open `/etc/mongod.config`
 
 
 ## Node
-Install https://github.com/nvm-sh/nvm for easy mgmt, then  node >= 14
+download version & extract to /opt, edit /usr/local/bin/(node|npm) symlinks to the new version.
+````
+ln -s /opt/node-v15/bin/node node15
+ln -s /opt/node-v15/bin/npm npm15
+mv -T node15 node
+mv -T npm15 npm
+````
 
 ## Nginx
 - Copy `config/nginx.prod.conf` to `/etc/nginx/sites-available/vinisync.conf`

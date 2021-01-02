@@ -4,7 +4,7 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "start": "sirv public --single --host 0.0.0.0",
+    "start": "nohup /usr/local/bin/node server/main.js >> /var/log/vinisync/vinisync.log 2>&1 &",
     "test": "scripty"
   },
   "mocha": {

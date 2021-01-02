@@ -33,5 +33,5 @@ fi
 
 # run
 echo "start app"
-nohup /usr/local/bin/node server/main.js >> /var/log/vinisync/vinisync.log 2>&1 &
+/usr/local/bin/npm start
 echo "done"

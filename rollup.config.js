@@ -50,7 +50,7 @@ export default {
 
 		// In dev mode, call `npm run start` once
 		// the bundle has been generated
-		!production && serve(),
+		!production, // && serve(),
 
 		// Watch the `public` directory and refresh the
 		// browser on changes when not in production
@@ -65,22 +65,22 @@ export default {
 	}
 };
 
-function serve() {
-	let started = false;
-
-	return {
-		writeBundle() {
-			if (!started) {
-				started = true;
-
-				require('child_process').spawn('npm', ['run', 'start', '--', '--dev'], {
-					stdio: ['ignore', 'inherit', 'inherit'],
-					shell: true
-				});
-			}
-		}
-	};
-}
+// function serve() {
+// 	let started = false;
+//
+// 	return {
+// 		writeBundle() {
+// 			if (!started) {
+// 				started = true;
+//
+// 				require('child_process').spawn('npm', ['run', 'start', '--', '--dev'], {
+// 					stdio: ['ignore', 'inherit', 'inherit'],
+// 					shell: true
+// 				});
+// 			}
+// 		}
+// 	};
+// }
 
 function getBuildNumber(){
 	let build = execSync('git rev-parse --short=7 HEAD').toString().substring(0, 7) // get short commit id, minus newline

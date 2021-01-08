@@ -19,5 +19,9 @@ const texts = {
     apogeeStart: 'Apogée début',
     sparkling: 'Pétillant',
     count: 'Bouteilles',
+    white: 'blanc',
+    red: 'rouge',
+    rose: 'rosé'
+
   }
 }

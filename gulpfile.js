@@ -17,14 +17,17 @@ const buildTime = DateTime.local().toFormat('yyyyMMddHHmm'),
 const config = {
 	dev: {
 		host: 'dev.vinisync.fr',
-    connectionString: 'mongodb://localhost:27017'
+    connectionString: 'mongodb://localhost:27017',
+    title: 'Vinisync [DEV]'
 	},
   stg: {
 		host: 'stg.vinisync.fr',
-    connectionString: `mongodb://${process.env['MONGO_CREDS_STG']}@localhost:27017/vinisync`
+    connectionString: `mongodb://${process.env['MONGO_CREDS_STG']}@localhost:27017/vinisync`,
+    title: 'Vinisync [STG]'
 	},
 	prod: {
-		host: 'vinisync.fr'
+		host: 'vinisync.fr',
+    title: 'Vinisync'
 	}
 }
 
@@ -35,12 +38,18 @@ if (!config[env]){
 
 const replacements = {
 	__HOST__: config[env].host,
-  __DBCONNEXIONSTRING__: config[env].connectionString
+  __DBCONNEXIONSTRING__: config[env].connectionString,
+  __TITLE__: config[env].title
 }
 
-function make(){
+function makeServer(){
   return replaceAll(src('server/**/*.js'))
     .pipe(dest('dist/server/'))
+}
+
+function makeIndex(){
+  return replaceAll(src('src/index.html'))
+    .pipe(dest('dist/public/'))
 }
 
 function startNodemon(cb){
@@ -72,13 +81,24 @@ function replaceAll(stream){
 
 function watchers(){
   watch(['server/**'], cb => {
-    make()
+    makeServer()
+    cb()
+  })
+
+  watch(['src/index.html'], cb => {
+    makeIndex()
     cb()
   })
 }
 
-exports.default = series(make, startNodemon, watchers)
-exports.make = make
+const make = exports.make = parallel(makeServer, makeIndex)
+exports.default = series(
+  make,
+  parallel(
+    startNodemon,
+    watchers
+  )
+)
 exports.build = series(
   // make files (server & client), then archive the lot
   parallel(make, rollup),

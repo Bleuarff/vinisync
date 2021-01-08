@@ -12,6 +12,20 @@ import fs from 'fs'
 const production = !process.env.ROLLUP_WATCH;
 const env = process.env.ROLLUP_WATCH ? 'dev' : 'prod'
 
+console.log(process.args)
+
+const config = {
+	dev: {
+		title: 'Vinisync [DEV]'
+	},
+	stg: {
+		title: 'Vinisync [STG]'
+	},
+	prod: {
+		title: 'Vinisync'
+	}
+}
+
 export default {
 	input: 'src/main.js',
 	output: {
@@ -24,7 +38,8 @@ export default {
 		replace({
       __ENVIRONMENT__: env,
 			__BUILDDATE__ : DateTime.local().toFormat('yyyyMMdd_HHmmZ'),
-			__BUILD__: getBuildNumber()
+			__BUILD__: getBuildNumber(),
+			__TITLE__: config[env].title
     }),
 
 		svelte({
@@ -50,7 +65,7 @@ export default {
 
 		// In dev mode, call `npm run start` once
 		// the bundle has been generated
-		!production, // && serve(),
+		// !production, && serve(),
 
 		// Watch the `public` directory and refresh the
 		// browser on changes when not in production

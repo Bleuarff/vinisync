@@ -1,6 +1,7 @@
 /node_modules/
 
 /dist/public/build/
+/dist/public/index.html
 /dist/server/
 
 /temp

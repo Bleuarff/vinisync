@@ -7,6 +7,7 @@
 	import History from './pages/History.svelte'
 	import Conflicts from './pages/Conflicts.svelte'
 	import Settings from './pages/Settings.svelte'
+	import Stats from './pages/Stats.svelte'
 	import Signup from './pages/Signup.svelte'
 	import Signin from './pages/Signin.svelte'
 	import PwdReset from './pages/PwdReset.svelte'
@@ -54,6 +55,7 @@
 	}, () => page = History)
 	router('/conflicts', getPath, () => page = Conflicts)
 	router('/settings', getPath, () => page = Settings)
+	router('/stats', getPath, () => page = Stats)
 	router('/signup', getPath, () => page = Signup)
 	router('/signin', getPath, () => page = Signin)
 	router('/pwd-reset/:id?', getPath, (ctx, next) => {
@@ -65,7 +67,7 @@
 
 	function getPath(ctx, next){
 		path = ctx.path
-		document.title = 'Vinisync'
+		document.title = '__TITLE__'
 		next()
 	}
 

@@ -24,7 +24,7 @@
   }
 
   onMount(async () => {
-    document.title = "Historique"
+    document.title += ' Historique'
     await repo.open()
     load()
   })

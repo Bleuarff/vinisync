@@ -71,7 +71,7 @@ export async function load(){
         }
       })
 
-      document.title = `${entry.wine.name || entry.wine.producer}${entry.wine.year ?  ' ' + entry.wine.year : ''} [${entry.count}]`
+      document.title += ` ${entry.wine.name || entry.wine.producer}${entry.wine.year ?  ' ' + entry.wine.year : ''} [${entry.count}]`
     }
     else{
       dispatch('notif', {text: `L'entrée n'existe pas`, err: true})

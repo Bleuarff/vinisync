@@ -263,9 +263,6 @@ onDestroy(() => {
 /* .entry > * {
   background: none !important;
 } */
-.bold{
-  font-weight: bold;
-}
 
 .entry{
   text-decoration: none;

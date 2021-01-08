@@ -9,7 +9,6 @@
   $: bottleCount = entries.reduce((cur, e) => {return cur + e.count}, 0)
 
   onMount(async () => {
-    // console.log('Stats mounted')
     await repo.open()
     load()
   })
@@ -17,7 +16,9 @@
   export async function load(){
     try{
       entries = await repo.getAll('entries')
+      entries = entries.filter(x => x.count > 0)
       setColorChart()
+      setEntryChart()
     }
     catch(ex){
       console.error(ex)
@@ -25,9 +26,53 @@
     }
   }
 
+  function setEntryChart(){
+    const data = entries.map(x => {return {
+      bottles: x.count,
+      color: x.wine.color,
+      label: x.wine.name || x.wine.producer
+    }}).sort((a, b) => {
+      if (a.bottles < b.bottles)
+        return -1
+      else if (a.bottles > b.bottles)
+        return 1
+      return 0
+    })
+    // debugger
+
+    const ctx = document.getElementById('volumes-entries').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        datasets: [{
+          data: data.map(x => x.bottles),
+          backgroundColor: data.map(x => getColor(x.color)),
+        }],
+        labels: data.map(x => x.label)
+
+      },
+      options: {
+        scales: {
+          xAxes: [{
+            type: 'category',
+            display: false
+          }],
+          yAxes: [{
+            ticks: {
+              min: 0,
+              stepSize: 2
+            }
+          }]
+        },
+        legend: {
+          display: false
+        }
+      }
+    })
+  }
+
   function setColorChart(){
     const data = []
-    let totalCount = 0
 
     entries.forEach(e => {
       if (e.count > 0){
@@ -37,15 +82,7 @@
         if (!item){
           item = {key: key, count: 0}
           data.push(item)
-          switch(key){
-            case 'red': item.color = '#a40e0e'
-              break
-            case 'white': item.color = '#ffea7a'
-              break
-            case 'rose': item.color = '#f78dad'
-              break
-            default: item.color = '#ccc'
-          }
+          item.color = getColor(key)
         }
         item.count += e.count
       }
@@ -75,6 +112,20 @@
       }
     })
   }
+
+  function getColor(name){
+    let color
+    switch(name){
+      case 'red': color = '#a40e0e'
+        break
+      case 'white': color = '#ffea7a'
+        break
+      case 'rose': color = '#f78dad'
+        break
+      default: color = '#ccc'
+    }
+    return color
+  }
 </script>
 
 <h2>Stats</h2>
@@ -83,8 +134,14 @@
   <p><span class="bold">{bottleCount}</span> bouteilles dans <span class="bold">{entries.length}</span> références</p>
 
   <div class="chart-ctnr">
+    <label>Répartition par couleur des vins</label>
     <canvas id="colors" width="400" height="250"></canvas>
   </div>
+</div>
+
+<div class="chart-ctnr">
+<label>Volume des entrées</label>
+  <canvas id="volumes-entries" width="400" height="250"></canvas>
 </div>
 
 <!-- pie chart couleur par entree, par bouteilles-->
@@ -98,6 +155,13 @@
 
   .chart-ctnr{
     width: 100%;
-    margin-bottom: 4em;
+    margin-bottom: 5em;
+  }
+
+  label{
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-bottom: .6em;
+    text-align: center;
   }
 </style>

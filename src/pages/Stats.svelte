@@ -19,6 +19,7 @@
       entries = entries.filter(x => x.count > 0)
       setColorChart()
       setEntryChart()
+      setYearChart()
     }
     catch(ex){
       console.error(ex)
@@ -71,21 +72,65 @@
     })
   }
 
+  function setYearChart(){
+    let data = []
+
+    entries.forEach(e => {
+      const key = (e.wine.year || 'N/A').toString()
+      let item = data.find(x => x.key === key)
+
+      if (!item){
+        item = {key: key, count: 0}
+        data.push(item)
+      }
+      item.count += e.count
+    })
+
+    data.sort((a, b) => {
+      if (a.key === 'N/A') return 1
+      else if (b.key === 'N/A') return -1
+      else if (a.key < b.key) return 1
+      else if (a.key > b.key) return -1
+      return 0
+    })
+    const maxItems = 10
+    if (data.length > maxItems){
+      data = data.reduce((list, cur, i) => {
+        if (i < maxItems)
+          list.push(cur)
+        else
+          list[maxItems - 1].count += cur.count
+        return list
+      }, [])
+      data[maxItems - 1].key = 'Autres'
+    }
+
+    const ctx = document.getElementById('years').getContext('2d')
+    const chart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        datasets: [{
+          data: data.map(x => x.count),
+          backgroundColor: ['#f90e0e', '#F47A1F', '#FDBB2F', '#377B2B', '#7AC142', '#acf70b', '#007CC3', '#00529B', '#23cdaf']
+        }],
+        labels: data.map(x => x.key)
+      }
+    })
+  }
+
   function setColorChart(){
     const data = []
 
     entries.forEach(e => {
-      if (e.count > 0){
-        const key = e.wine.color || 'N/A'
-        let item = data.find(x => x.key === key)
+      const key = e.wine.color || 'N/A'
+      let item = data.find(x => x.key === key)
 
-        if (!item){
-          item = {key: key, count: 0}
-          data.push(item)
-          item.color = getColor(key)
-        }
-        item.count += e.count
+      if (!item){
+        item = {key: key, count: 0}
+        data.push(item)
+        item.color = getColor(key)
       }
+      item.count += e.count
     })
 
     data.sort((a, b) => {
@@ -96,7 +141,6 @@
       return 0
     })
 
-    // debugger
     const ctx = document.getElementById('colors').getContext('2d');
     const chart = new Chart(ctx, {
       type: 'pie',
@@ -140,13 +184,16 @@
 </div>
 
 <div class="chart-ctnr">
-<label>Volume des entrées</label>
+  <label>Volume des entrées</label>
   <canvas id="volumes-entries" width="400" height="250"></canvas>
 </div>
 
-<!-- pie chart couleur par entree, par bouteilles-->
-<!-- pie chart region -->
-<!-- nb bouteilles par entree -->
+<div class="chart-ctnr">
+  <label>Répartition par millésime</label>
+  <canvas id="years" width="400" height="250"></canvas>
+</div>
+
+<!-- TODO: pie chart region -->
 
 <style>
   h2{

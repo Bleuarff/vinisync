@@ -46,6 +46,14 @@ let edit = false,
     countChangeTimeoutId // shared timeout id for increment/decrement operations
 
 // $: serialized = JSON.stringify(entry)
+// $: if (entry.wine.appellation){
+//   console.debug('appellation sanitization')
+//   let val = entry.wine.appellation
+//   val = val.replace(/\bst\b/gi, 'Saint')
+//             .replace(/Saint\b[^-]/gi, 'Saint-')
+//   if (val !== entry.wine.appellation)
+//     entry.wine.appellation = val
+// }
 
 onMount(async () => {
   await repo.open()
@@ -207,7 +215,7 @@ async function decrement(){
       </div>
       {/if}
       <div>
-        <FormText bind:value={entry.wine.country} readonly={!edit} label="Pays" type="text"></FormText>
+        <FormText bind:value={entry.wine.country} readonly={!edit} label="Pays" type="text" placeholder="Syldavie" datasource="country"></FormText>
       </div>
     </div>
 

@@ -7,6 +7,7 @@
   import cepages from '../data/cepages.js'
 
   const containings = ['37.5', '50', '52', '75', '1.5']
+  const countries = ['France', 'Italie', 'Espagne', 'Argentine', 'Chili', 'Allemagne', 'Portugal', 'Australie', 'Nouvelle-Zélande', 'Afrique du Sud', 'USA', 'Chine' ]
 
   export let source = ''
   export let value = ''
@@ -32,6 +33,8 @@
       case 'cepage':
         origList = cepages
         break
+      case 'country':
+        origList = countries
     }
   }
 

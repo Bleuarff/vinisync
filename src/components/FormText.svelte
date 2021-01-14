@@ -1,6 +1,7 @@
 <script>
-import { tick } from 'svelte'
+import { tick, createEventDispatcher } from 'svelte'
 import Autocomplete from './Autocomplete.svelte'
+const dispatch = createEventDispatcher()
 
 export let value = ''
 export let label = ''
@@ -32,6 +33,12 @@ function resize(e){
   }, 0)
 }
 
+function onChange(e){
+  resize(e) // call resize as for all other events
+  dispatch('change', {value: value})
+}
+
+
 </script>
 
 {#if !readonly || !!value}
@@ -41,7 +48,7 @@ function resize(e){
     <span class="readonly">{value} {#if type === 'containing'}{containingUnit}{/if}</span>
   {:else if type === 'text'}
     <textarea bind:value wrap="soft" bind:this={inputNd} rows="1" placeholder={placeholder}
-      on:input={resize} on:focus={resize} on:change={resize} class="input"
+      on:input={resize} on:focus={resize} on:change={onChange} class="input"
       on:focus="{e => {autocomplete && autocomplete.show()}}"
       on:blur="{e => {autocomplete && autocomplete.hide(e)}}"
       on:keydown="{e => {autocomplete && autocomplete.navigate(e)}}"></textarea>

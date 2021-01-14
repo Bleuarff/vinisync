@@ -182,6 +182,19 @@ async function decrement(){
   }
 }
 
+function sanitizeAppellation(e){
+  if (entry.wine.country === 'France'){
+    let val = e.detail.value
+                  .replace(/\bst(e)?\b/ig, 'saint$1')
+                  .replace(/\bsaint(e)?\b[^-]\b/g, 'Saint$1-')
+                  .replace(/' +/g, '\'')
+                  .replace(/\b([a-z])(?=[a-zA-Z]+)/g, (m, l) => l.toUpperCase() ) // Capitalize words
+
+    console.debug(`${e.detail.value} -> ${val}`)
+    entry.wine.appellation = val
+  }
+}
+
 </script>
 
 <div class="nav">
@@ -206,7 +219,8 @@ async function decrement(){
       </div>
     </div>
 
-    <FormText bind:value={entry.wine.appellation} readonly={!edit} label="Appellation" placeholder="Jasnières" datasource="appellation">
+    <FormText bind:value={entry.wine.appellation} readonly={!edit} on:change={sanitizeAppellation} label="Appellation" placeholder="Jasnières"
+      datasource="appellation">
     </FormText>
     <div class="line">
       {#if edit || entry.wine.year}

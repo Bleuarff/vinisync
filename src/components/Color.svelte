@@ -12,11 +12,15 @@
 
   // sets wine color. Selecting the current value removes it.
   function setColor(e){
-    const color = e.target.dataset.color
+    if (e.type === "keypress" && e.key !== 'Enter') return
 
+    const color = e.target.dataset.color
     if (!color) return
-    if (color !== value) value = color
-    else value = ''
+
+    if (color !== value)
+      value = color
+    else
+      value = ''
   }
 </script>
 
@@ -25,10 +29,10 @@
   {#if readonly}
     <div data-color={value} class="ro">{label}</div>
   {:else}
-    <div class="ctnr" on:click={setColor}>
-      <div data-color="red" class:selected="{value === 'red'}">Rouge</div>
-      <div data-color="white" class:selected="{value === 'white'}">Blanc</div>
-      <div data-color="rose" class:selected="{value === 'rose'}">Rosé</div>
+    <div class="ctnr" on:click={setColor} on:keypress={setColor}>
+      <div data-color="red" class:selected="{value === 'red'}" tabindex="0">Rouge</div>
+      <div data-color="white" class:selected="{value === 'white'}" tabindex="0">Blanc</div>
+      <div data-color="rose" class:selected="{value === 'rose'}" tabindex="0">Rosé</div>
     </div>
   {/if}
 {/if}
@@ -52,6 +56,11 @@
     cursor: pointer;
     user-select: none;
     position: relative;
+  }
+
+  .ctnr div:focus{
+    outline: 1px dotted black;
+
   }
 
   [data-color="red"]{

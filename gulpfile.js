@@ -40,7 +40,7 @@ const replacements = {
 	__HOST__: config[env].host,
   __DBCONNEXIONSTRING__: config[env].connectionString,
   __TITLE__: config[env].title,
-  __CACHE_VERSION__: buildTime // updated each time the sw is rebuilt 
+  __CACHE_VERSION__: buildTime // updated each time the sw is rebuilt
 }
 
 function makeServer(){
@@ -49,7 +49,7 @@ function makeServer(){
 }
 
 function makeIndex(){
-  return replaceAll(src('src/index.html'))
+  return replaceAll(src('src/public/index.html'))
     .pipe(dest('dist/public/'))
 }
 

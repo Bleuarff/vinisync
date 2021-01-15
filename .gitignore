@@ -2,6 +2,7 @@
 
 /dist/public/build/
 /dist/public/index.html
+/dist/public/sw.js
 /dist/server/
 
 /temp

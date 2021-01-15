@@ -39,7 +39,8 @@ if (!config[env]){
 const replacements = {
 	__HOST__: config[env].host,
   __DBCONNEXIONSTRING__: config[env].connectionString,
-  __TITLE__: config[env].title
+  __TITLE__: config[env].title,
+  __CACHE_VERSION__: buildTime // updated each time the sw is rebuilt 
 }
 
 function makeServer(){
@@ -49,6 +50,14 @@ function makeServer(){
 
 function makeIndex(){
   return replaceAll(src('src/index.html'))
+    .pipe(dest('dist/public/'))
+}
+
+// build service worker file
+function makeSW(){
+  replacements.__CACHE_VERSION__ = DateTime.local().toFormat('yyyyMMddHHmm')
+
+  return replaceAll(src('src/public/sw.js'))
     .pipe(dest('dist/public/'))
 }
 
@@ -84,14 +93,17 @@ function watchers(){
     makeServer()
     cb()
   })
-
   watch(['src/index.html'], cb => {
     makeIndex()
     cb()
   })
+  watch(['src/public/sw.js'], cb => {
+    makeSW()
+    cb()
+  })
 }
 
-const make = exports.make = parallel(makeServer, makeIndex)
+const make = exports.make = parallel(makeServer, makeIndex, makeSW)
 exports.default = series(
   make,
   parallel(

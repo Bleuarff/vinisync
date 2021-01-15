@@ -2,7 +2,7 @@
 
 // service worker
 
-const cacheName = '20201103.1'
+const cacheName = '__CACHE_VERSION__'
 const assets = [
   '/',
   '/vinisync.webmanifest',

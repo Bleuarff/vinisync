@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte'
   import { repo } from '../storage.js'
-  import moment from 'moment'
+  import { DateTime } from 'luxon'
   import Chart from 'chart.js'
   export let params
 
@@ -82,7 +82,7 @@
     let datapoints
     if (params.id){
       datapoints = updates.filter(x => x.change.count != null).reverse().map(x => {return {
-        t: moment(x.ts),
+        t: x.ts,
         y: x.change.count
       }})
     }
@@ -92,7 +92,7 @@
 
     // add last point with current time and same value as initial last point
     datapoints.push({
-      t: moment(),
+      t: DateTime.local().toISO(),
       y: datapoints[datapoints.length-1].y
     })
 
@@ -174,7 +174,7 @@
         count += c
 
       datapoints.push({
-        t: moment(change.ts),
+        t: change.ts,
         y: count
       })
     })
@@ -217,7 +217,7 @@
       <tbody>
         {#each updates as update}
           <tr>
-            <td class="ts">{moment(update.ts).format('DD/MM/YYYY HH:mm')}</td>
+            <td class="ts">{DateTime.fromISO(update.ts).toFormat('dd/LL/yyyy HH:mm')}</td>
             <td class="change">
               <div class="diff-ctnr">
                 {#if update.change.creationDate}<span>NEW</span>{/if}

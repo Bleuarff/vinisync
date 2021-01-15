@@ -4,7 +4,6 @@
   import Utils from '../utils.js'
   import { v4 as uuid} from 'uuid'
   import router from 'page'
-  import moment from 'moment'
   import { send } from '../fetch.js'
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher()

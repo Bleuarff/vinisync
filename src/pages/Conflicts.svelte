@@ -1,8 +1,7 @@
 <script>
   import {onMount} from 'svelte'
   import { repo } from '../storage.js'
-  import moment from 'moment'
-  import fr from 'moment/locale/fr.js'
+  import { DateTime } from 'luxon'
   let params
 
   let conflicts = []
@@ -96,7 +95,7 @@
             {#if conflict._entry.wine.year}[{conflict._entry.wine.year}]{/if}
           {/if}
         </div>
-        <div class="ts">le {moment(conflict.ts).format('dddd DD MMMM à HH:mm:ss')}</div>
+        <div class="ts">le {DateTime.fromISO(conflict.ts).toFormat('cccc dd LLLL à HH:mm')}</div>
         <table class="changes">
           <thead>
             <tr>

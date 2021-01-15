@@ -44,7 +44,7 @@
     <span>{email}</span>
 
     <label>Créé le</label>
-    <span>{createDate && createDate.toLocaleString(DateTime.DATE_HUGE)} à {createDate && createDate.toLocaleString(DateTime.TIME_24_SIMPLE)}</span>
+    <span>{createDate && createDate.toFormat('cccc dd LLLL à HH:mm')}</span>
 </div>
 
 <div id="version">build __BUILD__@__BUILDDATE__</div>

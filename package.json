@@ -21,7 +21,6 @@
     "gulp-nodemon": "^2.5.0",
     "gulp-replace": "^1.0.0",
     "idb": "^5.0.2",
-    "moment": "^2.24.0",
     "page": "^1.11.5",
     "rollup": "^1.20.0",
     "rollup-plugin-livereload": "^1.0.0",

@@ -2,7 +2,7 @@ import { repo } from './storage.js'
 import { send } from './fetch.js'
 import Utils from './utils.js'
 import { v4 as uuid} from 'uuid'
-import moment from 'moment'
+import { DateTime } from 'luxon'
 import { createEventDispatcher } from 'svelte'
 let dispatch
 
@@ -81,7 +81,9 @@ class SyncMgr{
       let lastSync = this.lastSync
 
       // sync only if forced or last sync is older than minimum time interval between syncs
-      if (!forced && moment().utc().diff(moment(lastSync), 'minute') < SYNC_INTERVAL)
+      const diff = DateTime.utc().diff(DateTime.fromISO(lastSync), 'minutes').toFormat('m')
+
+      if (!forced && diff < SYNC_INTERVAL)
         return false
 
       let updates = [] // updates received for this sync request

@@ -11,7 +11,7 @@ import syncMgr from '../syncMgr.js'
 import Utils from '../utils.js'
 import { v4 as uuid} from 'uuid'
 import router from 'page'
-import moment from 'moment'
+import { DateTime } from 'luxon'
 import { createEventDispatcher } from 'svelte'
 const dispatch = createEventDispatcher();
 
@@ -271,7 +271,7 @@ function sanitizeAppellation(e){
 
   {#if params.id && entry}
     <!-- TODO: display local time -->
-    <div class="timestamps">création {moment(entry.creationDate).format('DD/MM/YYYY HH:mm')} - MàJ {moment(entry.lastUpdateDate).format('DD/MM/YYYY HH:mm')}</div>
+    <div class="timestamps">création {DateTime.fromISO(entry.creationDate).toFormat('dd/LL/yyyy à HH:mm')} - MàJ {DateTime.fromISO(entry.lastUpdateDate).toFormat('dd/LL/yyyy à HH:mm')}</div>
   {/if}
 </div>
 

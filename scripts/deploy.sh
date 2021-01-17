@@ -16,8 +16,16 @@ gulp build --e $env
 zipName=$(ls -t releases/vin* | head -n 1 | cut -d / -f2)
 echo "Deploying archive $zipName..."
 
+# set host according to env
+host=""
+if [ "$env" = "stg" ]; then
+  host="gigondas"
+elif [ "$env" = "prod" ]; then
+  host="prd-vinisync-1"
+fi
+
 # upload it
-rsync "releases/$zipName" "scripts/install.sh" "sendgrid.env" "ubuntu@gigondas:~/vinisync/"
+rsync "releases/$zipName" "scripts/install.sh" "sendgrid.env" "ubuntu@$host:~/vinisync/"
 
 # on server: install & run
-ssh "ubuntu@gigondas" "chmod 744 ~/vinisync/install.sh && ~/vinisync/install.sh $zipName;"
+ssh "ubuntu@$host" "chmod 744 ~/vinisync/install.sh && ~/vinisync/install.sh $zipName;"

@@ -27,6 +27,7 @@ const config = {
 	},
 	prod: {
 		host: 'vinisync.fr',
+    connectionString: `mongodb://${process.env['MONGO_CREDS_PRD']}@localhost:29817/vinisync`,
     title: 'Vinisync'
 	}
 }

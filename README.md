@@ -26,6 +26,14 @@ node server/server.js
 `npm run build`  
 Then use nginx to server files
 
+## Deployment
+
+````bash
+./scripts/deploy.sh <env>
+````
+
+env being `stg` or  `prod`
+
 ## Sync reference
 
 ### client sendDiff

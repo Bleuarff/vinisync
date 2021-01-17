@@ -4,7 +4,7 @@
 
 ### install
 
-install packages **server** & **shell** from https://www.mongodb.com/try/download/community3.
+install packages **server** & **shell** from https://www.mongodb.com/try/download/community.
 
 ### db create & user mgmt
 ````bash
@@ -29,10 +29,10 @@ open `/etc/mongod.config`
 ## Node
 download version & extract to /opt, edit /usr/local/bin/(node|npm) symlinks to the new version.
 ````
-ln -s /opt/node-v15/bin/node node15
-ln -s /opt/node-v15/bin/npm npm15
-mv -T node15 node
-mv -T npm15 npm
+# ln -s /opt/node-v15/bin/node node15
+# ln -s /opt/node-v15/bin/npm npm15
+# mv -T node15 node
+# mv -T npm15 npm
 ````
 
 ## Nginx
@@ -42,6 +42,4 @@ mv -T npm15 npm
 ## TLS config
 `sudo certbot certonly --webroot -w /var/www/vinisync/ -d stg.vinisync.fr --preferred-challenges http`
 
-TODO:
-- build & upload script
-- server install script (after upload & unpack)
++ sudo apt install unzip

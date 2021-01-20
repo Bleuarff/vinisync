@@ -42,4 +42,10 @@ download version & extract to /opt, edit /usr/local/bin/(node|npm) symlinks to t
 ## TLS config
 `sudo certbot certonly --webroot -w /var/www/vinisync/ -d stg.vinisync.fr --preferred-challenges http`
 
+## Other
 + sudo apt install unzip
+
+
+## TODO
+- mongo backup script. To scaleway object storage ?
+- log rotation ? (mongo, nginx, vinisync)

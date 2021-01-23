@@ -1,0 +1,436 @@
+# Missing field must use default value
+
+- wine:
+    appellation: Chateauneuf du Pape
+    producer: Domaine du Grand Tinel
+    year: 2010,
+    country: France
+    color: white
+  count: 1
+- wine:
+    appellation: Saint-Georges Saint-Emilion
+    producer: Château Saint-Georges
+    year: 2015
+    country: France
+    color: red
+  count: 10
+- wine:
+    appellation: Arbois
+    producer: Jacques Tissot
+    name: Trousseau
+    year: 2015
+    country: France
+    color: red
+    cepages: ['trousseau']
+  count: 1
+- wine:
+    appellation: Tokay
+    producer: Chateau Megyer
+    name:
+    year: 1993
+    country: Hongrie
+    color: white
+    sweet: true
+  count: 6
+- wine:
+    appellation: Saint-Joseph
+    producer: Domaine de la Ville Rouge
+    name: Cuvée du Potier
+    year: 2016
+    country: France
+    color: red
+  count: 4
+- wine:
+    appellation: Banyuls
+    producer: Cellier des Dominicains
+    name: Le Dominicain
+    year: 2008
+    country: France
+    color: red
+    sweet: true
+  count: 9
+- wine:
+    appellation: Vouvray
+    producer: Monmousseau
+    name:
+    year:
+    country: France
+    color: white
+    sparkling: true
+  count: 8
+- wine:
+    appellation: Rivesaltes tuilé
+    producer: Roc du Gouverneur
+    name:
+    year:
+    country: France
+    color: red
+  count: 1
+- wine:
+    appellation: Macvin du Jura
+    producer: Domaine Macle
+    name: Macvin
+    year:
+    country: France
+    color: red
+  count: 3
+- wine:
+    appellation: Torrontes Tardio
+    producer: Bodega Nanni
+    name:
+    year: 2010
+    country: Argentine
+    color: white
+    sweet: true
+  count: 1
+- wine:
+    appellation: Alentejano
+    producer:
+    name: Vale do Chafariz
+    year: 2003
+    country: Argentineœ
+    color: red
+  count: 1
+- wine:
+    appellation: Vin de liqueur
+    producer: Domaine de Pierre Belle
+    name: Cartagene
+    year:
+    country: France
+    color:
+  count: 1
+- wine:
+    appellation: Côte Rotie
+    producer: Domaine Francois et Fils
+    name: Côte Rotie
+    year: 2016
+    country: France
+    color: red
+  count: 1
+- wine:
+    appellation: Bandol
+    producer: Chateau Pradeaux
+    name:
+    year: 2010
+    country: France
+    color: red
+    cepages: ['mourvèdre']
+  count: 2
+- wine:
+    appellation: Bandol
+    producer: Chateau Pradeaux
+    name:
+    year: 2014
+    country: France
+    color: red
+    cepages: ['mourvèdre']
+  count: 2
+- wine:
+    appellation: Côte du Jura
+    producer: Domaine Macle
+    name:
+    year: 2015
+    country: France
+    color: white
+  count: 1
+- wine:
+    appellation: Château Chalon
+    producer: Domaine Macle
+    name:
+    year: 2011
+    country: France
+    color: white
+    cepages: ['savagnin']
+  count: 2
+- wine:
+    appellation: Côte Rotie
+    producer: Domaine François Bracoud
+    name: Les Bonnivières
+    year: 2015
+    country: France
+    color: red
+    cepages: ['syrah']
+  count: 5
+- wine:
+    appellation: Châteauneuf du Pape
+    producer: Domaine du Grand Tinel
+    name: Cuvée Alexis Establet
+    year: 2012
+    country: France
+    color: red
+  count: 1
+- wine:
+    appellation: Chinon
+    producer: Château de Coulaine
+    name: La Diablesse
+    year: 2014
+    country: France
+    color: red
+  count: 5
+- wine:
+    appellation: Rasteau
+    producer: Domaine des Banquettes
+    name: VDN
+    year: 2013
+    country: France
+    color: red
+  count: 1
+- wine:
+    appellation: Chassagne Montrachet
+    producer: Domaine Vincent Bachelet
+    name:
+    year: 2015
+    country: France
+    color: white
+  count: 4
+- wine:
+    appellation: Pommard 1er Cru
+    producer: Domaine François Buffet
+    name: Les Poutures
+    year: 2014
+    country: France
+    color: red
+    cepages: ['pinot noir']
+  count: 5
+- wine:
+    appellation: Pauillac
+    producer: La Fleur de Haut-Bages
+    name: Liberal
+    year: 2015
+    country: France
+    color: red
+  count: 1
+- wine:
+    appellation: Côtes du Rhône
+    producer: Chateau de Fonsalettes
+    name:
+    year: 2000
+    country: France
+    color: red
+  count: 1
+- wine:
+    appellation: Côte Rotie
+    producer: Domaine François et Fils
+    name: Rozier
+    year: 2016
+    country: France
+    color: red
+  count: 1
+- wine:
+    appellation: Mercurey 1er Cru
+    producer: Domaine Michel Juillot
+    name: Clos des Barraults
+    year: 2012
+    country: France
+    color: red
+  count: 1
+- wine:
+    appellation: Rivesaltes
+    producer: Domaine Cazes
+    name: Cuvée Aimé Cazes
+    year: 1978
+    country: France
+    color: white
+    sweet: true
+  count: 1
+- wine:
+    appellation: Saint-Aubin
+    producer: Olivier Leflaive
+    name:
+    year: 2011
+    country: France
+    color: white
+  count: 1
+- wine:
+    appellation: Maranges 1er Cru
+    producer: Domaine Bertrand Bachelet
+    name: La Fussière
+    year: 2016
+    country: France
+    color: white
+  count: 1
+- wine:
+    appellation: Cornas
+    producer: Domaine Dumazet
+    name: Cuvée Charlemagne
+    year: 2011
+    country: France
+    color: red
+  count: 4
+- wine:
+    appellation: Rivesaltes
+    producer: Domaine Cazes
+    name: Grenat
+    year: 2008
+    country: France
+    color: red
+  count: 2
+- wine:
+    appellation: Muscat de Beaumes de Venise
+    producer: Balma Venitia
+    name:
+    year:
+    country: France
+    color: red
+  count: 2
+- wine:
+    appellation: Palette
+    producer: Chateau Crémade
+    name:
+    year: 2013
+    country: France
+    color: white
+  count: 1
+- wine:
+    appellation: Gewurztraminer SGN
+    producer: Clément Lissner
+    name:
+    year: 2001
+    country: France
+    color: white
+  count: 1
+- wine:
+    appellation: Umbria Blanco
+    producer: Romanelli
+    name: Le Tese
+    year: 2015
+    country: Italie
+    color: white
+  count: 1
+- wine:
+    appellation: Montefalco Sagrantino
+    producer: Romanelli
+    name:
+    year: 2013
+    country: France
+    color: red
+  count: 1
+- wine:
+    appellation: Vin de France
+    producer: La Winerie Parisienne
+    name: Antoine (60%s, 40%g)
+    year:
+    country: France
+    color: red
+    cepages: ['syrah', 'grenache']
+  count: 1
+- wine:
+    appellation: Arbois
+    producer: Domaine de la Touraize
+    name: Ploussard la Cabane
+    year: 2018
+    country: France
+    color: red
+    cepages: ['ploussard']
+  count: 2
+- wine:
+    appellation: Mercurey 1er Cru
+    producer: Domaine Michel Juillot
+    name:
+    year:  2017
+    country: France
+    color: white
+    cepages: ['chardonnay']
+  count: 2
+- wine:
+    appellation: Champagne
+    producer: Julien Chopin
+    name: blanc de noir Les Originelles
+    year:
+    country: France
+    color: white
+  count: 12
+- wine:
+    appellation:
+    producer: Maydie
+    name:  Tannat Vintage
+    year:
+    country: France
+    color: red
+  count: 2
+- wine:
+    appellation: Sainte-Foy Bordeaux
+    producer:
+    name: Bloody Nose
+    year: 2014
+    country: France
+    color: red
+  count: 1
+- wine:
+    appellation: Chateauneuf du Pape
+    producer: Domaine du Grand Tinel
+    name:
+    year: 2016
+    country: France
+    color: white
+  count: 6
+- wine:
+    appellation: IGP Vaucluse
+    producer: Burle
+    name: Est-ce que ?
+    year: 2019
+    country: France
+    color: red
+  count: 5
+- wine:
+    appellation: Vezelay
+    producer: La Soeur Cadette
+    name: La Chatelaine
+    year: 2015
+    country: France
+    color: white
+  count: 4
+- wine:
+    appellation: Bandol
+    producer: Chateau Pradeaux
+    name:
+    year: 2015
+    country: France
+    color: red
+    containing: 0.75
+    cepages: ['mourvèdre']
+  count: 6
+- wine:
+    appellation: Bandol
+    producer: Chateau Pradeaux
+    name:
+    year: 2015
+    country: France
+    containing: 1.5
+    cepages: ['mourvèdre']
+    color: red
+  count: 3
+- wine:
+    appellation: Crozes-Hermitage
+    producer: Chapoutier
+    name: Les Meysonniers
+    year: 2018
+    country: France
+    color: red
+  count: 6
+- wine:
+    appellation: Condrieu
+    producer: Chapoutier
+    name: Invitare
+    year: 2018
+    country: France
+    color: white
+  count: 6
+- wine:
+    appellation: Côte-Rotie
+    producer: Chapoutier
+    name: Les Becasses
+    year: 2018
+    country: France
+    color: red
+    cepages: ['syrah']
+  count: 4
+- wine:
+    appellation: Touraine
+    producer: Monmousseau
+    name: Cuvée JM
+    year:
+    country: France
+    color: white
+    sparkling: true
+  count: 6

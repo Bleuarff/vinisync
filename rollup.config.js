@@ -100,6 +100,7 @@ export default {
 function getBuildNumber(){
 	let build = execSync('git rev-parse --short=7 HEAD').toString().substring(0, 7) // get short commit id, minus newline
 	const status = execSync('git status --porcelain -z').toString().split('\u0000')
+									.filter(x => !x.startsWith('??')) // ignore untracked files
 
   if (status.length > 1){
     const hasher = createHash('sha1')

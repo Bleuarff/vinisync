@@ -12,6 +12,9 @@
   function addCepage(e){
     cepValue = cepValue.trim() // sanitize
 
+    if (!cepages)
+      cepages = []
+
     if (cepValue && !cepages.includes(cepValue)){ // checks if not already present
       cepages = [...cepages, cepValue]
       cepValue = ''
@@ -31,7 +34,7 @@
 {#if !readonly || cepages && cepages.length}
   <label>Cépages</label>
   <div class="ctnr" class:readonly>
-    {#each cepages as cepage}
+    {#each (cepages || []) as cepage}
       <div class="cpg">{cepage}
         {#if !readonly}
           <!-- delete button, only in edition -->

@@ -38,7 +38,7 @@
   <label>Mot de passe</label>
   <input type="password" bind:value={pwd}>
   {#if !pwd || pwd.length < PWD_MIN_LENGTH}
-    <span class="pwd-err">{PWD_MIN_LENGTH} charactères minimum</span>
+    <span class="pwd-err">{PWD_MIN_LENGTH} caractères minimum</span>
   {/if}
 
   <label>Confirmation du mot de passe</label>

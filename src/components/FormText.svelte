@@ -27,6 +27,7 @@ $: if (type === 'containing'){
 
 function resize(e){
   const nd = e ? e.currentTarget : inputNd
+  if (!nd) return
   setTimeout(() => {
     nd.style.height = ''
     nd.style.height = nd.scrollHeight+'px'

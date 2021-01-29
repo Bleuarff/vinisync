@@ -23,7 +23,7 @@
     catch(ex){
       console.error(ex)
     }
-    document.title += ' Vinisync: Paramètres'
+    document.title += ' Paramètres'
   })
 
   function forward(event) {

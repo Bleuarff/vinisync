@@ -9,6 +9,7 @@
   $: bottleCount = entries.reduce((cur, e) => {return cur + e.count}, 0)
 
   onMount(async () => {
+    document.title += ' Stats'
     await repo.open()
     load()
   })

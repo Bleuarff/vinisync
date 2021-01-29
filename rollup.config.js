@@ -10,9 +10,8 @@ import {createHash} from 'crypto';
 import fs from 'fs'
 
 const production = !process.env.ROLLUP_WATCH;
-const env = process.env.ROLLUP_WATCH ? 'dev' : 'prod'
-
-console.log(process.args)
+// const env = process.env.ROLLUP_WATCH ? 'dev' : 'prod'
+const env = process.env.VINISYNC_BUILD_ENV
 
 const config = {
 	dev: {

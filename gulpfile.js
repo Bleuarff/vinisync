@@ -4,7 +4,7 @@ const { series, parallel, src, dest, watch } = require('gulp'),
       nodemon = require('gulp-nodemon'),
       replace = require('gulp-replace'),
       argv = require('yargs').argv,
-      { exec } = require('child_process'),
+      { exec, spawn } = require('child_process'),
       zip = require('gulp-zip'),
       {DateTime} = require('luxon')
 
@@ -62,6 +62,16 @@ function makeSW(){
     .pipe(dest('dist/public/'))
 }
 
+function makeClient(){
+  const args = ['-c']
+  if (env === 'dev')
+    args.push('-w')
+  return spawn('rollup', args, {
+    stdio: 'inherit',
+    env: Object.assign({VINISYNC_BUILD_ENV: env}, process.env)
+  })
+}
+
 function startNodemon(cb){
   nodemon({
     script: 'dist/server/main.js',
@@ -69,10 +79,6 @@ function startNodemon(cb){
     env: { 'NODE_ENV': 'development' },
     done: cb
   })
-}
-
-function rollup(){
-  return exec('npm run build');
 }
 
 function archive(){
@@ -109,11 +115,14 @@ exports.default = series(
   make,
   parallel(
     startNodemon,
-    watchers
+    watchers,
+    makeClient
   )
 )
 exports.build = series(
   // make files (server & client), then archive the lot
-  parallel(make, rollup),
+  parallel(make, makeClient),
   archive
 )
+
+exports.client = makeClient

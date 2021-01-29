@@ -65,7 +65,7 @@
 
 
     <div class="locs">
-      {#each value as loc, idx}
+      {#each (value || []) as loc, idx}
         <span>
           {#if !readonly}<button class="small-btn-before-item" on:click={e=>{removeLoc(e, idx)}}>&#215;</button>{/if}
           {loc.replace(SEPARATOR, ' - ')}</span>

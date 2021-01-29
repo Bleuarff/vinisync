@@ -110,8 +110,8 @@
 
 	<Notif bind:this={notif}></Notif>
 
-	{#if env === 'dev'}
-		<div id="env-banner">DEV</div>
+	{#if env !== 'prod'}
+		<div id="env-banner" class={env}>{env}</div>
 	{/if}
 </main>
 
@@ -150,10 +150,18 @@
 		text-align: center;
 		border: 1px solid white;
 		z-index: 100;
-		background: #0c546b;
 		color: white;
     font-weight: 1000;
     transform: translateY(-50%) rotate(45deg) translateY(-5em);
+		text-transform: uppercase;
+		text-shadow: red 0px 0px 3px;
+	}
+
+	.dev{
+		background: #0c546b;
+	}
+	.stg{
+		background: #83db04;
 	}
 
 </style>

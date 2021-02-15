@@ -41,9 +41,11 @@
       await repo.open()
       await repo.clearAll()
       localStorage.clear() // delete all localStorage
+      return router('/')
     }
     catch(ex){
       console.error(ex)
+      dispatch('notif', {text: 'Erreur de suppression', err: true})
     }
 
   }

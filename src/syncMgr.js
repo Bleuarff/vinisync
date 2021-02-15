@@ -88,19 +88,22 @@ class SyncMgr{
 
       let updates = [] // updates received for this sync request
       let paginated = false
-
+      let page = 0
       // query server for updates
       do{
         const data = await send('/api/updates', 'GET', {
           lastSync: lastSync,
-          ids: updates.map(x => x.id),
           userid: this.user.id,
-          devid: this.devid
+          devid: this.devid,
+          page: page++
         }, this.user.key)
 
         updates = [...updates, ...data.updates]
-        paginated = data.total > updates.length
-        lastSync = data.lastSync // update lastSync for next iteration: pagination
+        paginated = data.count > updates.length
+
+        // set lastSync only if no more pages (do not change the query parameter lastSync)
+        if (!paginated)
+          lastSync = data.lastSync
       }
       while(paginated)
 

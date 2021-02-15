@@ -36,11 +36,12 @@ class Sync{
       const query = {
         userid: req.params.userid,
         devid: {$ne: req.params.devid}, // ignore updates made by the requesting node itself
-        uploadedDate : {$gt: DateTime.fromISO(req.params.lastSync).toBSON()}
+        uploadedDate: {$gt: DateTime.fromISO(req.params.lastSync).toBSON()}
       }
       const count = await db.collection('updates').countDocuments(query)
+      const page = parseInt(req.params.page, 10) || 0
       const lastSync = DateTime.utc()
-      const docs = await db.collection('updates').find(query).sort({ts: 1}).limit(PAGE_SIZE).toArray()
+      const docs = await db.collection('updates').find(query).sort({ts: 1}).skip(page * PAGE_SIZE).limit(PAGE_SIZE).toArray()
       res.send(200, {
         count: count,
         updates: docs,

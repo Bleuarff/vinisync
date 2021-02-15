@@ -44,7 +44,7 @@ async function importUrl(e){
 async function insert(backup){
   loader.show()
   await repo.open()
-  await repo.deleteAllTables()
+  await repo.clearAll()
 
   if (Array.isArray(backup))
     await importEntries(backup) // old basic format

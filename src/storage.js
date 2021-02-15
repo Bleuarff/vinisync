@@ -137,18 +137,12 @@ function deleteOne(table, id){
   return db.delete(table, id)
 }
 
-async function deleteAll(table){
-  const ids = await db.getAllKeys(table)
-  const proms = []
-  ids.forEach(id => { proms.push(db.delete(table, id)) })
-  return Promise.all(proms)
-}
-
-async function deleteAllTables(){
+// clears content in all tables
+async function clearAll(){
   const tables = ['entries', 'images', 'history', 'conflicts', 'updates']
   return tables.reduce(async (prom, table) => {
     await prom
-    return repo.deleteAll(table)
+    return db.clear(table)
   }, Promise.resolve())
 }
 
@@ -173,6 +167,6 @@ export const repo = {
   insertOne: insertOne,
 
   deleteOne: deleteOne,
-  deleteAll: deleteAll,
-  deleteAllTables: deleteAllTables
+
+  clearAll: clearAll
 }

@@ -2,6 +2,7 @@
   import {onMount} from 'svelte'
   import Download from '../components/Download.svelte'
   import LocationManager from '../components/LocationManager.svelte'
+  import { repo } from '../storage.js'
   import { createEventDispatcher } from 'svelte'
   import router from 'page'
   const dispatch = createEventDispatcher();
@@ -29,6 +30,23 @@
   function forward(event) {
 		dispatch('notif', event.detail);
 	}
+
+  async function clearAll(){
+    const confirmed = confirm('Supprimer toutes les données sur cet appareil ?')
+
+    if (!confirmed)
+      return
+
+    try{
+      await repo.open()
+      await repo.clearAll()
+      localStorage.clear() // delete all localStorage
+    }
+    catch(ex){
+      console.error(ex)
+    }
+
+  }
 </script>
 
 <h1>Paramètres</h1>
@@ -45,6 +63,11 @@
 
     <label>Créé le</label>
     <span>{createDate && createDate.toFormat('cccc dd LLLL à HH:mm')}</span>
+</div>
+
+<div class="danger">
+  <p>Ce bouton supprime toutes les données sur cet appareil.</p>
+  <button on:click={clearAll}>Supprimer les données locales</button>
 </div>
 
 <div id="version">build __BUILD__@__BUILDDATE__</div>
@@ -68,6 +91,18 @@
   }
   h2{
     margin-bottom: .8em;
+  }
+
+  .danger{
+    padding: .5em;
+    border-radius: 4px;
+    border: 1px solid red;
+    /* color: white; */
+  }
+
+  .danger button{
+    color: red;
+    text-align: center;
   }
 
   #version{

@@ -86,7 +86,7 @@ async function importImages(images){
       image.blob = await Utils.getBlobFromBase64(image.blob)
 
     proms.push(repo.insertOne('images', image))
-    syncMgr.syncIt(image, null, 'image')
+    syncMgr.syncIt(image, null, 'picture')
   })
   await Promise.all(proms)
 }

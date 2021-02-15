@@ -137,7 +137,7 @@ async function save(){
 
     if (hasModif){
       console.log('sync update: entry')
-      syncMgr.syncIt(entry, refEntry, 'entry', 'entries')
+      syncMgr.syncIt(entry, refEntry, 'entry')
     }
 
     edit = false

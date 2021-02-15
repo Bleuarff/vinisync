@@ -55,7 +55,7 @@
 
       console.log('sync update: picture')
 
-      syncMgr.syncIt(imgDoc, refPic, 'picture', 'images')
+      syncMgr.syncIt(imgDoc, refPic, 'picture')
 
       return true
     }

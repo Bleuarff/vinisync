@@ -1,15 +1,32 @@
 #!/bin/bash
+set -e
 
-# Uploads a file to vni-backups bucket
+TS=$(date +"%Y%m%d_%H%m")
+FILENAME="vinisync_stg_mongo_backup_$TS.gz"
 
-echo "creds $SCW_ACCESS_KEY/$SCW_SECRET_KEY" # check credentials exist
+# use username defined on the db to save
+mongodump --db=vinisync --username="$MONGO_USER" --password="$MONGO_PWD" --gzip --archive=$FILENAME --authenticationMechanism=SCRAM-SHA-256
+
+# restore: username must have admin rights
+# mongorestore  --username --password --authenticationMechanisme SCRAM-SHA-256 --gzip --archive=FILENAME
+
+echo "Archive $FILENAME created"
+
+# Check api key exists
+if [ -z "$SCW_ACCESS_KEY" ] || [ -z "$SCW_SECRET_KEY" ]
+then
+  echo "API key not defined"
+  exit
+fi
+
+# Uploads a file to vni-backups bucket (Scaleway)
 yyyymmdd=`date +%Y%m%d`
 s3Bucket="vni-backups"
 bucketLocation="fr-par"
 s3SecretKey=${SCW_SECRET_KEY}
 s3AccessKey=${SCW_ACCESS_KEY}
 endpoint="${s3Bucket}.s3.fr-par.scw.cloud"
-fileName="hello.txt"
+fileName="$FILENAME"
 contentLength=`cat ${fileName} | wc -c`
 contentHash=`openssl dgst -sha256 -hex ${fileName} | sed 's/.* //'`
 contentType=`file -b --mime-type $fileName`

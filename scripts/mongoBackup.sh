@@ -9,6 +9,8 @@ set -e
 
 ENV="$1"
 
+source ./.credentials.env
+
 TS=$(date +"%Y%m%d_%H%M")
 FILENAME="vinisync-$ENV-mongo-backup-$TS.gz"
 

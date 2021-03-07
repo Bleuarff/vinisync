@@ -4,7 +4,7 @@
 
 ### install
 
-install packages **server** & **shell** from https://www.mongodb.com/try/download/community.
+install packages **server**, **shell** & **Database tools** from https://www.mongodb.com/try/download/community.
 
 ### db create & user mgmt
 ````bash
@@ -42,10 +42,14 @@ download version & extract to /opt, edit /usr/local/bin/(node|npm) symlinks to t
 ## TLS config
 `sudo certbot certonly --webroot -w /var/www/vinisync/ -d stg.vinisync.fr --preferred-challenges http`
 
+# Set backup
+- make sure credentials env variables exist
+- transfer scripts/mongoBackup.sh to ~/vinisync & set up cron for `mongoBackup.sh <env>`
+
 ## Other
 + sudo apt install unzip
 
 
 ## TODO
-- mongo backup script. To scaleway object storage ?
+- backup rotation, delete old ones.
 - log rotation ? (mongo, nginx, vinisync)

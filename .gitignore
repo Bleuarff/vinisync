@@ -18,6 +18,6 @@ cert/
 releases/
 
 credentials
-credentials.env
+.credentials.env
 
 import.json

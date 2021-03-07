@@ -1,16 +1,24 @@
 #!/bin/bash
 set -e
 
-TS=$(date +"%Y%m%d_%H%m")
-FILENAME="vinisync_stg_mongo_backup_$TS.gz"
+#######################################
+#
+# Mongo backup & upload to scaleway s3
+#
+#######################################
 
-# use username defined on the db to save
+ENV="$1"
+
+TS=$(date +"%Y%m%d_%H%M")
+FILENAME="vinisync-$ENV-mongo-backup-$TS.gz"
+
 mongodump --db=vinisync --username="$MONGO_USER" --password="$MONGO_PWD" --gzip --archive=$FILENAME --authenticationMechanism=SCRAM-SHA-256
 
 # restore: username must have admin rights
 # mongorestore  --username --password --authenticationMechanisme SCRAM-SHA-256 --gzip --archive=FILENAME
 
-echo "Archive $FILENAME created"
+echo "
+Archive $FILENAME created"
 
 # Check api key exists
 if [ -z "$SCW_ACCESS_KEY" ] || [ -z "$SCW_SECRET_KEY" ]
@@ -26,12 +34,11 @@ bucketLocation="fr-par"
 s3SecretKey=${SCW_SECRET_KEY}
 s3AccessKey=${SCW_ACCESS_KEY}
 endpoint="${s3Bucket}.s3.fr-par.scw.cloud"
-fileName="$FILENAME"
-contentLength=`cat ${fileName} | wc -c`
-contentHash=`openssl dgst -sha256 -hex ${fileName} | sed 's/.* //'`
-contentType=`file -b --mime-type $fileName`
-echo $contentType
-b64=`openssl md5 -binary "$fileName" | openssl base64`
+contentLength=`cat ${FILENAME} | wc -c`
+contentHash=`openssl dgst -sha256 -hex ${FILENAME} | sed 's/.* //'`
+contentType=`file -b --mime-type $FILENAME`
+# echo $contentType
+b64=`openssl md5 -binary "$FILENAME" | openssl base64`
 acl="private"
 
 date=`date -u +%Y%m%dT%H%M%SZ`
@@ -71,10 +78,10 @@ key_and_sig_args="-F X-Amz-Credential=${s3AccessKey}/${yyyymmdd}/${region}/s3/aw
 #-F "X-Amz-Security-Token= ${xamztoken}" \
 
 curl -v   \
--F key=$fileName \
+-F key=$FILENAME \
 -F acl=$acl \
 $key_and_sig_args  \
 -F "content-md5= ${b64}" \
 -F "Policy=$p" \
--F "file=@$fileName" \
+-F "file=@$FILENAME" \
 https://${endpoint}

@@ -397,13 +397,28 @@ function sanitizeAppellation(e){
     flex-flow: row nowrap;
     justify-content: center;
   }
+  @media (max-width: 500px){
+    .buttons{
+      justify-content: space-evenly;
+    }
+  }
+
   .buttons button{
     color: white;
     background: #ba0e0e;
     border: 1px solid white;
     border-radius: 4px;
     font-size: 1.3em;
+    min-width: 4em;
+    margin: 0 .5em;
   }
+  .buttons button:first-child{
+    margin-left: 0;
+  }
+  .buttons button:last-child{
+    margin-right: 0;
+  }
+
   .edit{
     width: 25%;
   }

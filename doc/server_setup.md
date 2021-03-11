@@ -43,8 +43,7 @@ download version & extract to /opt, edit /usr/local/bin/(node|npm) symlinks to t
 `sudo certbot certonly --webroot -w /var/www/vinisync/ -d stg.vinisync.fr --preferred-challenges http`
 
 # Set backup
-- make sure credentials env variables exist
-- transfer scripts/mongoBackup.sh to ~/vinisync & set up cron for `mongoBackup.sh <env>`
+- transfer .credentials.env & scripts/mongoBackup.sh to ~/vinisync & set up cron for `mongoBackup.sh <env>`
 
 ## Other
 + sudo apt install unzip

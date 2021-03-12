@@ -40,9 +40,10 @@
 
   // filter list based on value
   $: {
-    // console.log('valuechanged: ' + value)
-    // remove new lines
-    value = value.replace(/[\r\n]/g, '')
+    // stringify & remove new lines
+    if (value)
+      value = value.toString().replace(/[\r\n]/g, '')
+
     if (!value){
       filteredList = [] // disable list if no input
     }

@@ -22,7 +22,7 @@ $: if (!readonly && type === 'text'){
 
 let containingUnit
 $: if (type === 'containing'){
-  containingUnit = value < 25 ? 'L': 'cl'
+  containingUnit = Number(value) < 25 ? 'L': 'cl'
 }
 
 function resize(e){

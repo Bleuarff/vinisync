@@ -10,7 +10,7 @@ sudo chown -R ubuntu:ubuntu /var/log/vinisync
 # decompress archive
 unzip -o "/home/ubuntu/vinisync/${zipName}" -d "/var/www/vinisync"
 
-source ~/vinisync/sendgrid.env
+source ~/vinisync/.credentials.env
 
 # install dependencies
 cd /var/www/vinisync

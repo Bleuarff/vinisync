@@ -25,7 +25,7 @@ elif [ "$env" = "prod" ]; then
 fi
 
 # upload it
-rsync "releases/$zipName" "scripts/install.sh" "sendgrid.env" "ubuntu@$host:~/vinisync/"
+rsync "releases/$zipName" "scripts/install.sh" ".credentials.env" "ubuntu@$host:~/vinisync/"
 
 # on server: install & run
 ssh "ubuntu@$host" "chmod 744 ~/vinisync/install.sh && ~/vinisync/install.sh $zipName;"

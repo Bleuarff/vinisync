@@ -13,7 +13,7 @@
     if (params.id)
       link.href = '/entry/' + params.id
     if (entry && entry.wine){
-      link.title = entry.wine.name
+      link.title = entry.wine.name || ''
       if (entry.wine.name && entry.wine.producer)
         link.title += ' - '
       if (entry.wine.producer)

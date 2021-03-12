@@ -2,6 +2,8 @@ import svelte from 'rollup-plugin-svelte';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import replace from '@rollup/plugin-replace';
+
+import { less } from 'svelte-preprocess-less'
 // import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
 import {DateTime} from 'luxon';
@@ -42,13 +44,17 @@ export default {
     }),
 
 		svelte({
+			preprocess: {
+        style: less(),
+      },
+			
 			// enable run-time checks when not in production
 			dev: !production,
 			// we'll extract any component CSS out into
 			// a separate file - better for performance
-			css: css => {
-				css.write('dist/public/build/bundle.css');
-			}
+			// css: css => {
+			// 	css.write('dist/public/build/bundle.css');
+			// }
 		}),
 
 		// If you have external dependencies installed from
@@ -79,22 +85,6 @@ export default {
 	}
 };
 
-// function serve() {
-// 	let started = false;
-//
-// 	return {
-// 		writeBundle() {
-// 			if (!started) {
-// 				started = true;
-//
-// 				require('child_process').spawn('npm', ['run', 'start', '--', '--dev'], {
-// 					stdio: ['ignore', 'inherit', 'inherit'],
-// 					shell: true
-// 				});
-// 			}
-// 		}
-// 	};
-// }
 
 function getBuildNumber(){
 	let build = execSync('git rev-parse --short=7 HEAD').toString().substring(0, 7) // get short commit id, minus newline

@@ -1,6 +1,6 @@
 # Vinisync
 
-Simple cellar management.
+Simple cellar management. https://vinisync.fr.
 
 ## Description
 

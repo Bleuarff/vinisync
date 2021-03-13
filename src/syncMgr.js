@@ -43,6 +43,12 @@ class SyncMgr{
     }
   }
 
+  // resets cached data
+  clear(){
+    this._devid = null
+    this._user = null
+  }
+
   // generic method to send a diff to server
   async syncIt(obj, ref, type){
     try{

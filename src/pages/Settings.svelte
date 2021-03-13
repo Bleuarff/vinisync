@@ -7,6 +7,8 @@
   import router from 'page'
   const dispatch = createEventDispatcher();
   import { DateTime } from 'luxon'
+  import syncMgr from '../syncMgr.js'
+  import { clearKey } from '../fetch.js'
 
   let email
   let createDate
@@ -41,6 +43,8 @@
       await repo.open()
       await repo.clearAll()
       localStorage.clear() // delete all localStorage
+      syncMgr.clear() // clear cached data in sync logic
+      clearKey() // deletes crypto key used to sign messages
       return router('/')
     }
     catch(ex){

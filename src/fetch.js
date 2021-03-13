@@ -35,7 +35,8 @@ export async function send(path, method = 'GET', data = {}, key){
   // and add it as Authorization header
   if (key){
     const input = [method, path, ts, options.body || '', qs.substring(1)].join('\n')
-    console.log(`input: ${input}`)
+    // console.debug(`req from ${data.userid} key ${key}`)
+    // console.debug(input)
     const signature = await sign(key, input)
     options.headers['Authorization'] = signature
   }
@@ -65,6 +66,10 @@ export async function send(path, method = 'GET', data = {}, key){
     else
       throw ex
   }
+}
+
+export function clearKey(){
+  cryptoKey = null
 }
 
 // sign the request if the user key

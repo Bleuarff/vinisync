@@ -50,9 +50,8 @@ class Security{
         return next(false)
       }
 
-      // logger.debug(`user: ${user._id}\nkey: ${user.key}\nAuth: ${signature}`)
-
       const input = [req.method, req.getPath(), date, req._body || req.body, req.getQuery()].join('\n')
+      // console.debug(`req from user ${user._id} key: ${user.key}`)
       // logger.debug(input)
       const hmac = createHmac('sha384', user.key)
       hmac.update(input)

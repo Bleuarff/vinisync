@@ -18,11 +18,14 @@
 	import I18n from './i18n.js'
 	import syncMgr from './syncMgr.js'
 
+	import {send} from './fetch.js'
+
 	let page,
 			currentComponent // component instance
 	let path // url pathname
 	let params // router path parameters
 	let notif // notif child component
+	let newRelease = false
 	const env = '__ENVIRONMENT__'
 
 	router('/', getPath, () => {
@@ -80,6 +83,17 @@
 			if ('serviceWorker' in navigator){
 				navigator.serviceWorker.register('/sw.js')
 			}
+
+			// check if new client version is available
+			send('/api/clientVersion')
+			.then(lastBuild => {
+				// console.debug(`current: ${vni.build} / latest ${lastBuild}`)
+				newRelease = vni.build !== lastBuild
+			})
+			.catch(ex => {
+				console.error(ex)
+				notif.show({text: 'VERSION_CHECK_ERROR', err: true})
+			})
 		}, 1e3)
 	})
 
@@ -101,10 +115,29 @@
 		}
 	}
 
+	// delete all asset caches, to make sure next reload goes to the network
+	async function updateClient(){
+    const cacheNames = await caches.keys()
+    await cacheNames.reduce(async (prom, cacheName) => {
+      await prom
+      console.debug(`deleting ${cacheName}`)
+      return caches.delete(cacheName)
+    }, Promise.resolve)
+
+    document.location.reload()
+  }
+
 </script>
 
 <main>
 	<TitleBar on:sync-request={forceSync}></TitleBar>
+
+	{#if newRelease}
+	<div id="new-release">
+	  <span>Nouvelle version disponible !</span>
+	  <a on:click={updateClient}>Mettre à jour</a>
+	</div>
+	{/if}
 
 	<svelte:component this={page} bind:this={currentComponent} params={params} on:notif="{e => {notif.show(e.detail)}}"/>
 
@@ -115,9 +148,7 @@
 	{/if}
 </main>
 
-<style>
-	@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap&subset=latin-ext');
-
+<style type="text/less">
 	:root{
 	  --main-color: #ba0e0e;
 		--main-color-light: #791a1a;
@@ -128,10 +159,12 @@
 		--wine-rose: #f78dad;
 
 		--dark-blue: #11151f;
+
+		--main-horiz-margin: 1em;
 	}
 
 	main {
-		padding: 2.5em 1em 1em 1em;
+		padding: 2.5em var(--main-horiz-margin) 1em var(--main-horiz-margin);
 		width: 100%;
 		max-width: var(--global-max-width);
 		margin: 0 auto;
@@ -155,6 +188,18 @@
     transform: translateY(-50%) rotate(45deg) translateY(-5em);
 		text-transform: uppercase;
 		text-shadow: red 0px 0px 3px;
+	}
+
+	#new-release{
+		margin-left: calc(-1 * var(--main-horiz-margin));
+		margin-right: calc(-1 * var(--main-horiz-margin));
+		background: #ffe036;
+		text-align: center;
+		padding: .4em .3em;
+
+		 a {
+			 cursor: pointer;
+		 }
 	}
 
 	.dev{

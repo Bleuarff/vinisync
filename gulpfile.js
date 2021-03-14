@@ -6,10 +6,14 @@ const { series, parallel, src, dest, watch } = require('gulp'),
       argv = require('yargs').argv,
       { exec, spawn } = require('child_process'),
       zip = require('gulp-zip'),
-      {DateTime} = require('luxon')
+      {DateTime} = require('luxon'),
+      { execSync } = require('child_process'),
+      {createHash} = require('crypto'),
+      fs = require('fs')
 
 const env = argv.e || argv.env || 'dev' // environment to build.
 const buildTime = DateTime.local().toFormat('yyyyMMddHHmm'),
+      buildNumber = getBuildNumber(),
       archiveName = `vinisync_${env}_${buildTime}.zip`
 
 // Config settings grouped by env.
@@ -41,7 +45,8 @@ const replacements = {
 	__HOST__: config[env].host,
   __DBCONNEXIONSTRING__: config[env].connectionString,
   __TITLE__: config[env].title,
-  __CACHE_VERSION__: buildTime // updated each time the sw is rebuilt
+  __CACHE_VERSION__: buildTime, // updated each time the sw is rebuilt
+  __BUILD__: buildNumber
 }
 
 function makeServer(){
@@ -68,7 +73,10 @@ function makeClient(){
     args.push('-w')
   return spawn('rollup', args, {
     stdio: 'inherit',
-    env: Object.assign({VINISYNC_BUILD_ENV: env}, process.env)
+    env: Object.assign({
+      VINISYNC_BUILD_ENV: env,
+      VINISYNC_BUILD_NUMBER: buildNumber
+    }, process.env)
   })
 }
 
@@ -108,6 +116,40 @@ function watchers(){
     makeSW()
     cb()
   })
+}
+
+function getBuildNumber(){
+	let build = execSync('git rev-parse --short=7 HEAD').toString().substring(0, 7) // get short commit id, minus newline
+	const status = execSync('git status --porcelain -z').toString().split('\u0000')
+									.filter(x => !x.startsWith('??') && !x.startsWith('D ')) // ignore untracked files
+
+  if (status.length > 1){
+    const hasher = createHash('sha1')
+    status.pop() // remove last element, always empty
+
+    // when a file is renamed, the separator between new and old names is also the null char.
+    // So detect and remove them from list of files to hash.
+    let idx, start = 0
+    do{
+      idx = status.findIndex((x, i) => i >= start && /^R. /.test(x))
+      if (idx != -1){
+        status.splice(idx + 1, 1)
+        start = idx + 1
+      }
+    }
+    while (idx > -1)
+
+    status.forEach(line => {
+      // parse each line. Does not handle the case when the line is in the form "XY to from"
+      const file = line.substring(3).split(' ')[0],
+            content = fs.readFileSync(file)
+      hasher.update(content)
+    })
+    const hash = hasher.digest('hex')
+    build += '_' + hash.substring(0, 4)
+  }
+
+	return build
 }
 
 const make = exports.make = parallel(makeServer, makeIndex, makeSW)

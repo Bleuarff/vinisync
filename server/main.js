@@ -76,6 +76,11 @@ void async function(){
   server.post('/api/pwdreset', User.createPwdReset)
   server.get('/api/pwdreset/:id', User.getPwdReset)
 
+  server.get('/api/clientVersion', (req, res, next) => {
+    res.send(200, '__BUILD__')
+    return next()
+  })
+
   /************************ end routes ***************************/
 
   server.listen(5002, function () {

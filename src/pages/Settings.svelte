@@ -51,7 +51,6 @@
       console.error(ex)
       dispatch('notif', {text: 'Erreur de suppression', err: true})
     }
-
   }
 </script>
 
@@ -72,24 +71,24 @@
 </div>
 
 <div class="danger">
-  <p>Ce bouton supprime toutes les données sur cet appareil.</p>
+  <p>Ce bouton supprime toutes les données sur cet appareil. Vous les récuperez en vous reconnectant.</p>
   <button on:click={clearAll}>Supprimer les données locales</button>
 </div>
 
 <div id="version">build __BUILD__@__BUILDDATE__</div>
 
-<style>
+<style type="text/less">
   #profile{
     margin: 4em -.5em 2em -.5em;
     border-radius: 3px;
     border: 1px solid var(--dark-blue);
     padding: 1em;
-  }
 
-  #profile span{
-    display: inline-block;
-    margin-left: 1em;
-    margin-bottom: .7em;
+    span{
+      display: inline-block;
+      margin-left: 1em;
+      margin-bottom: .7em;
+    }
   }
 
   label{

@@ -74,7 +74,7 @@ export async function load(){
 
   const updated = await syncMgr.checkUpdates()
   if (updated)
-    entries = origEntries  = await repo.getAll('entries')
+    entries = origEntries  = (await repo.getAll('entries')).filter(filterFunc)
     entries = sort(entries) // origEntries also sorted.
 }
 

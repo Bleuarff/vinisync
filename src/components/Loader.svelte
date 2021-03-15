@@ -19,14 +19,12 @@
   }
 </script>
 
-<!-- {#if visible} -->
-  <div id="loader" class:visible>
-    <div class="cloak">
-    </div>
-    <div id="anim">
-    </div>
+<div id="loader" class:visible>
+  <div class="cloak">
   </div>
-<!-- {/if} -->
+  <div id="anim">
+  </div>
+</div>
 
 <style type="text/less">
   #loader{
@@ -37,19 +35,22 @@
     height: 100vh;
     z-index: 500;
     display: none;
-    transition: opacity .2s;
-    opacity: 0;
+    // transition: opacity .2s;
+    // opacity: 0;
+    background: transparent;
 
     &.visible{
       display: block;
-      opacity: .6;
+      // opacity: .6;
     }
   }
 
   .cloak{
-    background: rgb(52, 52, 52, .6);
-    width: 100%;
-    height: 100%;
+    background: white;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10;
+    opacity: .4;
   }
 
   #anim {
@@ -60,25 +61,29 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-  }
-    #anim:after {
-      content: " ";
+
+    &:after {
+      content: "";
       display: block;
       width: 48vw;
       height: 48vw;
       margin: 8px;
       border-radius: 50%;
-      border: 30px solid #fff;
-      border-color: #fff transparent #fff transparent;
+      border-width: 30px;
+      border-style: solid;
+      border-color: var(--main-color) transparent var(--main-color) transparent;
       animation: lds-dual-ring 5s linear infinite;
       box-sizing: border-box;
+      opacity: .85;
     }
-    @keyframes lds-dual-ring {
-      0% {
-        transform: rotate(0deg);
-      }
-      100% {
-        transform: rotate(360deg);
-      }
+  }
+
+  @keyframes lds-dual-ring {
+    0% {
+      transform: rotate(0deg);
     }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
 </style>

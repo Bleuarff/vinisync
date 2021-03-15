@@ -104,12 +104,12 @@
 	})
 
 	function onMessage(e){
-		console.log('messaaaage !! ' + e.data.event)
+		// console.debug('msg ' + e.data.event)
 		switch(e.data.event){
-			case 'update-check-start':
+			case 'loader-start':
 				loader.show()
 				break;
-			case 'update-check-end':
+			case 'loader-end':
 				loader.hide()
 				break;
 			default:

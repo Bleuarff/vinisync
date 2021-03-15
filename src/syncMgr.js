@@ -98,7 +98,7 @@ class SyncMgr{
 
       // trigger custom event for notif
       // dispatch('update-check', {txt: 'coin'})
-      window.postMessage({event: 'update-check-start'}, '*')
+      window.postMessage({event: 'loader-start'}, document.location.origin)
 
       // query server for updates
       do{
@@ -157,7 +157,7 @@ class SyncMgr{
         throw ex
     }
     finally{
-      window.postMessage({event: 'update-check-end'}, '*')
+      window.postMessage({event: 'loader-end'}, document.location.origin)
     }
   }
 

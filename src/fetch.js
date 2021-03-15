@@ -61,7 +61,10 @@ export async function send(path, method = 'GET', data = {}, key){
   catch(ex){
     console.error(ex)
 
-    if (ex.message.includes('NetworkError'))
+    if (ex === 'TIMEOUT')
+      // TODO: send postmessage
+      throw new Error('TIMEOUT')
+    else if (ex && ex.message && ex.message.includes('NetworkError'))
       throw new Error('Erreur réseau, ressayer ultérieurement')
     else
       throw ex

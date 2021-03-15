@@ -15,6 +15,7 @@
 	import Err404 from './pages/Err404.svelte'
 	import Notif from './components/Notif.svelte'
 	import TitleBar from './components/TitleBar.svelte'
+	import Loader from './components/Loader.svelte'
 	import I18n from './i18n.js'
 	import syncMgr from './syncMgr.js'
 
@@ -26,6 +27,8 @@
 	let params // router path parameters
 	let notif // notif child component
 	let newRelease = false
+	let loader
+
 	const env = '__ENVIRONMENT__'
 
 	router('/', getPath, () => {
@@ -78,6 +81,8 @@
 
 	onMount(async () => {
 		console.log('app mount ')
+		window.addEventListener('message', onMessage, false)
+
 		setTimeout(() => {
 			syncMgr.pendingMonitor()
 			if ('serviceWorker' in navigator){
@@ -94,8 +99,23 @@
 				console.error(ex)
 				notif.show({text: 'VERSION_CHECK_ERROR', err: true})
 			})
+
 		}, 1e3)
 	})
+
+	function onMessage(e){
+		console.log('messaaaage !! ' + e.data.event)
+		switch(e.data.event){
+			case 'update-check-start':
+				loader.show()
+				break;
+			case 'update-check-end':
+				loader.hide()
+				break;
+			default:
+				console.debug('unknown event ' + JSON.stringify(e.data))
+		}
+	}
 
 	async function forceSync(){
 		try{
@@ -117,15 +137,15 @@
 
 	// delete all asset caches, to make sure next reload goes to the network
 	async function updateClient(){
-    const cacheNames = await caches.keys()
-    await cacheNames.reduce(async (prom, cacheName) => {
-      await prom
-      console.debug(`deleting ${cacheName}`)
-      return caches.delete(cacheName)
-    }, Promise.resolve)
+		const cacheNames = await caches.keys()
+		await cacheNames.reduce(async (prom, cacheName) => {
+			await prom
+			console.debug(`deleting ${cacheName}`)
+			return caches.delete(cacheName)
+		}, Promise.resolve)
 
-    document.location.reload()
-  }
+		document.location.reload()
+	}
 
 </script>
 
@@ -134,23 +154,25 @@
 
 	{#if newRelease}
 	<div id="new-release">
-	  <span>Nouvelle version disponible !</span>
-	  <a on:click={updateClient}>Mettre à jour</a>
+		<span>Nouvelle version disponible !</span>
+		<a on:click={updateClient}>Mettre à jour</a>
 	</div>
 	{/if}
 
-	<svelte:component this={page} bind:this={currentComponent} params={params} on:notif="{e => {notif.show(e.detail)}}"/>
+	<svelte:component this={page} bind:this={currentComponent} params={params} on:notif="{e => {notif.show(e.detail)}}" />
 
 	<Notif bind:this={notif}></Notif>
 
 	{#if env !== 'prod'}
 		<div id="env-banner" class={env}>{env}</div>
 	{/if}
+
+	<Loader bind:this={loader}></Loader>
 </main>
 
 <style type="text/less">
 	:root{
-	  --main-color: #ba0e0e;
+		--main-color: #ba0e0e;
 		--main-color-light: #791a1a;
 		--global-max-width: 700px;
 
@@ -174,8 +196,8 @@
 
 	#env-banner{
 		position: fixed;
-    right: 0;
-    top: 0;
+		right: 0;
+		top: 0;
 		top: 85px;
 		width: 170px;
 		padding: 4px;
@@ -184,8 +206,8 @@
 		border: 1px solid white;
 		z-index: 100;
 		color: white;
-    font-weight: 1000;
-    transform: translateY(-50%) rotate(45deg) translateY(-5em);
+		font-weight: 1000;
+		transform: translateY(-50%) rotate(45deg) translateY(-5em);
 		text-transform: uppercase;
 		text-shadow: red 0px 0px 3px;
 	}
@@ -197,9 +219,9 @@
 		text-align: center;
 		padding: .4em .3em;
 
-		 a {
-			 cursor: pointer;
-		 }
+		a {
+			cursor: pointer;
+		}
 	}
 
 	.dev{

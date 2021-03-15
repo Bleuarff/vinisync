@@ -1,32 +1,34 @@
 <script>
-  let visible = false
+  export let delay = 400
 
-  // TODO: listen to messages to track progress.
+  let visible = false
+  let id
+
+  // TODO:(import) listen to messages to track progress.
   // event arg: {idx, total}
 
   export function show(){
-      visible = true
-      // console.log('import start')
-      // performance.mark('import-start')
+      id = setTimeout(() => {
+        visible = true
+      }, delay)
   }
 
   export function hide(){
-    // performance.measure('import-dt', 'import-start')
-    // console.log(`import end: ${performance.getEntriesByName('import-dt')[0].duration}ms`)
+    clearTimeout(id)
     visible = false
   }
 </script>
 
-{#if visible}
-  <div id="loader">
+<!-- {#if visible} -->
+  <div id="loader" class:visible>
     <div class="cloak">
     </div>
     <div id="anim">
     </div>
   </div>
-{/if}
+<!-- {/if} -->
 
-<style>
+<style type="text/less">
   #loader{
     position: fixed;
     top: 0;
@@ -34,6 +36,14 @@
     width: 100vw;
     height: 100vh;
     z-index: 500;
+    display: none;
+    transition: opacity .2s;
+    opacity: 0;
+
+    &.visible{
+      display: block;
+      opacity: .6;
+    }
   }
 
   .cloak{

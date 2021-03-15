@@ -95,6 +95,11 @@ class SyncMgr{
       let updates = [] // updates received for this sync request
       let paginated = false
       let page = 0
+
+      // trigger custom event for notif
+      // dispatch('update-check', {txt: 'coin'})
+      window.postMessage({event: 'update-check-start'}, '*')
+
       // query server for updates
       do{
         const data = await send('/api/updates', 'GET', {
@@ -150,6 +155,9 @@ class SyncMgr{
         console.warn(ex.message)
       else
         throw ex
+    }
+    finally{
+      window.postMessage({event: 'update-check-end'}, '*')
     }
   }
 

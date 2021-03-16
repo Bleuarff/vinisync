@@ -1,7 +1,8 @@
 <script>
   export let delay = 400
 
-  let visible = false
+  let status = ''
+  let transitionDelay = 200
   let id
 
   // TODO:(import) listen to messages to track progress.
@@ -9,17 +10,23 @@
 
   export function show(){
       id = setTimeout(() => {
-        visible = true
+        status = 'transit'
+        setTimeout(() => {
+          status = 'visible'
+        }, transitionDelay)
       }, delay)
   }
 
   export function hide(){
     clearTimeout(id)
-    visible = false
+    status = 'transit'
+    setTimeout(() => {
+      status = ''
+    }, 200)
   }
 </script>
 
-<div id="loader" class:visible>
+<div id="loader" class={status} style="--transition-delay: {transitionDelay}ms">
   <div class="cloak">
   </div>
   <div id="anim">
@@ -33,15 +40,20 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 500;
     display: none;
-    // transition: opacity .2s;
-    // opacity: 0;
+    transition: opacity var(--transition-delay);
+    opacity: 0;
     background: transparent;
+    z-index: 500;
+
+    &.transit{
+      display: block;
+      opacity: 0;
+    }
 
     &.visible{
       display: block;
-      // opacity: .6;
+      opacity: 1;
     }
   }
 

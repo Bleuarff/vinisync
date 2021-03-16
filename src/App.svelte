@@ -54,7 +54,6 @@
 		next()
 	}, () => page = Entry)
 	router('/import', getPath, () => page = Import)
-	// router('/sync', getPath, () => page = Sync)
 	router('/history/:id?', getPath, (ctx, next) => {
 		params = ctx.params
 		next()

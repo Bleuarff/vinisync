@@ -103,6 +103,8 @@
 	})
 
 	function onMessage(e){
+		if (e.origin !== location.origin) return
+
 		// console.debug('msg ' + e.data.event)
 		switch(e.data.event){
 			case 'loader-start':
@@ -110,6 +112,9 @@
 				break;
 			case 'loader-end':
 				loader.hide()
+				break;
+			case 'notif':
+				notif.show(e.data)
 				break;
 			default:
 				console.debug('unknown event ' + JSON.stringify(e.data))

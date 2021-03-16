@@ -97,7 +97,6 @@ class SyncMgr{
       let page = 0
 
       // trigger custom event for notif
-      // dispatch('update-check', {txt: 'coin'})
       window.postMessage({event: 'loader-start'}, document.location.origin)
 
       // query server for updates

@@ -22,8 +22,9 @@
   // dedup & sort values
   function dedup(src, field){
     return src.reduce((dedup, cur) => {
-      if (!!cur[field] && !dedup.includes(cur[field]))
-        dedup.push(cur[field])
+      const value = cur[field] && cur[field].toString()
+      if (!!cur[field] && !dedup.includes(value))
+        dedup.push(value)
       return dedup
     }, []).sort()
   }

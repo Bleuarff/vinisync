@@ -7,12 +7,16 @@
   let selected // current filter displayed (year, appellation, producer)
 
   let selectNd = null
-  let showAll = false
+  let showAll = true
 
   // set datalist for each filter
   $: appellationData = dedup(source, 'appellation')
   $: producerData = dedup(source, 'producer')
   $: yearData = dedup(source, 'year')
+  $:{
+    if (!showAll && !['year', 'appellation', 'producer'].includes(selected))
+      selected = null
+  }
 
   // dedup & sort values
   function dedup(src, field){
@@ -32,6 +36,8 @@
       case 'producer': datalist = producerData
         break
       case 'year': datalist = yearData
+        break
+      default: datalist = []
     }
   }
 
@@ -57,6 +63,10 @@
     else{
       // show selector
       selected = field
+
+      // boolean properties are triggered immediately
+      if (['sparkling', 'sweet'].includes(selected))
+        dispatch('filter', {filter: selected, value: true})
     }
 
     await tick()
@@ -72,34 +82,58 @@
 <div id="filters" class="wide">
   <div class="filters-ctnr">
     <label for="selector">Filtres:</label>
-    <div class="selector" id="selector" class:showAll>
-      <span data-name="year" on:click="{toggleHandler}" class:selected="{selected==='year'}">Année</span>
-      <span data-name="producer" on:click="{toggleHandler}" class:selected="{selected==='producer'}">Producteur</span>
-      <span data-name="appellation" on:click="{toggleHandler}" class:selected="{selected==='appellation'}">Appellation</span>
+    <div class="{selected}" id="selector" class:showAll>
+      <span data-name="year" on:click="{toggleHandler}">Année</span>
+      <span data-name="producer" on:click="{toggleHandler}">Producteur</span>
+      <span data-name="appellation" on:click="{toggleHandler}">Appellation</span>
       {#if showAll}
-        <span>Couleur</span>
-        <span>Cepages</span>
-        <span>Bulles</span>
-        <span>moelleux</span>
+        <span data-name="color" on:click="{toggleHandler}">Couleur</span>
+        <span data-name="cepage" on:click="{toggleHandler}">Cepages</span>
+        <span data-name="sparkling" on:click="{toggleHandler}">Bulles</span>
+        <span data-name="sweet" on:click="{toggleHandler}">moelleux</span>
       {/if}
     </div>
 
     <button class="more"on:click="{()=>{showAll = !showAll}}">{showAll ? '-' : '+'} de filtres</button>
 
     {#if selected}
-      <select class="filter-value {selected}" on:blur={filter} bind:this={selectNd}>
-        {#each datalist as elem}
-          <option value={elem}>{elem}</option>
-        {/each}
-        <option value="">Non renseigné</option>
-      </select>
+    <!-- TODO: different inputs, depending on selected field.
+      - year: dropdown
+      - producteur, appellation, cepages: dropdown w/ text filter
+      - couleur: color component
+      - bulle/moelleux: nothing
+    -->
+      {#if selected === "year"}
+        <select class="filter-value {selected}" on:change={filter} bind:this={selectNd}>
+          {#each datalist as elem}
+            <option value={elem}>{elem}</option>
+          {/each}
+          <option value="">Non renseigné</option>
+        </select>
+      {:else if ['producer', 'appellation', 'cepage'].includes(selected)}
+        <select class="filter-value {selected}" on:change={filter} bind:this={selectNd}>
+          {#each datalist as elem}
+            <option value={elem}>{elem}</option>
+          {/each}
+          <option value="">Non renseigné</option>
+        </select>
+      {/if}
     {/if}
   </div>
 </div>
 
 <style type="text/less">
+  :root{
+    --selector-width: 140px;
+  }
+
+  @media (max-width: 500px){
+    #selector span{
+      --selector-width: 111px;
+    }
+  }
+
   .filters-ctnr{
-    max-width: 450px;
     margin: auto;
     display: flex;
     flex-flow: column nowrap;
@@ -110,71 +144,27 @@
       align-self: flex-end;
       border: none;
       background: none;
-      // color: var(--main-color);
       text-decoration: underline;
       padding: 3px 2px 3px 5px;
       cursor: pointer;
     }
   }
 
-  .selector{
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, minmax(0, auto));
-    border: 1px solid var(--main-color);
-    border-radius: 4px;
+  #selector{
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
 
     span {
-      --padding: 5px;
-      padding: var(--padding) 0;
-      flex: 1 0 33%;
+      padding: 4px 0;
       text-align: center;
       cursor: pointer;
       position: relative;
+      margin: 3px;
 
-      &:nth-child(-n+2){
-        border-right: 1px solid var(--main-color);
-      }
-
-      .showAll&{
-        border: none;
-
-        &:not(:last-child):after{
-          // border-bottom
-          content: '';
-          position: relative;
-          height: 1px;
-          background: var(--main-color);
-          display: block;
-          width: 50%;
-          transform: translate(50%, var(--padding);)
-        }
-
-        .vertical-border(){
-          position: absolute;
-          top: 25%;
-          display: block;
-          content: '';
-          height: 50%;
-          width: 1px;
-          background: var(--main-color);
-        }
-
-        // border-right
-        &:not(:nth-child(3)):not(:nth-child(6)):before{
-          right: 0;
-          .vertical-border();
-        }
-
-        &:last-child:nth-child(7){
-          grid-column: 2/3;
-          grid-row: 3/4;
-          &:after{
-            .vertical-border();
-            left: 0;
-          }
-        }
-      }
+      width: var(--selector-width);
+      border: 1px solid var(--main-color);
+      border-radius: 2px;
     }
   }
 
@@ -182,10 +172,19 @@
     font-size: .85em;
   }
 
-  .selected{
+  .year > *[data-name="year"],
+  .producer > *[data-name="producer"],
+  .appellation > *[data-name="appellation"],
+  .color > *[data-name="color"],
+  .cepage > *[data-name="cepage"],
+  .sparkling > *[data-name="sparkling"],
+  .sweet > *[data-name="sweet"]{
     color: white;
     background: var(--main-color);
+    box-shadow: inset 1px 1px 2px 0px #373737;
+    border-color: #6c0707;
   }
+
 
   .filter-value{
     display: block;

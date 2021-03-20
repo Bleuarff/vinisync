@@ -1,5 +1,6 @@
 <script>
   import {onMount, tick} from 'svelte'
+  import Color from './Color.svelte'
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher();
 
@@ -75,7 +76,8 @@
   }
 
   function filter(e){
-    dispatch('filter', {filter: selected, value: e.currentTarget.value})
+    const value = (e.currentTarget || e.detail).value
+    dispatch('filter', {filter: selected, value: value})
   }
 </script>
 
@@ -117,6 +119,8 @@
           {/each}
           <option value="">Non renseigné</option>
         </select>
+      {:else if selected === 'color'}
+        <Color readonly={false} filter={true} on:change={filter}></Color>
       {/if}
     {/if}
   </div>

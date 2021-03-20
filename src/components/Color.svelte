@@ -1,6 +1,10 @@
 <script>
+  import { createEventDispatcher } from 'svelte'
+  const dispatch = createEventDispatcher();
+
   export let value = ''
   export let readonly = true
+  export let filter = false
 
   let label
   $: {
@@ -21,15 +25,20 @@
       value = color
     else
       value = ''
+
+    if (value)
+      dispatch('change', {value: value})
   }
 </script>
 
 {#if value || !readonly}
-  <label>Couleur</label>
+  {#if !filter}
+    <label>Couleur</label>
+  {/if}
   {#if readonly}
     <div data-color={value} class="ro">{label}</div>
   {:else}
-    <div class="ctnr" on:click={setColor} on:keypress={setColor}>
+    <div class="ctnr" class:filter on:click={setColor} on:keypress={setColor}>
       <div data-color="red" class:selected="{value === 'red'}" tabindex="0">Rouge</div>
       <div data-color="white" class:selected="{value === 'white'}" tabindex="0">Blanc</div>
       <div data-color="rose" class:selected="{value === 'rose'}" tabindex="0">Rosé</div>
@@ -97,8 +106,14 @@
     margin-bottom: 20px
   }
 
+  .filter{
+    width: 100%;
+    max-width: 450px;
+    margin: auto;
+  }
+
   @media (min-width: 450px){
-    .ctnr{
+    .ctnr:not(.filter){
       justify-content: flex-start;
     }
     .ctnr div:not(:first-child){

@@ -178,6 +178,8 @@
 	:root{
 		--main-color: #ba0e0e;
 		--main-color-light: #791a1a;
+
+		--main-color-darker: #620202;
 		--global-max-width: 700px;
 
 		--wine-red: #a40e0e;

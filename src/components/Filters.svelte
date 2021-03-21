@@ -1,6 +1,7 @@
 <script>
   import {onMount, tick} from 'svelte'
   import Color from './Color.svelte'
+  import Dropdown from './Dropdown.svelte'
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher();
 
@@ -49,7 +50,8 @@
   // set filter field and value from outside
   export async function preset(field, value){
     await toggle(field)
-    selectNd.value = value
+    if (selectNd)
+      selectNd.value = value
   }
 
   function toggleHandler(e){
@@ -86,14 +88,14 @@
   <div class="filters-ctnr">
     <label for="selector">Filtres:</label>
     <div class="{selected}" id="selector" class:showAll>
-      <span data-name="year" on:click="{toggleHandler}">Année</span>
-      <span data-name="producer" on:click="{toggleHandler}">Producteur</span>
-      <span data-name="appellation" on:click="{toggleHandler}">Appellation</span>
+      <button data-name="year" on:click="{toggleHandler}">Année</button>
+      <button data-name="producer" on:click="{toggleHandler}">Producteur</button>
+      <button data-name="appellation" on:click="{toggleHandler}">Appellation</button>
       {#if showAll}
-        <span data-name="color" on:click="{toggleHandler}">Couleur</span>
-        <span data-name="cepage" on:click="{toggleHandler}">Cepages</span>
-        <span data-name="sparkling" on:click="{toggleHandler}">Bulles</span>
-        <span data-name="sweet" on:click="{toggleHandler}">moelleux</span>
+        <button data-name="color" on:click="{toggleHandler}">Couleur</button>
+        <button data-name="cepage" on:click="{toggleHandler}">Cepages</button>
+        <button data-name="sparkling" on:click="{toggleHandler}">Bulles</button>
+        <button data-name="sweet" on:click="{toggleHandler}">moelleux</button>
       {/if}
     </div>
 
@@ -114,12 +116,13 @@
           <option value="">Non renseigné</option>
         </select>
       {:else if ['producer', 'appellation', 'cepage'].includes(selected)}
-        <select class="filter-value {selected}" on:change={filter} bind:this={selectNd}>
+        <Dropdown data={datalist} on:change={filter}></Dropdown>
+        <!-- <select class="filter-value {selected}" on:change={filter} bind:this={selectNd}>
           {#each datalist as elem}
             <option value={elem}>{elem}</option>
           {/each}
           <option value="">Non renseigné</option>
-        </select>
+        </select> -->
       {:else if selected === 'color'}
         <Color readonly={false} filter={true} on:change={filter}></Color>
       {/if}
@@ -159,17 +162,23 @@
     display: flex;
     flex-flow: row wrap;
     justify-content: center;
+  }
 
-    span {
-      padding: 4px 0;
-      text-align: center;
-      cursor: pointer;
-      position: relative;
-      margin: 3px;
+  button  {
+    padding: 4px 0;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    margin: 3px;
 
-      width: var(--selector-width);
-      border: 1px solid var(--main-color);
-      border-radius: 2px;
+    width: var(--selector-width);
+    border: 1px solid var(--main-color);
+    border-radius: 2px;
+    background: white;
+
+    &:focus, &:hover{
+      border-width: 2px;
+      padding: 2px 0;
     }
   }
 
@@ -188,6 +197,7 @@
     background: var(--main-color);
     box-shadow: inset 1px 1px 2px 0px #373737;
     border-color: #6c0707;
+    border-width: 1px;
   }
 
 

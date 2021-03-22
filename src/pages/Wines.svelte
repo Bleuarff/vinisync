@@ -206,6 +206,10 @@ onDestroy(() => {
     on:filter={filterList} bind:this={filtersNd}>
   </Filters>
 
+  {#if !!filterConfig && entries}
+    <span>{entries.length} résultat{entries.length <= 1 ? '' : 's'}</span>
+  {/if}
+
   {#if entries.length > 0}
     <div id="entries" class="wide">
       <div class="entry sort-ctnr">

@@ -21,7 +21,9 @@ const texts = {
     count: 'Bouteilles',
     white: 'blanc',
     red: 'rouge',
-    rose: 'rosé'
+    rose: 'rosé',
 
+    producer: 'producteur',
+    appellation: 'appellation'
   }
 }

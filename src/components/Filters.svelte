@@ -131,7 +131,7 @@
           <option value="">Non renseigné</option>
         </select>
       {:else if ['producer', 'appellation', 'cepage'].includes(selected)}
-        <Dropdown src={datalist} on:change={filter}></Dropdown>
+        <Dropdown src={datalist} on:change={filter} name={selected}></Dropdown>
       {:else if selected === 'color'}
         <Color readonly={false} filter={true} on:change={filter}></Color>
       {/if}

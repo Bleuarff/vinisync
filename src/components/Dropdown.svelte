@@ -5,6 +5,7 @@
 
 	let value
 	export let src = []
+	export let name = ''
 	let modal = false
 
 	$: currentData = src
@@ -46,6 +47,7 @@
 	<input type="text" bind:value readonly on:click={expand} on:keypress={expand} placeholder={placeholder}>
 	{#if modal}
 		<div id="content">
+			<h3>{i18n.getString(name)}</h3>
 			<input type="text" bind:value placeholder={placeholder}>
 			<ul class="options">
 				{#each currentData as value}
@@ -110,6 +112,13 @@
 		background: white;
 		opacity: .4;
 		z-index: 70;
+	}
+
+	h3{
+		margin: 0 0 .5em;
+		align-self: flex-start;
+		text-transform: capitalize;
+		font-size: 1.1em;
 	}
 
 	.options{

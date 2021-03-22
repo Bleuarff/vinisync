@@ -4,19 +4,19 @@
 	const dispatch = createEventDispatcher()
 
 	let value
-	export let data = []
+	export let src = []
 	let modal = false
 
-	$: currentData = data
-	$: placeholder = data[Math.round(Math.random()*16)]
+	$: currentData = src
+	$: placeholder = src && src.length && src[Math.round(Math.random()*16)].label
 
 	$: {
 		if (!value)
-			currentData = data
+			currentData = src
 		else{
 			const normalized = value, // TODO: actual normalization
 						rx = new RegExp(`${value}`, 'i')
-			currentData = data.filter(x => rx.test(x))
+			currentData = src.filter(x => rx.test(x.key))
 		}
 	}
 
@@ -49,7 +49,7 @@
 			<input type="text" bind:value placeholder={placeholder}>
 			<ul class="options">
 				{#each currentData as value}
-				<li on:click="{select(value)}" tabindex="0">{value}</li>
+				<li on:click="{select(value.key)}" data-key={value.key} tabindex="0">{value.label}</li>
 				{/each}
 			</ul>
 			<div class="cancel" on:click={()=>{modal = false}}><span class="icon-cancel"></span></div>

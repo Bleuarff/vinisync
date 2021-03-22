@@ -3,31 +3,46 @@
   import Color from './Color.svelte'
   import Dropdown from './Dropdown.svelte'
   import { createEventDispatcher } from 'svelte'
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher()
+  import Undiacritics from '../undiacritics.js'
 
+  // naming is hard, ok?
+  const valueFields = ['year', 'producer', 'appellation'] // TODO: handle cepages
   export let source = []
-  let selected // current filter displayed (year, appellation, producer)
+  let selected // current filter displayed (year, appellation, producer, color, cepage, sparkling, sweet)
 
   let selectNd = null
   let showAll = true
 
-  // set datalist for each filter
-  $: appellationData = dedup(source, 'appellation')
-  $: producerData = dedup(source, 'producer')
-  $: yearData = dedup(source, 'year')
+  let appellationData, producerData, yearData
+
   $:{
     if (!showAll && !['year', 'appellation', 'producer'].includes(selected))
       selected = null
   }
 
-  // dedup & sort values
-  function dedup(src, field){
-    return src.reduce((dedup, cur) => {
-      const value = cur[field] && cur[field].toString()
-      if (!!cur[field] && !dedup.includes(value))
-        dedup.push(value)
-      return dedup
-    }, []).sort()
+  // update all datalists in one pass
+  $: if (source){
+    let tmp = {}, // store arrays of keys
+        fullData = {} // store arrays of {key, lbl} objects
+
+    source.forEach(e => {
+      if (e){
+        valueFields.forEach(field => {
+          const value = e[field] && Undiacritics.removeAll(e[field].toString()), // normalized value, for dedup
+                label = e[field] && e[field].toString() // actual value, for display
+
+          if (value && (!tmp[field] || !tmp[field].includes(value))){
+            (tmp[field] = (tmp[field] || [])).push(value); // undecipherable, but short.
+            (fullData[field] = (fullData[field] || [])).push({key: value, label: label});
+          }
+        })
+      }
+    })
+
+    appellationData = fullData.appellation
+    producerData = fullData.producer
+    yearData = fullData.year
   }
 
   // datalist is the current list of options. Changes when a filter is selected
@@ -111,18 +126,12 @@
       {#if selected === "year"}
         <select class="filter-value {selected}" on:change={filter} bind:this={selectNd}>
           {#each datalist as elem}
-            <option value={elem}>{elem}</option>
+            <option value={elem.key}>{elem.label}</option>
           {/each}
           <option value="">Non renseigné</option>
         </select>
       {:else if ['producer', 'appellation', 'cepage'].includes(selected)}
-        <Dropdown data={datalist} on:change={filter}></Dropdown>
-        <!-- <select class="filter-value {selected}" on:change={filter} bind:this={selectNd}>
-          {#each datalist as elem}
-            <option value={elem}>{elem}</option>
-          {/each}
-          <option value="">Non renseigné</option>
-        </select> -->
+        <Dropdown src={datalist} on:change={filter}></Dropdown>
       {:else if selected === 'color'}
         <Color readonly={false} filter={true} on:change={filter}></Color>
       {/if}

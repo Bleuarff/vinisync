@@ -202,7 +202,7 @@ onDestroy(() => {
     {/if}
   </p>
 
-  <Filters source="{origEntries.map(x => {return {year: x.wine.year, appellation: x.wine.appellation, producer: x.wine.producer}})}"
+  <Filters source="{origEntries.map(x => {return {year: x.wine.year, appellation: x.wine.appellation, producer: x.wine.producer, cepages: x.wine.cepages}})}"
     on:filter={filterList} bind:this={filtersNd}>
   </Filters>
 

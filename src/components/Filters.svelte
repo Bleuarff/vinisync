@@ -7,16 +7,17 @@
   import Undiacritics from '../undiacritics.js'
 
   // naming is hard, ok?
-  const valueFields = ['year', 'producer', 'appellation'] // TODO: handle cepages
+  const valueFields = ['year', 'producer', 'appellation', 'cepages'] // TODO: handle cepages
   export let source = []
   let selected // current filter displayed (year, appellation, producer, color, cepage, sparkling, sweet)
 
   let selectNd = null
   let showAll = true
 
-  let appellationData, producerData, yearData
+  let appellationData, producerData, yearData, cepageData
 
   $:{
+    // on toggling off the additional filters, reset filter selection, unless it's one of the main filters.
     if (!showAll && !['year', 'appellation', 'producer'].includes(selected))
       selected = null
   }
@@ -29,13 +30,25 @@
     source.forEach(e => {
       if (e){
         valueFields.forEach(field => {
-          const value = e[field] && Undiacritics.removeAll(e[field].toString()), // normalized value, for dedup
-                label = e[field] && e[field].toString() // actual value, for display
-
-          if (value && (!tmp[field] || !tmp[field].includes(value))){
-            (tmp[field] = (tmp[field] || [])).push(value); // undecipherable, but short.
-            (fullData[field] = (fullData[field] || [])).push({key: value, label: label});
+          let values // array of values for the given field in this 'entry' (not the actual entry, though)
+          let labels
+          if (field === 'cepages'){
+            values = e[field] && e[field].map(x => Undiacritics.removeAll(x).toLowerCase())
+            labels = e[field]
+            if (values) console.log(values)
           }
+          else{
+            values = e[field] && [Undiacritics.removeAll(e[field].toString())], // normalized value, for dedup
+            labels = e[field] && [e[field].toString()] // actual value, for display
+          }
+
+          values && values.forEach((value, idx) => {
+            if (value && (!tmp[field] || !tmp[field].includes(value))){
+              // undecipherable, but short way to push to array after creating and assigning it if needed.
+              (tmp[field] = (tmp[field] || [])).push(value);
+              (fullData[field] = (fullData[field] || [])).push({key: value, label: labels[idx]});
+            }
+          })
         })
       }
     })
@@ -43,6 +56,7 @@
     appellationData = fullData.appellation
     producerData = fullData.producer
     yearData = fullData.year
+    cepageData = fullData.cepages
   }
 
   // datalist is the current list of options. Changes when a filter is selected
@@ -54,6 +68,8 @@
       case 'producer': datalist = producerData
         break
       case 'year': datalist = yearData
+        break
+      case 'cepage': datalist = cepageData
         break
       default: datalist = []
     }

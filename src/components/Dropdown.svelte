@@ -9,7 +9,7 @@
 	let modal = false
 
 	$: currentData = src
-	$: placeholder = src && src.length && src[Math.round(Math.random()*16)].label
+	$: placeholder = src && src.length && src[Math.round(Math.random() * src.length)].label
 
 	$: {
 		if (!value)

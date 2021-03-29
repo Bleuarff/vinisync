@@ -2,6 +2,7 @@
 import { onMount, onDestroy } from 'svelte'
 import {repo } from '../storage.js'
 import syncMgr from '../syncMgr.js'
+import Undiacritics from '../undiacritics.js'
 import Filters from '../components/Filters.svelte'
 const CONFIG_SORT_KEY = 'config.page.wines.sort'
 const CONFIG_FILTER_KEY = 'config.pages.wines.filter'
@@ -147,7 +148,7 @@ function filterList(e){
     filterConfig = null
     return
   }
-  // console.log(`filter ${e.detail.filter}=${e.detail.value}`)
+  console.log(`filter ${e.detail.filter}=${e.detail.value}`)
   filterConfig = {
     field: e.detail.filter,
     value: e.detail.value
@@ -155,9 +156,17 @@ function filterList(e){
 
   let filterFn // filter function to filter by
 
-  if (!!filterConfig.value)
-    // truthy value provided: non-strict equality check
-    filterFn = x => x.wine[filterConfig.field] == filterConfig.value
+  if (!!filterConfig.value){
+
+    // filter by normalized value, whether by string (appellation, producer or) in array (cepages)
+    if (filterConfig.field === 'cepages')
+      filterFn = x => x.wine[filterConfig.field] && x.wine[filterConfig.field].map(c => Undiacritics.removeAll(c).toLowerCase()).includes(filterConfig.value)
+    else if (['appellation', 'producer'].includes(filterConfig.field))
+      filterFn = x => x.wine[filterConfig.field] && Undiacritics.removeAll(x.wine[filterConfig.field]).toLowerCase() === filterConfig.value
+    else
+      // filter by exact value (year, color, sparkling, sweet)
+      filterFn = x => x.wine[filterConfig.field] == filterConfig.value
+  }
   else
     // filter for all falsy values
     filterFn = x => !x.wine[filterConfig.field]
@@ -227,7 +236,7 @@ onDestroy(() => {
             {#if entry.wine.name && entry.wine.producer}<div class="name-sep"></div>{/if}
             {#if entry.wine.producer}<div class="producer">{entry.wine.producer}</div>{/if}
           </div>
-          <div class="app">{entry.wine.appellation}</div>
+          <div class="app">{entry.wine.appellation || ''}</div>
           <span class="count">{entry.count}</span>
         </a>
 

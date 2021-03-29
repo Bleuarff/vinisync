@@ -8,7 +8,16 @@
 	export let name = ''
 	let modal = false
 
-	$: currentData = src
+	// init suggestion list with source list, sorted.
+	$: currentData = src.sort((a, b) => {
+		if (a.key < b.key)
+			return -1
+		else if (a.key > b.key)
+			return 1
+		return 0
+	})
+
+	// choose a random value as placeholder. TODO: check for undefined
 	$: placeholder = src && src.length && src[Math.round(Math.random() * src.length)].label
 
 	$: {

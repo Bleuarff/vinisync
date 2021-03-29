@@ -35,10 +35,9 @@
           if (field === 'cepages'){
             values = e[field] && e[field].map(x => Undiacritics.removeAll(x).toLowerCase())
             labels = e[field]
-            if (values) console.log(values)
           }
           else{
-            values = e[field] && [Undiacritics.removeAll(e[field].toString())], // normalized value, for dedup
+            values = e[field] && [Undiacritics.removeAll(e[field].toString()).toLowerCase()], // normalized value, for dedup
             labels = e[field] && [e[field].toString()] // actual value, for display
           }
 
@@ -69,7 +68,7 @@
         break
       case 'year': datalist = yearData
         break
-      case 'cepage': datalist = cepageData
+      case 'cepages': datalist = cepageData
         break
       default: datalist = []
     }
@@ -124,7 +123,7 @@
       <button data-name="appellation" on:click="{toggleHandler}">Appellation</button>
       {#if showAll}
         <button data-name="color" on:click="{toggleHandler}">Couleur</button>
-        <button data-name="cepage" on:click="{toggleHandler}">Cepages</button>
+        <button data-name="cepages" on:click="{toggleHandler}">Cepages</button>
         <button data-name="sparkling" on:click="{toggleHandler}">Bulles</button>
         <button data-name="sweet" on:click="{toggleHandler}">moelleux</button>
       {/if}
@@ -146,7 +145,7 @@
           {/each}
           <option value="">Non renseigné</option>
         </select>
-      {:else if ['producer', 'appellation', 'cepage'].includes(selected)}
+      {:else if ['producer', 'appellation', 'cepages'].includes(selected)}
         <Dropdown src={datalist} on:change={filter} name={selected}></Dropdown>
       {:else if selected === 'color'}
         <Color readonly={false} filter={true} on:change={filter}></Color>
@@ -215,7 +214,7 @@
   .producer > *[data-name="producer"],
   .appellation > *[data-name="appellation"],
   .color > *[data-name="color"],
-  .cepage > *[data-name="cepage"],
+  .cepages > *[data-name="cepages"],
   .sparkling > *[data-name="sparkling"],
   .sweet > *[data-name="sweet"]{
     color: white;

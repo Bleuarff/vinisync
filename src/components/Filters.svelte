@@ -52,10 +52,11 @@
       }
     })
 
-    appellationData = fullData.appellation
-    producerData = fullData.producer
-    yearData = fullData.year
-    cepageData = fullData.cepages
+    appellationData = fullData.appellation.sort(sortByKeyAsc)
+    producerData = fullData.producer.sort(sortByKeyAsc)
+    cepageData = fullData.cepages.sort(sortByKeyAsc)
+    yearData = fullData.year.sort(sortByKeyDesc)
+    console.log(yearData)
   }
 
   // datalist is the current list of options. Changes when a filter is selected
@@ -72,6 +73,17 @@
         break
       default: datalist = []
     }
+  }
+
+  function sortByKeyAsc(a, b){
+    if (a.key < b.key) return -1
+		else if (a.key > b.key) return 1
+		return 0
+  }
+  function sortByKeyDesc(a, b){
+    if (a.key < b.key) return 1
+		else if (a.key > b.key) return -1
+		return 0
   }
 
   onMount(() => {

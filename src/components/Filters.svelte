@@ -60,22 +60,6 @@
     yearData = fullData.year.sort(sortByKeyDesc)
   }
 
-  // datalist is the current list of options. Changes when a filter is selected
-  let datalist
-  $: {
-    switch(selected){
-      case 'appellation': datalist = appellationData
-        break
-      case 'producer': datalist = producerData
-        break
-      case 'year': datalist = yearData
-        break
-      case 'cepages': datalist = cepageData
-        break
-      default: datalist = []
-    }
-  }
-
   function sortByKeyAsc(a, b){
     if (a.key < b.key) return -1
 		else if (a.key > b.key) return 1
@@ -145,21 +129,30 @@
     <button class="more"on:click="{()=>{showAll = !showAll}}">{showAll ? '-' : '+'} de filtres</button>
 
     {#if selected}
-    <!-- TODO: different inputs, depending on selected field.
-      - year: dropdown
-      - producteur, appellation, cepages: dropdown w/ text filter
-      - couleur: color component
-      - bulle/moelleux: nothing
-    -->
+      <!-- different inputs, depending on selected field.
+        - year: dropdown
+        - producteur, appellation, cepages: dropdown w/ text filter
+        - couleur: color component
+        - sweet/sparkling: n/a, filter is triggered on toggle
+      -->
       {#if selected === "year"}
         <select class="filter-value {selected}" on:change={filter} bind:this={selectNd}>
-          {#each datalist as elem}
+          {#each yearData as elem}
             <option value={elem.key}>{elem.label}</option>
           {/each}
           <option value="">Non renseigné</option>
         </select>
-      {:else if ['producer', 'appellation', 'cepages'].includes(selected)}
-        <Dropdown src={datalist} on:change={filter} name={selected}></Dropdown>
+
+      {:else if selected === 'producer'}
+        <Dropdown src={producerData} on:change={filter} name="producter"></Dropdown>
+
+      {:else if selected === 'appellation'}
+
+        <Dropdown src={appellationData} on:change={filter} name="appellation"></Dropdown>
+
+      {:else if selected === 'cepages'}
+        <Dropdown src={cepageData} on:change={filter} name="cepages"></Dropdown>
+
       {:else if selected === 'color'}
         <Color readonly={false} filter={true} on:change={filter}></Color>
       {/if}

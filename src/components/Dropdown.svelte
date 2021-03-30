@@ -51,7 +51,10 @@
 	{#if modal}
 		<div id="content">
 			<h3>{i18n.getString(name)}</h3>
-			<input type="text" bind:value placeholder={placeholder}>
+			<div class="input-ctnr">
+				<input type="text" bind:value placeholder={placeholder}>
+				<span class="icon-cancel" on:click="{e => {value = ''}}"></span>
+			</div>
 			<ul class="options">
 				{#each currentData as value}
 				<li on:click="{select(value.key)}" data-key={value.key} tabindex="0">{value.label}</li>
@@ -149,6 +152,23 @@
 			&:hover, &:focus{
 				background: var(--main-color-darker);
 			}
+		}
+	}
+
+	.input-ctnr{
+		display: flex;
+		flex-flow: row nowrap;
+		justify-content: flex-start;
+		align-items: center;
+		margin-bottom: .5em;
+
+		input{
+			flex: 1 0 50%;
+			margin: 0;
+		}
+		.icon-cancel{
+			font-size: 1.5em;
+			cursor: pointer;
 		}
 	}
 

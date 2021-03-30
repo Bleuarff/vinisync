@@ -32,6 +32,7 @@
         valueFields.forEach(field => {
           let values // array of values for the given field in this 'entry' (not the actual entry, though)
           let labels
+          // obtain value & corresponding normalized key
           if (field === 'cepages'){
             values = e[field] && e[field].map(x => Undiacritics.removeAll(x).toLowerCase())
             labels = e[field]
@@ -41,6 +42,7 @@
             labels = e[field] && [e[field].toString()] // actual value, for display
           }
 
+          // compare keys to ignore duplicates.
           values && values.forEach((value, idx) => {
             if (value && (!tmp[field] || !tmp[field].includes(value))){
               // undecipherable, but short way to push to array after creating and assigning it if needed.
@@ -56,7 +58,6 @@
     producerData = fullData.producer.sort(sortByKeyAsc)
     cepageData = fullData.cepages.sort(sortByKeyAsc)
     yearData = fullData.year.sort(sortByKeyDesc)
-    console.log(yearData)
   }
 
   // datalist is the current list of options. Changes when a filter is selected

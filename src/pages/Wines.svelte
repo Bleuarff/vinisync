@@ -148,7 +148,7 @@ function filterList(e){
     filterConfig = null
     return
   }
-  console.log(`filter ${e.detail.filter}=${e.detail.value}`)
+  // console.log(`filter ${e.detail.filter}=${e.detail.value}`)
   filterConfig = {
     field: e.detail.filter,
     value: e.detail.value
@@ -158,7 +158,7 @@ function filterList(e){
 
   if (!!filterConfig.value){
 
-    // filter by normalized value, whether by string (appellation, producer or) in array (cepages)
+    // filter by normalized value, whether by string (appellation, producer) or in array (cepages)
     if (filterConfig.field === 'cepages')
       filterFn = x => x.wine[filterConfig.field] && x.wine[filterConfig.field].map(c => Undiacritics.removeAll(c).toLowerCase()).includes(filterConfig.value)
     else if (['appellation', 'producer'].includes(filterConfig.field))

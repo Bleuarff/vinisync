@@ -3,13 +3,15 @@ import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import replace from '@rollup/plugin-replace';
 
-import { less } from 'svelte-preprocess-less'
+import sveltePreprocess from 'svelte-preprocess';
+import { less } from 'svelte-preprocess';
+import postcss from 'rollup-plugin-postcss';
+
 // import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
 import {DateTime} from 'luxon';
 
 const production = !process.env.ROLLUP_WATCH;
-// const env = process.env.ROLLUP_WATCH ? 'dev' : 'prod'
 const env = process.env.VINISYNC_BUILD_ENV
 
 const config = {
@@ -41,18 +43,21 @@ export default {
     }),
 
 		svelte({
-			preprocess: {
-        style: less(),
-      },
+			preprocess: [
+				less({ })
+			],
 
-			// enable run-time checks when not in production
-			dev: !production,
-			// we'll extract any component CSS out into
-			// a separate file - better for performance
-			// css: css => {
-			// 	css.write('dist/public/build/bundle.css');
-			// }
+			compilerOptions: {
+				// enable run-time checks when not in production
+				dev: !production,
+			},
 		}),
+
+		postcss({
+			extract: true,
+			minimize: env !== 'dev',
+      plugins: []
+    }),
 
 		// If you have external dependencies installed from
 		// npm, you'll most likely need these plugins. In

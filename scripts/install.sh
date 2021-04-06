@@ -16,7 +16,7 @@ source ~/vinisync/.credentials.env
 cd /var/www/vinisync
 
 # uncomment when there are new dependencies
-# /usr/local/bin/npm install
+# /usr/local/bin/npm install --production
 
 # find existing process
 # TODO: Cannot run other processes with same script. Need more foolproof way.

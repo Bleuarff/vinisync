@@ -2,7 +2,7 @@
  const { DateTime } = require('luxon')
 
 function getTime(){
-  return `[${DateTime.local().toFormat('dd/LL/yy HH:mm')}] `
+  return `[${DateTime.local().toFormat('yy-LL-dd HH:mm')}] `
 }
 
 module.exports = exports = {

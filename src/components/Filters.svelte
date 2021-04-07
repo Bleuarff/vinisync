@@ -7,12 +7,12 @@
   import Undiacritics from '../undiacritics.js'
 
   // naming is hard, ok?
-  const valueFields = ['year', 'producer', 'appellation', 'cepages'] // TODO: handle cepages
+  const valueFields = ['year', 'producer', 'appellation', 'cepages']
   export let source = []
   let selected // current filter displayed (year, appellation, producer, color, cepage, sparkling, sweet)
 
   let selectNd = null
-  let showAll = true
+  let showAll = false
 
   let appellationData, producerData, yearData, cepageData
 
@@ -165,9 +165,9 @@
     --selector-width: 140px;
   }
 
-  @media (max-width: 500px){
-    #selector span{
-      --selector-width: 111px;
+  @media (max-width: 450px){
+    #selector button{
+      --selector-width: 30%;
     }
   }
 

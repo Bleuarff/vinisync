@@ -4,27 +4,17 @@ Simple cellar management. https://vinisync.fr.
 
 ## Description
 
-Vinisync is a simple cellar management. It stores all information locally. Your data leaves your device only if you enable synchronization with other Vinisync instances on other devices.
+Vinisync is a simple cellar management. We want it to be the most easy-to-use cellar inventory system. It works completely fine when offline, all your data is on your device at all times. You can sync different devices, though.
 
 Chrome and Firefox only. Not even tested on other browsers.
 
 ## Run dev
 
-Needs node.js >=14. Run `nvm use` first
+Needs node.js >=14. Run `nvm use` first.
 
-bundler:
 ````
-npm run dev
+gulp
 ````
-
-server:
-````
-node server/server.js
-````
-
-## Run prod
-`npm run build`  
-Then use nginx to server files
 
 ## Deployment
 

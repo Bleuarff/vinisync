@@ -8,13 +8,14 @@ set -e
 #######################################
 
 ENV="$1"
+DEST_FOLDER="$2"
 
 source ./.credentials.env
 
 TS=$(date +"%Y%m%d_%H%M")
 FILENAME="vinisync-$ENV-mongo-backup-$TS.gz"
 
-mongodump --db=vinisync --username="$MONGO_USER" --password="$MONGO_PWD" --gzip --archive=$FILENAME --authenticationMechanism=SCRAM-SHA-256
+mongodump --db=vinisync --username="$MONGO_USER" --password="$MONGO_PWD" --gzip --archive=$FILENAME --authenticationMechanism=SCRAM-SHA-256 --port=29817
 
 # restore: username must have admin rights
 # mongorestore  --username --password --authenticationMechanisme SCRAM-SHA-256 --gzip --archive=FILENAME
@@ -80,7 +81,7 @@ key_and_sig_args="-F X-Amz-Credential=${s3AccessKey}/${yyyymmdd}/${region}/s3/aw
 #-F "X-Amz-Security-Token= ${xamztoken}" \
 
 curl -v   \
--F key=$FILENAME \
+-F "key=$DEST_FOLDER/$FILENAME" \
 -F acl=$acl \
 $key_and_sig_args  \
 -F "content-md5= ${b64}" \

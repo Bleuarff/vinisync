@@ -12,6 +12,7 @@
 
   let email
   let createDate
+  let swVersion = '---'
 
   onMount(() => {
     try{
@@ -22,12 +23,23 @@
 
       email = user.email
       createDate = DateTime.fromISO(user.createDate).setLocale(document.documentElement.lang)
+
+      navigator.serviceWorker.addEventListener('message', receive)
+      navigator.serviceWorker.controller?.postMessage({type: 'GET_VERSION'})
     }
     catch(ex){
       console.error(ex)
     }
     document.title += ' Paramètres'
   })
+
+  function receive(e){
+    if (e.data?.type === 'VERSION')
+      swVersion = e.data.version
+
+    // unbind after use
+    navigator.serviceWorker.removeEventListener('message', receive)
+  }
 
   function forward(event) {
 		dispatch('notif', event.detail);
@@ -75,7 +87,7 @@
   <button on:click={clearAll}>Supprimer les données locales</button>
 </div>
 
-<div id="version">build __BUILD__@__BUILDDATE__</div>
+<div id="version">build __BUILD__@__BUILDDATE__ / sw {swVersion}</div>
 
 <style type="text/less">
   #profile{

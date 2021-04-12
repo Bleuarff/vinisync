@@ -79,3 +79,16 @@ self.addEventListener('activate', e => {
     }
   }))
 })
+
+// Client / service postmessage communication
+self.addEventListener('message', async (e) => {
+  try{
+    if (e.data?.type === 'GET_VERSION') {
+      const client = await self.clients.get(e.source?.id)
+      client?.postMessage({type: 'VERSION', version: cacheName})
+    }
+  }
+  catch(ex){
+    console.error(ex)
+  }
+})

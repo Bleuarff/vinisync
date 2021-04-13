@@ -91,13 +91,9 @@
 			// check if new client version is available
 			send('/api/clientVersion')
 			.then(lastBuild => {
-				// console.debug(`current: ${vni.build} / latest ${lastBuild}`)
 				newRelease = vni.build !== lastBuild
 			})
-			.catch(ex => {
-				console.error(ex)
-				notif.show({text: 'VERSION_CHECK_ERROR', err: true})
-			})
+			.catch(ex => {}) // just swallow
 
 		}, 1e3)
 	})

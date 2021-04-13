@@ -5,6 +5,7 @@
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher()
 
+  export let networkOk
   let visible = true
   let debouncer = 0
   let lastScrollY = 0
@@ -40,12 +41,12 @@
         <a href="/conflicts" class="icon-bomb" title="Conflits"></a>
       {/if}
 
-      <button class="icon-arrows-cw force-sync" title="Forcer la synchro" on:click="{()=>{dispatch('sync-request')}}"></button>
+      <button class="icon-arrows-cw force-sync" class:hidden={!networkOk} title="Forcer la synchro" on:click="{()=>{dispatch('sync-request')}}"></button>
     </div>
   </div>
 {/if}
 
-<style>
+<style type="text/less">
   #top{
     position: fixed;
     top: 0;

@@ -28,6 +28,7 @@
 	let notif // notif child component
 	let newRelease = false
 	let loader
+	let networkOk = true // fetch sends event when request completes or timeouts.
 
 	const env = '__ENVIRONMENT__'
 
@@ -112,6 +113,12 @@
 			case 'notif':
 				notif.show(e.data)
 				break;
+			case 'timeout':
+				networkOk = false
+				break
+			case 'no-timeout':
+				networkOk = true
+				break
 			default:
 				console.debug('unknown event ' + JSON.stringify(e.data))
 		}
@@ -150,7 +157,7 @@
 </script>
 
 <main>
-	<TitleBar on:sync-request={forceSync}></TitleBar>
+	<TitleBar on:sync-request={forceSync} networkOk={networkOk}></TitleBar>
 
 	{#if newRelease}
 	<div id="new-release">

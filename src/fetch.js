@@ -1,6 +1,6 @@
 // Wrapper around fetch
 
-const TIMEOUT = 30 * 1e3
+const TIMEOUT = 8 * 1e3
 
 function LogicException(data) {
   this.status = data.status
@@ -56,14 +56,16 @@ export async function send(path, method = 'GET', data = {}, key){
     if (res.status >= 400)
       throw new LogicException({status: res.status, data: data})
 
+    window.postMessage({event: 'no-timeout'}, document.location.origin)
     return data
   }
   catch(ex){
     console.error(ex)
 
-    if (ex === 'TIMEOUT')
-      // TODO: send postmessage
+    if (ex === 'TIMEOUT'){
+      window.postMessage({event: 'timeout'}, document.location.origin)
       throw new Error('TIMEOUT')
+    }
     else if (ex && ex.message && ex.message.includes('NetworkError'))
       throw new Error('Erreur réseau, ressayer ultérieurement')
     else

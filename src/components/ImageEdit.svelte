@@ -82,6 +82,10 @@
           filesize = refPic.blob.size
           rotation = refPic.rotation || 0
         }
+        else{
+          imageUrl = null
+          rotation = filesize = 0
+        }
       }
       catch(ex){
         dispatch('notif', {text: `Erreur de récuperation de l'image`, err: true})

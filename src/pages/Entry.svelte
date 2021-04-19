@@ -195,6 +195,13 @@ function sanitizeAppellation(e){
   }
 }
 
+// toggles edit mode off
+function quitEdit(e){
+  edit = false
+  entry = Utils.deepClone(refEntry)
+  imageEditor.clearEdit()
+}
+
 </script>
 
 <div class="nav">
@@ -280,7 +287,7 @@ function sanitizeAppellation(e){
     {#if edit}
       <button on:click="{save}">Save</button>
       {#if params.id}
-      <button on:click="{()=>{ edit = false; imageEditor.clearEdit() }}">Annuler</button>
+      <button on:click="{quitEdit}">Annuler</button>
       {/if}
     {:else}
       <button on:click="{()=>{ edit = true }}" class="edit">Edit</button>

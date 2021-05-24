@@ -1,30 +1,30 @@
 'use strict'
 
 const db = require('./db.js').db,
-      { DateTime } = require('luxon'),
-      logger = require('./logger.js')
+			{ DateTime } = require('luxon'),
+			logger = require('./logger.js')
 
 /*
 Sample document:
 
 {
-  _id,
-  // time range for which server data was lost.
-  from, // resend msgs synced after this date
-  to, // and before this one.
-  createDate
+	_id,
+	// time range for which server data was lost.
+	from, // resend msgs synced after this date
+	to, // and before this one.
+	createDate
 }
 */
 
 module.exports = exports = {
 	get: async (req, res, next) => {
 		try{
-      let since
-      if (req.params.since)
-        since = DateTime.fromISO(req.params.since).toBSON()
+			let since
+			if (req.params.since)
+				since = DateTime.fromISO(req.params.since).toBSON()
 
 			const list = await db.collection('resyncs').find({
-        createDate: { $gte: since || req.user.createDate },
+				createDate: { $gte: since || req.user.createDate },
 			}).toArray()
 
 			res.send(200, {

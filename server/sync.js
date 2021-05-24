@@ -23,6 +23,14 @@ class Sync{
       return next()
     }
     catch(ex){
+      // duplicate key error: an update with this id already exists. Just ignore it,
+      // it's either a re-executed resync request or a bug. Anyway, this helps achieving idempotence. I think.
+      if (ex.code === 11000){
+        res.send(204)
+        logger.log('Duplicate %s ignored', req.params.id)
+        return next()
+      }
+
       logger.error(ex)
       res.send(500)
       return next(false)

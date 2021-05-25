@@ -122,7 +122,7 @@
         <button data-name="color" on:click="{toggleHandler}">Couleur</button>
         <button data-name="cepages" on:click="{toggleHandler}">Cepages</button>
         <button data-name="sparkling" on:click="{toggleHandler}">Bulles</button>
-        <button data-name="sweet" on:click="{toggleHandler}">moelleux</button>
+        <button data-name="sweet" on:click="{toggleHandler}">Moelleux</button>
       {/if}
     </div>
 
@@ -208,7 +208,7 @@
 
     &:focus, &:hover{
       border-width: 2px;
-      padding: 2px 0;
+      padding: 3px 0;
     }
   }
 

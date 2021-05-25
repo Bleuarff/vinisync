@@ -89,12 +89,17 @@
 				navigator.serviceWorker.register('/sw.js')
 			}
 
-			// check if new client version is available
-			send('/api/clientVersion')
-			.then(lastBuild => {
-				newRelease = vni.build !== lastBuild
-			})
-			.catch(ex => {}) // just swallow
+			const user = JSON.parse(localStorage.getItem('user'))
+			if (user && user.id && user.key){
+				send('/api/resync', 'GET', {userid: user.id}, user.key)
+				.then(d => {
+					newRelease = vni.build !== d.build
+					if (d.resyncs && d.resyncs.length){
+						syncMgr.processResyncs(d.resyncs)
+					}
+				})
+				.catch(err => {}) // just swallow it
+			}
 
 		}, 1e3)
 	})

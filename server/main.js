@@ -28,7 +28,8 @@ void async function(){
   /************************ Configure server ***************************/
   const Sync = require('./sync.js'),
         User = require('./user.js'),
-        Security = require('./security.js')
+        Security = require('./security.js'),
+        Resync = require('./resync.js')
 
   server.use(restify.plugins.acceptParser(server.acceptable))
   server.use((req, res, next) => {
@@ -76,6 +77,9 @@ void async function(){
   server.post('/api/pwdreset', User.createPwdReset)
   server.get('/api/pwdreset/:id', User.getPwdReset)
 
+  server.get('/api/resync', Security.verify, Resync.get)
+
+  // deprecated
   server.get('/api/clientVersion', (req, res, next) => {
     res.send(200, '__BUILD__')
     return next()

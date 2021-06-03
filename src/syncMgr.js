@@ -67,7 +67,7 @@ class SyncMgr{
         diff = obj // no reference object means new document, send all
       }
 
-      await this._sendDiff(type, diff)
+      await this._saveDiff(type, diff)
 
     }
     catch(ex){
@@ -245,27 +245,33 @@ class SyncMgr{
   }
 
   // returns nothing (empty promise) if server db update goes well
-  async _sendDiff(type, diff){
+  async _saveDiff(type, diff){
     const payload = {
       id: uuid(),
       changes: diff,
       ts: diff.lastUpdateDate,
       userid: this.user.id,
       type: type,
-      devid: this.devid
+      devid: this.devid,
+      pending: 'true' // indexedDB index does not support boolean keys
     }
 
-    try{ // send update to server
+    try{
+      await repo.insertOne('updates', payload) // save locally
+
+      delete payload.pending // not needed on server
       await send('/api/update', 'POST', payload, this.user.key)
+
+      // update local copy once its accepted by server
+      await repo.updateOne('updates', payload.id, {pending: 'false'})
     }
     catch(ex){ // on failure, save to db
-      try{
-        await repo.insertOne('updates', payload)
-      }
-      catch(innerex){ // ...all hell broke loose
-        console.error(innerex)
-        throw new Error('UPDATE_SERVER_AND_LOCAL_FAILED')
-      }
+      // try{
+      // }
+      // catch(innerex){ // ...all hell broke loose
+      //   console.error(innerex)
+      //   throw new Error('UPDATE_SERVER_AND_LOCAL_FAILED')
+      // }
     }
   }
 
@@ -279,15 +285,22 @@ class SyncMgr{
   async _sendPending(){
 
     try{
-      const updates = await repo.getAll('updates')
-      if (updates.length === 0) return // nothing to send
+      const pendingCount = await repo.countFromIndex('updates', 'pending', 'true')
+      console.debug(`${pendingCount} pending updates`)
+      if (!pendingCount)
+        return console.log('No pending updates')
+
+      const updates = await repo.getAllFromIndex('updates', 'pending', 'true')
+
+      if (updates.length === 0)
+        return console.log('no pending updates') // nothing to send
 
       // process each upate, synchronously
       await updates.reduce(async (prom, update) => {
         await prom
         try{
           await send('/api/update', 'POST', update, this.user.key)
-          await repo.deleteOne('updates', update.id)
+          await repo.updateOne('updates', update.id, {pending: 'false'})
           return Promise.resolve()
         }
         catch(ex){

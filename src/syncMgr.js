@@ -68,7 +68,6 @@ class SyncMgr{
       }
 
       await this._saveDiff(type, diff)
-
     }
     catch(ex){
       if (ex.message === 'SYNC_NOT_CONFIGURED')
@@ -245,6 +244,7 @@ class SyncMgr{
   }
 
   // returns nothing (empty promise) if server db update goes well
+  // Saves an update, both locally & send to server
   async _saveDiff(type, diff){
     const payload = {
       id: uuid(),
@@ -256,22 +256,29 @@ class SyncMgr{
       pending: 'true' // indexedDB index does not support boolean keys
     }
 
+    // save locally
     try{
-      await repo.insertOne('updates', payload) // save locally
+      await repo.insertOne('updates', payload)
+    }
+    catch(ex){
+      console.error(ex)
+      dispatch('notif', {text: 'LOCAL_SAVE_ERROR', err: true})
+      // TODO: exception should be logged on server
+    }
 
-      delete payload.pending // not needed on server
+    // send update to server
+    try{
+      delete payload.pending // prop not needed on server
       await send('/api/update', 'POST', payload, this.user.key)
 
-      // update local copy once its accepted by server
+      // update local copy once its accepted by server.
+      // If that fails, it is resent to server, which will ignore it based on id.
       await repo.updateOne('updates', payload.id, {pending: 'false'})
     }
-    catch(ex){ // on failure, save to db
-      // try{
-      // }
-      // catch(innerex){ // ...all hell broke loose
-      //   console.error(innerex)
-      //   throw new Error('UPDATE_SERVER_AND_LOCAL_FAILED')
-      // }
+    catch(ex){
+      console.error(ex)
+      dispatch('notif', {text: 'UPDATE_SEND_ERROR', err: true})
+      // TODO: log on server
     }
   }
 

@@ -35,6 +35,7 @@ async function open(){
           const store = transaction.objectStore('updates')
           store.createIndex('pending', 'pending', {unique: false, multiEntry: false})
           store.createIndex('entryId', 'changes.id', {unique: false, multiEntry: false})
+          store.createIndex('lastUpdate', 'ts', {unique: false, multiEntry: false})
         }
         catch(ex){
           console.error('Update v2 error')
@@ -88,12 +89,13 @@ async function findOne(table, query){
 }
 
 // creates new document in table
-async function insertOne(table, obj){
+async function insertOne(table, obj, setTimestamps = true){
   try{
     const ts = (new Date()).toISOString()
-    if (!obj.lastUpdateDate)
+
+    if (setTimestamps && !obj.lastUpdateDate)
       obj.lastUpdateDate = ts
-    if (!obj.creationDate)
+    if (setTimestamps && !obj.creationDate)
       obj.creationDate = ts
 
     await db.add(table, obj)

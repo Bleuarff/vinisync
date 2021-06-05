@@ -258,7 +258,7 @@ class SyncMgr{
 
     // save locally
     try{
-      await repo.insertOne('updates', payload)
+      await repo.insertOne('updates', payload, false)
     }
     catch(ex){
       console.error(ex)

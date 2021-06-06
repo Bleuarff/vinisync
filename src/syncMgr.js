@@ -212,7 +212,6 @@ class SyncMgr{
       if (remoteEntry.wine.producer) diff.wine.producer = remoteEntry.wine.producer
       if (remoteEntry.wine.year) diff.wine.year = remoteEntry.wine.year
     }
-    Utils.updateHistory(diff, remoteEntry.id, remoteEntry.lastUpdateDate)
   }
 
   async _mergePicture(update){
@@ -341,8 +340,6 @@ class SyncMgr{
     // - send these updates again & resync request id. Should be saved pending on failure.
     //    (+ smth to distinguish them from normal updates if they appear in pending list)
     // - update the lastResyncDate value from local storage: set with request.to
-
-    // server: save update & resync id IF update id not already present (all devices will try to send it) - idempotence
   }
 }
 

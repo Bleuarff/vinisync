@@ -111,11 +111,12 @@ async function save(){
         // timestamp validation: make sure the reference data before modification
         //  is the last version (not updated in background during edition process).
         const dbRef = await repo.findById('entries', params.id)
+
         if (dbRef && (refEntry.lastUpdateDate < dbRef.lastUpdateDate))
-          throw new Error('DB OBJECT EDITED SINCE YOU OPENED IT') // TODO:save for resolution?
+          throw new Error('DB OBJECT EDITED SINCE YOU OPENED IT')
+
         entry = await repo.updateDoc('entries', entry)
         msg = 'Mise à jour OK'
-        Utils.updateHistory(diff, entry.id, entry.lastUpdateDate)
       }
     }
     else{ // create new entry
@@ -123,12 +124,6 @@ async function save(){
       entry = await repo.insertOne('entries', entry)
       msg = 'Bouteille ajoutée'
       router(`/entry/${entry.id}`) // soft redirect: address bar updated but that's all
-
-      const diff = {count: entry.count, wine: {}, creationDate: entry.creationDate}
-      if (entry.wine.name) diff.wine.name = entry.wine.name
-      if (entry.wine.producer) diff.wine.producer = entry.wine.producer
-      if (entry.wine.year) diff.wine.year = entry.wine.year
-      Utils.updateHistory(diff, entry.id, entry.lastUpdateDate)
     }
 
     const imgOk = await imageEditor.save(entry.id)

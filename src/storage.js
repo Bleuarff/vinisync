@@ -20,7 +20,6 @@ async function open(){
 
           db.createObjectStore('updates', {keyPath: 'id', autoIncrement: false})
           db.createObjectStore('images', {keyPath: 'id', autoIncrement: false})
-          db.createObjectStore('history', {keyPath: 'entryId', autoIncrement: false})
           db.createObjectStore('conflicts', {keyPath: 'id', autoIncrement: false})
         }
         catch(ex){

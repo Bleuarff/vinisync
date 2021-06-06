@@ -71,12 +71,6 @@ async function importEntries(entries){
     entry.id = entry.id || uuid()
     proms.push(repo.insertOne('entries', entry))
     syncMgr.syncIt(entry, null, 'entry')
-
-    const diff = {count: entry.count, wine: {}, creationDate: entry.creationDate}
-    if (entry.wine.name) diff.wine.name = entry.wine.name
-    if (entry.wine.producer) diff.wine.producer = entry.wine.producer
-    if (entry.wine.year) diff.wine.year = entry.wine.year
-    Utils.updateHistory(diff, entry.id, entry.lastUpdateDate)
   })
   await Promise.all(proms)
 }

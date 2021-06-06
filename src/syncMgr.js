@@ -120,6 +120,12 @@ class SyncMgr{
       // clock drift, etc are ignored. distributed computing is easy!
       await updates.reduce(async (prom, update) => {
         await prom
+
+        // check if not already received - if so, ignore the update
+        const exists =!!(await repo.findById('updates', update._id))
+        if (exists)
+          return Promise.resolve()
+
         switch(update.type){
           case 'entry':
             await this._mergeEntry(update)
@@ -133,6 +139,11 @@ class SyncMgr{
           default:
             console.error(`"${update.type}" type of update is not supported`)
         }
+
+        // save update document
+        update.id = update._id
+        delete update._id
+        await repo.insertOne('updates', update)
       }, Promise.resolve())
 
       // save last sync date after confirmation everything is saved
@@ -258,7 +269,7 @@ class SyncMgr{
 
     // save locally
     try{
-      await repo.insertOne('updates', payload, false)
+      await repo.insertOne('updates', payload)
     }
     catch(ex){
       console.error(ex)

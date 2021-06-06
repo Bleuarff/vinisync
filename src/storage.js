@@ -89,13 +89,14 @@ async function findOne(table, query){
 }
 
 // creates new document in table
-async function insertOne(table, obj, setTimestamps = true){
+async function insertOne(table, obj){
   try{
-    const ts = (new Date()).toISOString()
+    const editTimestamps = !['updates'].includes(table),
+          ts = (new Date()).toISOString()
 
-    if (setTimestamps && !obj.lastUpdateDate)
+    if (editTimestamps && !obj.lastUpdateDate)
       obj.lastUpdateDate = ts
-    if (setTimestamps && !obj.creationDate)
+    if (editTimestamps && !obj.creationDate)
       obj.creationDate = ts
 
     await db.add(table, obj)

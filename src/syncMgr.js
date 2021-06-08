@@ -283,7 +283,7 @@ class SyncMgr{
 
       // update local copy once its accepted by server.
       // If that fails, it is resent to server, which will ignore it based on id.
-      await repo.updateOne('updates', payload.id, {pending: 'false'})
+      await repo.updateOne('updates', payload.id, {pending: undefined})
     }
     catch(ex){
       console.error(ex)

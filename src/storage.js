@@ -36,7 +36,6 @@ async function open(){
           const store = transaction.objectStore('updates')
           store.createIndex('pending', 'pending', {unique: false, multiEntry: false})
           store.createIndex('entryId', 'changes.id', {unique: false, multiEntry: false})
-          store.createIndex('lastUpdate', 'ts', {unique: false, multiEntry: false})
         }
         catch(ex){
           console.error('Update v2 error')

@@ -5,6 +5,8 @@ const DB_VERSION = 2,
 
 let db
 
+window.vni = { ...window.vni, ...{ db: DB_VERSION } }
+
 async function open(){
   if (db) return
 

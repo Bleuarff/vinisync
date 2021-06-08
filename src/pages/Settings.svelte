@@ -87,7 +87,7 @@
   <button on:click={clearAll}>Supprimer les données locales</button>
 </div>
 
-<div id="version">build __BUILD__@__BUILDDATE__ / sw {swVersion}</div>
+<div id="version">build __BUILD__@__BUILDDATE__ / sw {swVersion} / db {window.vni?.db}</div>
 
 <style type="text/less">
   #profile{

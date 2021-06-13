@@ -339,13 +339,60 @@ class SyncMgr{
 
   // given a list of resync requests, re-sends all impacted updates.
   async processResyncs(list){
-    console.debug('TODO: resends')
+    // console.debug('TODO: resends')
     // for each request:
     // - take all updates (how?) made between request's from & to properties.
     // storage.getAllFromIndex('updates', '')
     // - send these updates again & resync request id. Should be saved pending on failure.
     //    (+ smth to distinguish them from normal updates if they appear in pending list)
     // - update the lastResyncDate value from local storage: set with request.to
+
+    await list.reduce(async (prom, request, idx) => {
+      await prom
+      try{
+        console.debug(`Resync ${request._id}: from ${request.from} to ${request.to}`)
+
+        if (!DateTime.fromISO(request.from).isValid || !DateTime.fromISO(request.to).isValid){
+          console.error(`Invalid to/from dates for resync '${request._id}'`)
+          return Promise.resolve()
+        }
+
+        const docs = await repo.getAllFromIndex('updates', 'uploadedDate', IDBKeyRange.bound(request.from, request.to))
+        console.debug(`${docs.length} impacted updates`)
+        const ok = await this.sendResyncUpdates(docs)
+
+        if (ok){
+          // mark as resolved for this device
+          await send(`/api/resync/${request._id}/confirm`, 'POST', {userid: this.user.id, devid: this.devid}, this.user.key)
+        }
+
+        return Promise.resolve()
+      }
+      catch(ex){
+        return Promise.resolve()
+      }
+    }, Promise.resolve())
+  }
+
+  // loop to send updates one after another.
+  // Always resolves with status (bool)
+  async sendResyncUpdates(docs){
+    let ok = true
+    await docs.reduce(async (prom, doc) => {
+      await prom
+      try{
+        return send('/api/update', 'POST', doc, this.user.key)
+      }
+      catch(ex){
+        ok = false
+        // TODO: remote logging
+        console.error('Update resync error')
+        console.error(ex)
+        return Promise.resolve() // swallow error and process the other updates
+      }
+    }, Promise.resolve())
+
+    return ok
   }
 }
 

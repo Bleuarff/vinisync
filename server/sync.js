@@ -8,9 +8,8 @@ const PAGE_SIZE = 50
 class Sync{
   static async insertUpdate(req, res, next){
     try{
-      // TODO: validate params
-      const ts = req.params.ts ? DateTime.fromISO(req.params.ts) : DateTime.utc(),
-            uploadedDate = DateTime.utc()
+      const ts = DateTime.fromISO(req.params.ts).isValid ? DateTime.fromISO(req.params.ts) : DateTime.utc(),
+            uploadedDate = DateTime.fromISO(req.params.uploadedDate) ? DateTime.fromISO(req.params.uploadedDate) : DateTime.utc()
 
       await db.collection('updates').insertOne({
         _id: req.params.id,

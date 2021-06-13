@@ -58,7 +58,12 @@ class Security{
       const computedSignature = hmac.digest('base64')
       // logger.debug(`sign: ${computedSignature}`)
 
-      req.user = user // save user in req, to avoid controllers retrieving it again
+      req.user = {...user} // save user in req, to avoid controllers retrieving it again
+      req.user.id = req.user._id
+      delete req.user._id
+      // no need to keep & move around auth details
+      delete req.user.pwd
+      delete req.user.key
 
       if (computedSignature === signature)
         return next()

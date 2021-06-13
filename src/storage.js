@@ -36,6 +36,7 @@ async function open(){
           const store = transaction.objectStore('updates')
           store.createIndex('pending', 'pending', {unique: false, multiEntry: false})
           store.createIndex('entryId', 'changes.id', {unique: false, multiEntry: false})
+          store.createIndex('uploadedDate', 'uploadedDate', {unique: false, multiEntry: false})
         }
         catch(ex){
           console.error('Update v2 error')
@@ -195,7 +196,7 @@ function deleteOne(table, id){
 
 // clears content in all tables
 async function clearAll(){
-  const tables = ['entries', 'images', 'history', 'conflicts', 'updates']
+  const tables = ['entries', 'images', 'conflicts', 'updates']
   return tables.reduce(async (prom, table) => {
     await prom
     return db.clear(table)

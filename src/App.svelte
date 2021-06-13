@@ -103,7 +103,7 @@
 				.catch(err => {}) // just swallow it
 			}
 
-		}, 1e3)
+		}, 4e3)
 	})
 
 	function onMessage(e){

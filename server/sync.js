@@ -9,7 +9,9 @@ class Sync{
   static async insertUpdate(req, res, next){
     try{
       // TODO: validate params
-      const ts = req.params.ts ? DateTime.fromISO(req.params.ts) : DateTime.utc()
+      const ts = req.params.ts ? DateTime.fromISO(req.params.ts) : DateTime.utc(),
+            uploadedDate = DateTime.utc()
+
       await db.collection('updates').insertOne({
         _id: req.params.id,
         userid: req.params.userid,
@@ -17,9 +19,9 @@ class Sync{
         type: req.params.type,
         devid: req.params.devid,
         ts: ts.toBSON(), // timestamp for when update was performed
-        uploadedDate: DateTime.utc().toBSON()// timestamp of when update is received
+        uploadedDate: uploadedDate.toBSON()// timestamp of when update is received
       })
-      res.send(204)
+      res.send(200, { uploadedDate })
       return next()
     }
     catch(ex){

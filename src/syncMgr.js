@@ -279,11 +279,16 @@ class SyncMgr{
     // send update to server
     try{
       delete payload.pending // prop not needed on server
-      await send('/api/update', 'POST', payload, this.user.key)
+      const res = await send('/api/update', 'POST', payload, this.user.key),
+            uploadDate = res?.uploadedDate
 
       // update local copy once its accepted by server.
+      const data = {pending: undefined}
+      if (uploadDate && DateTime.fromISO(uploadDate).isValid)
+        data.uploadedDate = uploadDate
+
       // If that fails, it is resent to server, which will ignore it based on id.
-      await repo.updateOne('updates', payload.id, {pending: undefined})
+      await repo.updateOne('updates', payload.id, data)
     }
     catch(ex){
       console.error(ex)
@@ -303,7 +308,7 @@ class SyncMgr{
 
     try{
       const pendingCount = await repo.countFromIndex('updates', 'pending', 'true')
-      console.debug(`${pendingCount} pending updates`)
+      // console.debug(`${pendingCount} pending updates`)
       if (!pendingCount)
         return console.log('No pending updates')
 
@@ -337,6 +342,7 @@ class SyncMgr{
     console.debug('TODO: resends')
     // for each request:
     // - take all updates (how?) made between request's from & to properties.
+    // storage.getAllFromIndex('updates', '')
     // - send these updates again & resync request id. Should be saved pending on failure.
     //    (+ smth to distinguish them from normal updates if they appear in pending list)
     // - update the lastResyncDate value from local storage: set with request.to

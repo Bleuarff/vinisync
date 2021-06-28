@@ -321,8 +321,15 @@ class SyncMgr{
       await updates.reduce(async (prom, update) => {
         await prom
         try{
-          await send('/api/update', 'POST', update, this.user.key)
-          await repo.updateOne('updates', update.id, {pending: 'false'})
+          const res = await send('/api/update', 'POST', update, this.user.key),
+                uploadDate = res?.uploadedDate
+
+          // update local copy once its accepted by server.
+          const data = {pending: undefined}
+          if (uploadDate && DateTime.fromISO(uploadDate).isValid)
+            data.uploadedDate = uploadDate
+
+          await repo.updateOne('updates', update.id, data)
           return Promise.resolve()
         }
         catch(ex){
@@ -339,34 +346,30 @@ class SyncMgr{
 
   // given a list of resync requests, re-sends all impacted updates.
   async processResyncs(list){
-    // console.debug('TODO: resends')
-    // for each request:
-    // - take all updates (how?) made between request's from & to properties.
-    // storage.getAllFromIndex('updates', '')
-    // - send these updates again & resync request id. Should be saved pending on failure.
-    //    (+ smth to distinguish them from normal updates if they appear in pending list)
-    // - update the lastResyncDate value from local storage: set with request.to
 
+    // process resync sequentially
     await list.reduce(async (prom, request, idx) => {
       await prom
       try{
         console.debug(`Resync ${request._id}: from ${request.from} to ${request.to}`)
 
+        // check from/to timestamps are valid
         if (!DateTime.fromISO(request.from).isValid || !DateTime.fromISO(request.to).isValid){
           console.error(`Invalid to/from dates for resync '${request._id}'`)
           return Promise.resolve()
         }
 
+        // get all updates within range
         const docs = await repo.getAllFromIndex('updates', 'uploadedDate', IDBKeyRange.bound(request.from, request.to))
         console.debug(`${docs.length} impacted updates`)
-        const ok = await this.sendResyncUpdates(docs)
+        const ok = await this.sendResyncUpdates(docs) // send updates
 
         if (ok){
           // mark as resolved for this device
           await send(`/api/resync/${request._id}/confirm`, 'POST', {userid: this.user.id, devid: this.devid}, this.user.key)
         }
 
-        return Promise.resolve()
+        return Promise.resolve() // go for the next resync
       }
       catch(ex){
         return Promise.resolve()

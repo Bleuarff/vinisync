@@ -31,59 +31,60 @@
 
   export async function load(){
     if (params.id){
-      const doc = await repo.findById('history', params.id)
-      if (doc){
-        updates = analyze(doc.edits)
+      const docs = await repo.getAllFromIndex('updates', 'entryId',  params.id)
+      if (docs){
+        updates = analyze(docs)
         entry = await repo.findById('entries', params.id)
         document.title += ` ${entry.wine.name || entry.wine.producer}${entry.wine.year ?  ' ' + entry.wine.year : ''}`
       }
     }
     else{
-      const docs = await repo.getAll('history')
       const entries = await repo.getAll('entries')
-      docs.forEach(doc => {
-        const refEntry = entries.find(x => x.id === doc.entryId)
-        updates = updates.concat(analyze(doc.edits, refEntry)) // populate global list of updates
-      })
+      await entries.reduce(async (prom, entry) => {
+        await prom
+        const docs = await repo.getAllFromIndex('updates', 'entryId', entry.id)
+        if (docs?.length)
+          updates = updates.concat(analyze(docs, entry)) // populate global list of updates
+      }, Promise.resolve())
       updates = updates.sort(sortByDate)
     }
     createChart()
   }
 
   // adds metadata from a list of changes for a single entry.
-  function analyze(changeList, refEntry){
-    changeList = changeList.sort(sortByDate)
+  function analyze(updates, refEntry){
+    updates = updates.sort(sortByDate)
 
-    for (let i = 0; i < changeList.length; i++){
-      const change = changeList[i].change
-      if (change.count != null){ // can be 0
+    for (let i = 0; i < updates.length; i++){
+      const changes = updates[i].changes
+      if (changes.count != null){ // can be 0
         // find previous element with count
-        const prev = changeList.slice(i+1).find(x => x.change.count != null)
+        const prev = updates.slice(i+1).find(x => x.changes.count != null)
         if (prev){
-          change.countDiff = change.count - prev.change.count
-          // console.log(change)
+          changes.countDiff = changes.count - prev.changes.count
+          // console.log(changes)
         }
       }
 
       // populate with entry data (in global view)
       if (refEntry){
-        change.wine = change.wine || {}
-        change.wine.name = change.wine.name || refEntry.wine.name
-        change.wine.producer = change.wine.producer || refEntry.wine.producer
-        change.wine.year = change.wine.year || refEntry.wine.year
-        changeList[i]._entryId = refEntry.id
+        changes.wine = changes.wine || {}
+        changes.wine.name = changes.wine.name || refEntry.wine.name
+        changes.wine.producer = changes.wine.producer || refEntry.wine.producer
+        changes.wine.year = changes.wine.year || refEntry.wine.year
+        updates[i]._entryId = refEntry.id
       }
     }
-    return changeList
+    return updates
   }
 
   function createChart(){
     const ctx = document.getElementById('chart')
     let datapoints
     if (params.id){
-      datapoints = updates.filter(x => x.change.count != null).reverse().map(x => {return {
+      datapoints = updates.filter(x => x.changes.count != null).reverse().map(x => {return {
         t: x.ts,
-        y: x.change.count
+        y: x.changes.count
       }})
     }
     else {
@@ -161,20 +162,20 @@
 
   // returns data for global history with bottle counts.
   function getGlobalCounts(){
-    const changes = updates.filter(x => x.change.count != null).reverse(),
+    const changes = updates.filter(x => x.changes.count != null).reverse(),
           map = new Map(), // store count by entryId
           datapoints = []
 
-    changes.forEach(change => {
+    changes.forEach(upd => {
       // udpate map with count for entry, whether new or update,
       // then iterates over map to get total count at this point.
-      map.set(change._entryId, change.change.count)
+      map.set(upd._entryId, upd.changes.count)
       let count = 0
       for (const c of map.values())
         count += c
 
       datapoints.push({
-        t: change.ts,
+        t: upd.ts,
         y: count
       })
     })
@@ -220,29 +221,29 @@
             <td class="ts">{DateTime.fromISO(update.ts).toFormat('dd/LL/yyyy HH:mm')}</td>
             <td class="change">
               <div class="diff-ctnr">
-                {#if update.change.creationDate}<span>NEW</span>{/if}
-                {#if update.change.countDiff}
-                  <span class="count-diff">{update.change.countDiff > 0 ? '+' :''}{update.change.countDiff}</span>
-                  <span class="count">[{update.change.count}]</span>
-                {:else if update.change.count}
-                  <span class="count">[{update.change.count}]</span>
+                {#if update.changes.creationDate}<span>NEW</span>{/if}
+                {#if update.changes.countDiff}
+                  <span class="count-diff">{update.changes.countDiff > 0 ? '+' :''}{update.changes.countDiff}</span>
+                  <span class="count">[{update.changes.count}]</span>
+                {:else if update.changes.count}
+                  <span class="count">[{update.changes.count}]</span>
                 {/if}
-                {#if update.change.wine}
-                  {#if update.change.wine.name}
-                    <span class="name">{update.change.wine.name}</span>
+                {#if update.changes.wine}
+                  {#if update.changes.wine.name}
+                    <span class="name">{update.changes.wine.name}</span>
                   {/if}
 
-                  {#if (update.change.wine.producer && update.change.wine.name)}<span> - </span>{/if}
+                  {#if (update.changes.wine.producer && update.changes.wine.name)}<span> - </span>{/if}
 
-                  {#if update.change.wine.producer}
-                    <span class="producer">{update.change.wine.producer}</span>
+                  {#if update.changes.wine.producer}
+                    <span class="producer">{update.changes.wine.producer}</span>
                   {/if}
-                  {#if update.change.wine.year}
-                    <span class="year">({update.change.wine.year})</span>
+                  {#if update.changes.wine.year}
+                    <span class="year">({update.changes.wine.year})</span>
                   {/if}
                 {/if}
               </div>
-              <!-- {formatChange(update.change)} -->
+              <!-- {formatChange(update.changes)} -->
             </td>
           </tr>
         {/each}

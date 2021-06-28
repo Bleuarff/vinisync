@@ -104,30 +104,6 @@ export default class Utils{
     return cp
   }
 
-  // get history doc for entry id, update it with change & save it
-  static async updateHistory(change, entryId, ts){
-    if (!entryId)
-      throw new Error('updateHistory needs entryId')
-
-    let history = await repo.findById('history', entryId)
-    if (!history)
-      history = {entryId: entryId, edits: []}
-    else if (!history.edits)
-      history.edits = []
-
-    history.edits.unshift({
-      ts: ts || (new Date()).toISOString(),
-      change: change || 'UNKNOWN'
-    })
-
-    try{
-      await repo.updateDoc('history', history)
-    }
-    catch(ex){
-      console.error(ex)
-    }
-  }
-
   // thanks to https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest#Examples
   static async computeHash(input, algo = 'SHA-256'){
     const msgUint8 = new TextEncoder().encode(input),

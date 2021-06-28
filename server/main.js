@@ -77,7 +77,8 @@ void async function(){
   server.post('/api/pwdreset', User.createPwdReset)
   server.get('/api/pwdreset/:id', User.getPwdReset)
 
-  server.get('/api/resync', Security.verify, Resync.get)
+  server.get('/api/init', Security.verify, Resync.get)
+  server.post('/api/resync/:id/confirm', Security.verify, Resync.confirm)
 
   // deprecated
   server.get('/api/clientVersion', (req, res, next) => {

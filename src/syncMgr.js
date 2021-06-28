@@ -67,8 +67,7 @@ class SyncMgr{
         diff = obj // no reference object means new document, send all
       }
 
-      await this._sendDiff(type, diff)
-
+      await this._saveDiff(type, diff)
     }
     catch(ex){
       if (ex.message === 'SYNC_NOT_CONFIGURED')
@@ -121,6 +120,12 @@ class SyncMgr{
       // clock drift, etc are ignored. distributed computing is easy!
       await updates.reduce(async (prom, update) => {
         await prom
+
+        // check if not already received - if so, ignore the update
+        const exists =!!(await repo.findById('updates', update._id))
+        if (exists)
+          return Promise.resolve()
+
         switch(update.type){
           case 'entry':
             await this._mergeEntry(update)
@@ -134,6 +139,11 @@ class SyncMgr{
           default:
             console.error(`"${update.type}" type of update is not supported`)
         }
+
+        // save update document
+        update.id = update._id
+        delete update._id
+        await repo.insertOne('updates', update)
       }, Promise.resolve())
 
       // save last sync date after confirmation everything is saved
@@ -202,7 +212,6 @@ class SyncMgr{
       if (remoteEntry.wine.producer) diff.wine.producer = remoteEntry.wine.producer
       if (remoteEntry.wine.year) diff.wine.year = remoteEntry.wine.year
     }
-    Utils.updateHistory(diff, remoteEntry.id, remoteEntry.lastUpdateDate)
   }
 
   async _mergePicture(update){
@@ -245,27 +254,46 @@ class SyncMgr{
   }
 
   // returns nothing (empty promise) if server db update goes well
-  async _sendDiff(type, diff){
+  // Saves an update, both locally & send to server
+  async _saveDiff(type, diff){
     const payload = {
       id: uuid(),
       changes: diff,
       ts: diff.lastUpdateDate,
       userid: this.user.id,
       type: type,
-      devid: this.devid
+      devid: this.devid,
+      pending: 'true' // indexedDB index does not support boolean keys
     }
 
-    try{ // send update to server
-      await send('/api/update', 'POST', payload, this.user.key)
+    // save locally
+    try{
+      await repo.insertOne('updates', payload)
     }
-    catch(ex){ // on failure, save to db
-      try{
-        await repo.insertOne('updates', payload)
-      }
-      catch(innerex){ // ...all hell broke loose
-        console.error(innerex)
-        throw new Error('UPDATE_SERVER_AND_LOCAL_FAILED')
-      }
+    catch(ex){
+      console.error(ex)
+      dispatch('notif', {text: 'LOCAL_SAVE_ERROR', err: true})
+      // TODO: exception should be logged on server
+    }
+
+    // send update to server
+    try{
+      delete payload.pending // prop not needed on server
+      const res = await send('/api/update', 'POST', payload, this.user.key),
+            uploadDate = res?.uploadedDate
+
+      // update local copy once its accepted by server.
+      const data = {pending: undefined}
+      if (uploadDate && DateTime.fromISO(uploadDate).isValid)
+        data.uploadedDate = uploadDate
+
+      // If that fails, it is resent to server, which will ignore it based on id.
+      await repo.updateOne('updates', payload.id, data)
+    }
+    catch(ex){
+      console.error(ex)
+      dispatch('notif', {text: 'UPDATE_SEND_ERROR', err: true})
+      // TODO: log on server
     }
   }
 
@@ -279,15 +307,29 @@ class SyncMgr{
   async _sendPending(){
 
     try{
-      const updates = await repo.getAll('updates')
-      if (updates.length === 0) return // nothing to send
+      const pendingCount = await repo.countFromIndex('updates', 'pending', 'true')
+      // console.debug(`${pendingCount} pending updates`)
+      if (!pendingCount)
+        return console.log('No pending updates')
+
+      const updates = await repo.getAllFromIndex('updates', 'pending', 'true')
+
+      if (updates.length === 0)
+        return console.log('no pending updates') // nothing to send
 
       // process each upate, synchronously
       await updates.reduce(async (prom, update) => {
         await prom
         try{
-          await send('/api/update', 'POST', update, this.user.key)
-          await repo.deleteOne('updates', update.id)
+          const res = await send('/api/update', 'POST', update, this.user.key),
+                uploadDate = res?.uploadedDate
+
+          // update local copy once its accepted by server.
+          const data = {pending: undefined}
+          if (uploadDate && DateTime.fromISO(uploadDate).isValid)
+            data.uploadedDate = uploadDate
+
+          await repo.updateOne('updates', update.id, data)
           return Promise.resolve()
         }
         catch(ex){
@@ -304,14 +346,56 @@ class SyncMgr{
 
   // given a list of resync requests, re-sends all impacted updates.
   async processResyncs(list){
-    console.debug('TODO: resends')
-    // for each request:
-    // - take all updates (how?) made between request's from & to properties.
-    // - send these updates again & resync request id. Should be saved pending on failure.
-    //    (+ smth to distinguish them from normal updates if they appear in pending list)
-    // - update the lastResyncDate value from local storage: set with request.to
 
-    // server: save update & resync id IF update id not already present (all devices will try to send it) - idempotence
+    // process resync sequentially
+    await list.reduce(async (prom, request, idx) => {
+      await prom
+      try{
+        console.debug(`Resync ${request._id}: from ${request.from} to ${request.to}`)
+
+        // check from/to timestamps are valid
+        if (!DateTime.fromISO(request.from).isValid || !DateTime.fromISO(request.to).isValid){
+          console.error(`Invalid to/from dates for resync '${request._id}'`)
+          return Promise.resolve()
+        }
+
+        // get all updates within range
+        const docs = await repo.getAllFromIndex('updates', 'uploadedDate', IDBKeyRange.bound(request.from, request.to))
+        console.debug(`${docs.length} impacted updates`)
+        const ok = await this.sendResyncUpdates(docs) // send updates
+
+        if (ok){
+          // mark as resolved for this device
+          await send(`/api/resync/${request._id}/confirm`, 'POST', {userid: this.user.id, devid: this.devid}, this.user.key)
+        }
+
+        return Promise.resolve() // go for the next resync
+      }
+      catch(ex){
+        return Promise.resolve()
+      }
+    }, Promise.resolve())
+  }
+
+  // loop to send updates one after another.
+  // Always resolves with status (bool)
+  async sendResyncUpdates(docs){
+    let ok = true
+    await docs.reduce(async (prom, doc) => {
+      await prom
+      try{
+        return send('/api/update', 'POST', doc, this.user.key)
+      }
+      catch(ex){
+        ok = false
+        // TODO: remote logging
+        console.error('Update resync error')
+        console.error(ex)
+        return Promise.resolve() // swallow error and process the other updates
+      }
+    }, Promise.resolve())
+
+    return ok
   }
 }
 

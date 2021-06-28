@@ -89,9 +89,11 @@
 				navigator.serviceWorker.register('/sw.js')
 			}
 
-			const user = JSON.parse(localStorage.getItem('user'))
-			if (user && user.id && user.key){
-				send('/api/resync', 'GET', {userid: user.id}, user.key)
+			const user = JSON.parse(localStorage.getItem('user')),
+						deviceId = localStorage.getItem('devid')
+
+			if (user && user.id && user.key && deviceId){
+				send('/api/init', 'GET', { userid: user.id, devid: deviceId }, user.key)
 				.then(d => {
 					newRelease = vni.build !== d.build
 					if (d.resyncs && d.resyncs.length){
@@ -101,7 +103,7 @@
 				.catch(err => {}) // just swallow it
 			}
 
-		}, 1e3)
+		}, 4e3)
 	})
 
 	function onMessage(e){

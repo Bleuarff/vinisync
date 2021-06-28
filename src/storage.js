@@ -1,9 +1,11 @@
 import { openDB, deleteDB, wrap, unwrap } from 'idb'
 
-const DB_VERSION = 1,
+const DB_VERSION = 2,
       DB_NAME = 'vinisync'
 
 let db
+
+window.vni = { ...window.vni, ...{ db: DB_VERSION } }
 
 async function open(){
   if (db) return
@@ -18,15 +20,27 @@ async function open(){
           store.createIndex('creationDate', 'creationDate', {unique: false})
           store.createIndex('lastUpdateDate', 'lastUpdateDate', {unique: false})
 
-          // db.createObjectStore('config', {keyPath: 'id', autoIncrement: false})
           db.createObjectStore('updates', {keyPath: 'id', autoIncrement: false})
           db.createObjectStore('images', {keyPath: 'id', autoIncrement: false})
-          db.createObjectStore('history', {keyPath: 'entryId', autoIncrement: false})
           db.createObjectStore('conflicts', {keyPath: 'id', autoIncrement: false})
         }
         catch(ex){
           console.error('Update Error')
           console.error(ex)
+          throw ex
+        }
+      }
+
+      if (oldVersion < 2){
+        try{
+          const store = transaction.objectStore('updates')
+          store.createIndex('pending', 'pending', {unique: false, multiEntry: false})
+          store.createIndex('entryId', 'changes.id', {unique: false, multiEntry: false})
+          store.createIndex('uploadedDate', 'uploadedDate', {unique: false, multiEntry: false})
+        }
+        catch(ex){
+          console.error('Update v2 error')
+          throw ex
         }
       }
     }
@@ -78,10 +92,12 @@ async function findOne(table, query){
 // creates new document in table
 async function insertOne(table, obj){
   try{
-    const ts = (new Date()).toISOString()
-    if (!obj.lastUpdateDate)
+    const editTimestamps = !['updates'].includes(table),
+          ts = (new Date()).toISOString()
+
+    if (editTimestamps && !obj.lastUpdateDate)
       obj.lastUpdateDate = ts
-    if (!obj.creationDate)
+    if (editTimestamps && !obj.creationDate)
       obj.creationDate = ts
 
     await db.add(table, obj)
@@ -133,13 +149,54 @@ async function updateOne(table, id, modifs, keepTime = false){
   }
 }
 
+function getFromIndex(table, index, key){
+  try{
+    return db.getFromIndex(table, index, key)
+  }
+  catch(ex){
+    console.error(ex)
+    throw new Error(`getFromIndex error: table ${table} index ${index} key ${key}`)
+  }
+}
+
+function getAllFromIndex(table, index, key){
+  try{
+    return db.getAllFromIndex(table, index, key)
+  }
+  catch(ex){
+    console.error(ex)
+    throw new Error(`getAllFromIndex error: table ${table} index ${index} key ${key}`)
+  }
+}
+
+function countFromIndex(table, index, key){
+  try{
+    return db.countFromIndex(table, index, key)
+  }
+  catch(ex){
+    console.error(ex)
+    throw new Error(`countFromIndex error: table ${table} index ${index} key ${key}`)
+  }
+}
+
+function count(table){
+  try{
+    const store = db.transaction(table).store
+    return store.count()
+  }
+  catch(ex){
+    console.error(ex)
+    throw new Error(`count error on table ${table}`)
+  }
+}
+
 function deleteOne(table, id){
   return db.delete(table, id)
 }
 
 // clears content in all tables
 async function clearAll(){
-  const tables = ['entries', 'images', 'history', 'conflicts', 'updates']
+  const tables = ['entries', 'images', 'conflicts', 'updates']
   return tables.reduce(async (prom, table) => {
     await prom
     return db.clear(table)
@@ -148,25 +205,31 @@ async function clearAll(){
 
 
 export const repo = {
-  open: open,
+  open,
 
-  getAll: getAll,
+  getAll,
 
   // find by providing document id
-  findById: findById,
+  findById,
 
   // find by providing a query function.
-  findOne: findOne,
+  findOne,
+
+  getFromIndex,
+  getAllFromIndex,
+  countFromIndex,
 
   // updates doc by replacing it entirely
-  updateDoc: updateDoc,
+  updateDoc,
 
   // updates doc by providing only modified fields
-  updateOne: updateOne,
+  updateOne,
 
-  insertOne: insertOne,
+  insertOne,
 
-  deleteOne: deleteOne,
+  deleteOne,
 
-  clearAll: clearAll
+  count,
+
+  clearAll,
 }

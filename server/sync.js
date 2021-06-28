@@ -9,7 +9,7 @@ class Sync{
   static async insertUpdate(req, res, next){
     try{
       const ts = DateTime.fromISO(req.params.ts).isValid ? DateTime.fromISO(req.params.ts) : DateTime.utc(),
-            uploadedDate = DateTime.fromISO(req.params.uploadedDate) ? DateTime.fromISO(req.params.uploadedDate) : DateTime.utc()
+            uploadedDate = DateTime.fromISO(req.params.uploadedDate).isValid ? DateTime.fromISO(req.params.uploadedDate) : DateTime.utc()
 
       await db.collection('updates').insertOne({
         _id: req.params.id,

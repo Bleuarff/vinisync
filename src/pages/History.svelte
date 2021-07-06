@@ -48,7 +48,9 @@
       }, Promise.resolve())
       updates = updates.sort(sortByDate)
     }
-    createChart()
+
+    if (updates.length > 0)
+      createChart()
   }
 
   // adds metadata from a list of changes for a single entry.

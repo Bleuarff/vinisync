@@ -46,7 +46,7 @@ async function download(e){
   // assign url to new node & click it for immediate download
   const target = document.getElementById('download-link')
   target.href = dataUrl
-  const ts = DateTime.local().toFormat('yyyyMddHHmm') // to string
+  const ts = DateTime.local().toFormat('yyyyMMddHHmm') // to string
   filename = `vinisync_backup_${ts}.json `
   await tick()
   target.click()

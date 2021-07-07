@@ -202,7 +202,7 @@
 	}
 
 	main {
-		padding: 2.5em var(--main-horiz-margin) 1em var(--main-horiz-margin);
+		padding: 4em var(--main-horiz-margin) 1em var(--main-horiz-margin);
 		width: 100%;
 		max-width: var(--global-max-width);
 		margin: 0 auto;
@@ -214,8 +214,7 @@
 		position: fixed;
 		right: 0;
 		top: 0;
-		top: 85px;
-		width: 170px;
+		width: 300px;
 		padding: 4px;
 		opacity: .9;
 		text-align: center;
@@ -223,7 +222,7 @@
 		z-index: 100;
 		color: white;
 		font-weight: 1000;
-		transform: translateY(-50%) rotate(45deg) translateY(-5em);
+		transform: translate(50%, -50%) rotate(45deg) translateY(80px);
 		text-transform: uppercase;
 		text-shadow: red 0px 0px 3px;
 	}

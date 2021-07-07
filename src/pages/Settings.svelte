@@ -66,7 +66,7 @@
   }
 </script>
 
-<h1>Paramètres</h1>
+<h2>Paramètres</h2>
 
 <Download></Download>
 
@@ -106,6 +106,7 @@
   label{
     font-size: .9em;
   }
+
   h2{
     margin-bottom: .8em;
   }

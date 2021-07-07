@@ -54,8 +54,8 @@
     right: 0%;
     background: #ba0e0e;
     color: white;
-    font-size: 1.2em;
-    padding: 5px 10px;
+    font-size: 1.5em;
+    padding: 8px 10px;
     border-bottom: 1px solid white;
     z-index: 100;
   }
@@ -68,7 +68,7 @@
 	a {
 		text-decoration: none;
 		color: unset;
-    --link-space: 6px;
+    --link-space: 10px;
     padding-left: var(--link-space);
     padding-right: var(--link-space);
 	}
@@ -77,7 +77,8 @@
     display: inline-block;
     width: 29px;
     padding-left: 0;
-    background: url('/img/logo_23.png') no-repeat;
+    background: url('/img/logo.svg') no-repeat;
+    background-size: contain;
   }
 
   .force-sync{

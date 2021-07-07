@@ -288,7 +288,7 @@ class SyncMgr{
         data.uploadedDate = uploadDate
 
       // If that fails, it is resent to server, which will ignore it based on id.
-      await repo.updateOne('updates', payload.id, data)
+      await repo.updateOne('updates', payload.id, data, true)
     }
     catch(ex){
       console.error(ex)

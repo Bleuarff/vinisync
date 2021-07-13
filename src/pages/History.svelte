@@ -207,11 +207,11 @@
 
 <div id="history">
 
-  <div id="chart-ctnr">
-    <canvas id="chart" width="400" height="250"></canvas>
-  </div>
-
   {#if updates && updates.length > 0}
+    <div id="chart-ctnr">
+      <canvas id="chart" width="400" height="250"></canvas>
+    </div>
+
     <table>
       <thead>
         <th>Heure</th>
@@ -289,7 +289,7 @@
   }
 
   .empty{
-    margin: 3em 1em 1em 1em;
+    margin: 8em 1em 1em 1em;
     padding: 2em;
     text-align: center;
     border: 1px solid var(--main-color);

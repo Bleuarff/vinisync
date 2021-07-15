@@ -3,6 +3,7 @@
   // TODO: include custom values from db
 
   import {tick} from 'svelte'
+  import Undiacritics from '../undiacritics.js'
   import appellations from '../data/appellations.js'
   import cepages from '../data/cepages.js'
 
@@ -48,8 +49,8 @@
       filteredList = [] // disable list if no input
     }
     else{
-      const rx = new RegExp(value, 'i')
-      filteredList = origList.filter(x => x.match(rx))
+      const rx = new RegExp(Undiacritics.removeAll(value), 'i')
+      filteredList = origList.filter(x => Undiacritics.removeAll(x).match(rx))
     }
   }
 

@@ -180,10 +180,16 @@ async function decrement(){
 function sanitizeAppellation(e){
   if (entry.wine.country === 'France'){
     let val = e.detail.value
+                  .normalize('NFC')
                   .replace(/\bst(e)?\b/ig, 'saint$1')
                   .replace(/\bsaint(e)?\b[^-]\b/g, 'Saint$1-')
                   .replace(/' +/g, '\'')
-                  .replace(/\b([a-z])(?=[a-zA-Z]+)/g, (m, l) => l.toUpperCase() ) // Capitalize words
+
+                  // \b is not enough for word boundary, accented chars are not considered letters,
+                  // so use negative lookbehind.
+                  .replace(/(?<![a-z\u00C0-\u017F])\b([a-z])(?=[a-z\u00C0-\u017F]+)/g, (m, l) => l.toUpperCase() ) // Capitalize words
+                  // lowercase commmon prepositions when not in starting position.
+                  .replace(/(?<!^)\b(et|au|aux|du|de|des|le|la|les|en|lès)\b/gi, (m, l) => l.toLowerCase() )
 
     console.debug(`${e.detail.value} -> ${val}`)
     entry.wine.appellation = val

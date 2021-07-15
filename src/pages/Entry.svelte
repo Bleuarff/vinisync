@@ -43,7 +43,10 @@ let entry = {
 let edit = false,
     refEntry, // clone of the entry fresh out of db, to get diff of modifications
     imageEditor,
-    countChangeTimeoutId // shared timeout id for increment/decrement operations
+    countChangeTimeoutId, // shared timeout id for increment/decrement operations
+    backToHistory =  false
+
+$: backUrl = backToHistory ? 'javascript:history.back()' : `/wines${entry.count <= 0 ? '/oldref' : ''}`
 
 // $: serialized = JSON.stringify(entry)
 // $: if (entry.wine.appellation){
@@ -62,7 +65,6 @@ onMount(async () => {
 })
 
 export async function load(){
-  // console.debug('log entry')
   refEntry = null
   edit = !params.id
   if (params.id){
@@ -86,6 +88,8 @@ export async function load(){
       return router('/wines')
     }
   }
+
+  backToHistory = location.search.includes('fh=1')
 }
 
 // validation, save logic & sync
@@ -206,7 +210,7 @@ function quitEdit(e){
 </script>
 
 <div class="nav">
-  <a href="/wines{entry.count <= 0 ? '/oldref' : ''}" class="back">liste</a>
+  <a href="{backUrl}" class="back">{backToHistory ? 'historique général' : 'liste'}</a>
   {#if params.id}
     <a href="/history/{params.id}" class="forward">historique</a>
   {/if}

@@ -11,7 +11,7 @@
   let link = {href: '/wines', title: 'Retour'}
   $: {
     if (params.id)
-      link.href = '/entry/' + params.id
+      link.href = 'javascript:history.back()'
     if (entry && entry.wine){
       link.title = entry.wine.name || ''
       if (entry.wine.name && entry.wine.producer)
@@ -247,6 +247,13 @@
               </div>
               <!-- {formatChange(update.changes)} -->
             </td>
+
+            {#if !entry}
+              <td>
+                <a href="/entry/{update._entryId}?fh=1" title="Voir cette entrée">&#x25b6;</a>
+              </td>
+            {/if}
+
           </tr>
         {/each}
       </tbody>
@@ -258,7 +265,7 @@
   {/if}
 </div>
 
-<style>
+<style lang="less">
   #history{
     margin-top: 2em;
   }
@@ -279,13 +286,18 @@
     background: #eeeeee;
   }
   td{
-    padding: 3px 0;
+    padding: 4px 0;
   }
   td:first-child{
     padding-left: 6px;
   }
   td:last-child{
     padding-right: 6px;
+  }
+
+  td a{
+    color: #3e3e3e;
+    text-decoration: none;
   }
 
   .empty{

@@ -74,6 +74,7 @@
         changes.wine.name = changes.wine.name || refEntry.wine.name
         changes.wine.producer = changes.wine.producer || refEntry.wine.producer
         changes.wine.year = changes.wine.year || refEntry.wine.year
+        changes.wine.color = changes.wine.color || refEntry.wine.color
         updates[i]._entryId = refEntry.id
       }
     }
@@ -249,8 +250,8 @@
             </td>
 
             {#if !entry}
-              <td>
-                <a href="/entry/{update._entryId}?fh=1" title="Voir cette entrée">&#x25b6;</a>
+              <td class="entry-link">
+                <a href="/entry/{update._entryId}?fh=1" class="{update.changes?.wine?.color}" title="Voir cette entrée">&#x25b6;</a>
               </td>
             {/if}
 
@@ -298,6 +299,19 @@
   td a{
     color: #3e3e3e;
     text-decoration: none;
+  }
+
+  td.entry-link{
+    .red {
+      color: var(--wine-red);
+    }
+    .white {
+      color: var(--wine-white);
+      -webkit-text-stroke: 1px #636363;
+    }
+    .rose {
+      color: var(--wine-rose);
+    }
   }
 
   .empty{

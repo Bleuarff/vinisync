@@ -21,3 +21,5 @@ credentials
 .credentials.env
 
 import.json
+
+scripts/getObject.sh

@@ -1,7 +1,7 @@
 'use strict'
 
 const { DateTime } = require('luxon'),
-      db = require('./db.js').db,
+      db = require('./utils/db.js').db,
       { createHmac } = require('crypto'),
       logger = require('./logger.js')
 

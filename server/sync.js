@@ -1,5 +1,5 @@
 'use strict'
-const db = require('./db.js').db,
+const db = require('./utils/db.js').db,
       { DateTime } = require('luxon'),
       logger = require('./logger.js')
 

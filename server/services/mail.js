@@ -1,6 +1,6 @@
 'use strict'
 
-const db = require('../db.js').db,
+const db = require('../utils/db.js').db,
       logger = require('../logger.js'),
       sgMail = require('@sendgrid/mail')
 

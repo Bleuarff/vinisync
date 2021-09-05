@@ -1,0 +1,5 @@
+# Server runtime configuration data
+
+log:
+  - console
+  - https://dac.vinisync.fr

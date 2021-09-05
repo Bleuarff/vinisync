@@ -9,7 +9,9 @@ const { series, parallel, src, dest, watch } = require('gulp'),
       {DateTime} = require('luxon'),
       { execSync } = require('child_process'),
       {createHash} = require('crypto'),
-      fs = require('fs')
+      fs = require('fs'),
+      merge = require('merge2'),
+      rename = require('gulp-rename')
 
 const env = argv.e || argv.env || 'dev' // environment to build.
 const buildTime = DateTime.local().toFormat('yyyyMMddHHmm'),
@@ -51,6 +53,12 @@ const replacements = {
 
 function makeServer(){
   return replaceAll(src('server/**/*.js'))
+          .pipe(dest('dist/server/'))
+}
+
+function makeConfig(){
+  return src(`config/config.${env}.yml`)
+    .pipe(rename('config/config.yml'))
     .pipe(dest('dist/server/'))
 }
 
@@ -108,6 +116,10 @@ function watchers(){
     makeServer()
     cb()
   })
+  watch(['config/config.dev.yml'], cb => {
+    makeConfig()
+    cb()
+  })
   watch(['src/index.html'], cb => {
     makeIndex()
     cb()
@@ -152,7 +164,7 @@ function getBuildNumber(){
 	return build
 }
 
-const make = exports.make = parallel(makeServer, makeIndex, makeSW)
+const make = exports.make = parallel(makeServer, makeConfig, makeIndex, makeSW)
 exports.default = series(
   make,
   parallel(

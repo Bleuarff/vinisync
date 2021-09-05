@@ -1,5 +1,5 @@
 'use strict'
-const db = require('./db.js').db,
+const db = require('./utils/db.js').db,
       bcrypt = require('bcrypt'),
       uuid = require('uuid'),
       { DateTime } = require('luxon'),

@@ -1,7 +1,7 @@
 'use strict'
 
 const restify = require('restify'),
-      db = require('./db.js'),
+      db = require('./utils/db.js'),
       { DateTime } = require('luxon'),
       logger = require('./logger.js')
 

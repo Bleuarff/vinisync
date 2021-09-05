@@ -1,7 +1,7 @@
 'use strict'
 
 const db = require('../utils/db.js').db,
-      logger = require('../logger.js'),
+      logger = require('../utils/logger.js'),
       sgMail = require('@sendgrid/mail')
 
 const COLLECTION_NAME = 'email_templates'

@@ -3,7 +3,7 @@
 const restify = require('restify'),
       db = require('./utils/db.js'),
       { DateTime } = require('luxon'),
-      logger = require('./logger.js')
+      logger = require('./utils/logger.js')
 
 const dbConnectionString = '__DBCONNEXIONSTRING__'
 
@@ -89,7 +89,7 @@ void async function(){
   /************************ end routes ***************************/
 
   server.listen(5002, function () {
-    logger.log('%s listening at %s', server.name, server.url);
+    logger.log(`${server.name} listening at ${server.url}`);
   });
 
   // properly close on relevant signals

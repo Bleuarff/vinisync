@@ -3,7 +3,7 @@
 const { DateTime } = require('luxon'),
       db = require('./utils/db.js').db,
       { createHmac } = require('crypto'),
-      logger = require('./logger.js')
+      logger = require('./utils/logger.js')
 
 const MAX_DATE_OFFSET = 15 * 60 // Max offset between request date and server time, in seconds
 

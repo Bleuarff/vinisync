@@ -2,7 +2,7 @@
 
 const db = require('./utils/db.js').db,
 			{ DateTime } = require('luxon'),
-			logger = require('./logger.js')
+			logger = require('./utils/logger.js')
 
 /*
 Resync request sample document:

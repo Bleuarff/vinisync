@@ -224,7 +224,11 @@
             <td class="ts">{DateTime.fromISO(update.ts).toFormat('dd/LL/yyyy HH:mm')}</td>
             <td class="change">
               <div class="diff-ctnr">
-                {#if update.changes.creationDate}<span>NEW</span>{/if}
+                {#if update.changes.creationDate}
+                  <!-- <span class="new-icon">&#10041;</span> -->
+                  <img src="/img/addentry.svg" class="new-icon">
+                {/if}
+
                 {#if update.changes.countDiff}
                   <span class="count-diff">{update.changes.countDiff > 0 ? '+' :''}{update.changes.countDiff}</span>
                   <span class="count">[{update.changes.count}]</span>
@@ -333,5 +337,14 @@
     width: 100%;
     /* height: 220px; */
     margin-bottom: 3em;
+  }
+
+  .new-icon{
+    // font-size: 1em;
+    // color: darkblue;
+    filter: invert(1);
+    height: 14px;
+    margin-right: 4px;
+    transform: scale(1.3);
   }
 </style>

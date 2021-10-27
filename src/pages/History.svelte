@@ -200,6 +200,11 @@
     else if (a.ts > b.ts) return -1
     return 0
   }
+
+  function getEvolutionFactor(changes){
+    const ratio = changes.countDiff || changes.count || -6
+    return Math.max(Math.min(ratio, 6), -6)
+  }
 </script>
 
 {#if link}
@@ -216,18 +221,18 @@
     <table>
       <thead>
         <th>Heure</th>
-        <th>Modification</th>
+        <th class="evolution"></th>
+        <th class="change">Modification</th>
       </thead>
       <tbody>
         {#each updates as update}
           <tr>
             <td class="ts">{DateTime.fromISO(update.ts).toFormat('dd/LL/yyyy HH:mm')}</td>
+            <td class="evolution">
+              <span class="arrow" style="--qt:{getEvolutionFactor(update.changes)};">→</span>
+            </td>
             <td class="change">
               <div class="diff-ctnr">
-                {#if update.changes.creationDate}
-                  <!-- <span class="new-icon">&#10041;</span> -->
-                  <img src="/img/addentry.svg" class="new-icon">
-                {/if}
 
                 {#if update.changes.countDiff}
                   <span class="count-diff">{update.changes.countDiff > 0 ? '+' :''}{update.changes.countDiff}</span>
@@ -284,7 +289,6 @@
     vertical-align: top;
   }
   .change{
-    padding-left: 1em;
     width: 100%;
   }
   tr:nth-child(2n+1){
@@ -298,6 +302,17 @@
   }
   td:last-child{
     padding-right: 6px;
+  }
+
+  .evolution{
+    min-width: 3em;
+    text-align: center;
+    vertical-align: top;
+
+    .arrow{
+      display: inline-block;
+      transform: rotate(calc(-15deg * var(--qt, 0)));
+    }
   }
 
   td a{

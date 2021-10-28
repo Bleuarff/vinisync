@@ -136,20 +136,15 @@
               time: {
                 displayFormats:
                 {
-                  millisecond: 'DD/MM/YYYY',
-                  second: 'DD/MM/YYYY',
-                  minute: 'DD/MM/YYYY',
-                  hour: 'DD/MM/YYYY',
-                  day: 'DD/MM/YYYY',
-                  week: 'DD/MM/YYYY',
-                  month: 'DD/MM/YYYY',
-                  quarter: 'DD/MM/YYYY',
-                  year: 'DD/MM/YYYY',
+                  day: 'DD/MM/YY',
+                  month: 'MM/YY',
+                  quarter: 'MM/YY',
+                  year: 'YYYY'
                 },
                 tooltipFormat: 'DD/MM/YYYY',
               },
               ticks: {
-                source: 'data'
+                source: entry ? 'data' : 'auto'
               },
             }],
             yAxes: [{

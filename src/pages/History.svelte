@@ -311,7 +311,7 @@
 
     .arrow{
       display: inline-block;
-      transform: rotate(calc(-15deg * var(--qt, 0)));
+      transform: rotate(calc(-15deg * var(--qt, 0))) scale(1.2);
     }
   }
 

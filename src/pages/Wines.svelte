@@ -229,7 +229,7 @@ onDestroy(() => {
       </div>
 
       {#each entries as entry}
-        <a href="/entry/{entry.id}" class="entry">
+        <a href="/entry/{entry.id}{mode=== 'old' ?'?fe=1' : ''}" class="entry">
           <span class="year {entry.wine.color}" >{entry.wine.year || ''}</span>
           <div class="names">
             {#if entry.wine.name}<div class="name">{entry.wine.name}</div>{/if}

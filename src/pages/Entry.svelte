@@ -44,9 +44,10 @@ let edit = false,
     refEntry, // clone of the entry fresh out of db, to get diff of modifications
     imageEditor,
     countChangeTimeoutId, // shared timeout id for increment/decrement operations
-    backToHistory =  false
+    backToHistory =  false,
+    backToEmptyList = false
 
-$: backUrl = backToHistory ? 'javascript:history.back()' : `/wines${entry.count <= 0 ? '/oldref' : ''}`
+$: backUrl = backToHistory ? 'javascript:history.back()' : `/wines${backToEmptyList ? '/oldref' : ''}`
 
 // $: serialized = JSON.stringify(entry)
 // $: if (entry.wine.appellation){
@@ -90,6 +91,7 @@ export async function load(){
   }
 
   backToHistory = location.search.includes('fh=1')
+  backToEmptyList = location.search.includes('fe=1')
 }
 
 // validation, save logic & sync

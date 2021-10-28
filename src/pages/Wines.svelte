@@ -163,6 +163,8 @@ function filterList(e){
       filterFn = x => x.wine[filterConfig.field] && x.wine[filterConfig.field].map(c => Undiacritics.removeAll(c).toLowerCase()).includes(filterConfig.value)
     else if (['appellation', 'producer'].includes(filterConfig.field))
       filterFn = x => x.wine[filterConfig.field] && Undiacritics.removeAll(x.wine[filterConfig.field]).toLowerCase() === filterConfig.value
+    else if (filterConfig.field === 'apogee')
+      filterFn = x => (x.wine.apogeeStart && x.wine.apogeeStart <= filterConfig.value) || (x.wine.apogeeEnd && x.wine.apogeeEnd >= filterConfig.value)
     else
       // filter by exact value (year, color, sparkling, sweet)
       filterFn = x => x.wine[filterConfig.field] == filterConfig.value

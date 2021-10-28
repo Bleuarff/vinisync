@@ -98,6 +98,9 @@
       // boolean properties are triggered immediately
       if (['sparkling', 'sweet'].includes(selected))
         dispatch('filter', {filter: selected, value: true})
+      else if (selected === 'apogee'){
+        dispatch('filter', {filter: selected, value: (new Date()).getFullYear()})
+      }
     }
 
     await tick()
@@ -123,6 +126,7 @@
         <button data-name="cepages" on:click="{toggleHandler}">Cepages</button>
         <button data-name="sparkling" on:click="{toggleHandler}">Bulles</button>
         <button data-name="sweet" on:click="{toggleHandler}">Moelleux</button>
+        <button data-name="apogee" on:click="{toggleHandler}">Apogée</button>
       {/if}
     </div>
 
@@ -222,7 +226,8 @@
   .color > *[data-name="color"],
   .cepages > *[data-name="cepages"],
   .sparkling > *[data-name="sparkling"],
-  .sweet > *[data-name="sweet"]{
+  .sweet > *[data-name="sweet"],
+  .apogee > *[data-name="apogee"]{
     color: white;
     background: var(--main-color);
     box-shadow: inset 1px 1px 2px 0px #373737;

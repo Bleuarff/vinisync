@@ -196,8 +196,9 @@
     return 0
   }
 
+  // returns evolution arrow rotation factor, based on update count/diff.
   function getEvolutionFactor(changes){
-    const ratio = changes.countDiff || changes.count || -6
+    const ratio = changes.countDiff || changes.count || 0
     return Math.max(Math.min(ratio, 6), -6)
   }
 </script>
@@ -307,6 +308,7 @@
     .arrow{
       display: inline-block;
       transform: rotate(calc(-15deg * var(--qt, 0))) scale(1.2);
+      opacity: max(var(--qt), calc(-1 * var(--qt)));
     }
   }
 
@@ -347,14 +349,5 @@
     width: 100%;
     /* height: 220px; */
     margin-bottom: 3em;
-  }
-
-  .new-icon{
-    // font-size: 1em;
-    // color: darkblue;
-    filter: invert(1);
-    height: 14px;
-    margin-right: 4px;
-    transform: scale(1.3);
   }
 </style>

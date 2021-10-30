@@ -6,7 +6,7 @@ function getTime(){
   return `[${DateTime.local().toFormat('yy-LL-dd HH:mm')}] `
 }
 
-function writeMessage(level, msg, payload){
+function writeMessage(level, system, msg, payload){
   const cfg = config().log
   const ts = DateTime.utc()
 
@@ -14,7 +14,7 @@ function writeMessage(level, msg, payload){
     try{
 
       if (target === 'stdout'){
-        toStdout(level, ts, msg, payload)
+        toStdout(level, system, ts, msg, payload)
       }
       else if (target.startsWith('http')){
         // TODO: post request logstash http plugin')
@@ -27,14 +27,13 @@ function writeMessage(level, msg, payload){
   }
 }
 
-function toStdout(lvl, ts, txt, payload){
-  let str = `[${ts.toFormat('yy-LL-dd HH:mm')}] ${txt}`
+function toStdout(lvl, system, ts, txt, payload){
+  let str = `[${ts.toFormat('yy-LL-dd HH:mm')}][${system}] ${txt}`
 
   const data = payload && Object.entries(payload).map(([k, v]) => `${k}=${v.toString()}`) // TODO: go through all object tree to serialize everything right.
   if (data && data.length)
     str += ` [${data.join(', ')}]`
   console[lvl](str)
-
 }
 
 function toHttp(lvl, txt, payload){
@@ -42,20 +41,27 @@ function toHttp(lvl, txt, payload){
 }
 
 
-module.exports = exports = {
-  log: function(msg, data){
-    writeMessage('log', msg, data)
-  },
+// exports a function that must be called with system name (current system being logged).
+module.exports = exports = (system) => {
+  if (!system || typeof system !== 'string')
+    throw new Error('Logger: invalid system name');
 
-  debug: function(msg, data){
-    writeMessage('debug', msg, data)
-  },
+  return {
+    log: function(msg, data){
+      writeMessage('log', system, msg, data)
+    },
 
-  warn: (msg, data) => {
-    writeMessage('warn', msg, data)
-  },
+    debug: function(msg, data){
+      writeMessage('debug', system, msg, data)
+    },
 
-  error: function(msg, err, data){
-    // writeMessage('error', err)
+    warn: (msg, data) => {
+      writeMessage('warn', system, msg, data)
+    },
+
+    error: function(msg, err, data){
+      // writeMessage('error', err)
+    }
   }
+
 }

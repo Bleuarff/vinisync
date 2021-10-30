@@ -3,7 +3,7 @@
 const restify = require('restify'),
       db = require('./utils/db.js'),
       { DateTime } = require('luxon'),
-      logger = require('./utils/logger.js')
+      logger = require('./utils/logger.js')('main')
 
 const dbConnectionString = '__DBCONNEXIONSTRING__'
 

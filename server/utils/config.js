@@ -19,7 +19,7 @@ void function getConfFromFile(){
 		const filepath = join(__dirname, '../config/config.yml')
 		const content = readFileSync(filepath, 'utf8')
 		_config = yaml.load(content)
-		console.debug(JSON.stringify(_config))
+		// console.debug(JSON.stringify(_config))
 	}
 	catch(ex){
 		throw new VError(ex, 'Error reading configuration file')

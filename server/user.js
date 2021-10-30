@@ -3,7 +3,7 @@ const db = require('./utils/db.js').db,
       bcrypt = require('bcrypt'),
       uuid = require('uuid'),
       { DateTime } = require('luxon'),
-      logger = require('./utils/logger.js'),
+      logger = require('./utils/logger.js')('user'),
       MailSrv = require('./services/mail.js')
 
 const BCRYPT_SALT_ROUNDS = 10,

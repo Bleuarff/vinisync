@@ -1,7 +1,7 @@
 'use strict'
 const db = require('./utils/db.js').db,
       { DateTime } = require('luxon'),
-      logger = require('./utils/logger.js')
+      logger = require('./utils/logger.js')('sync')
 
 const PAGE_SIZE = 50
 

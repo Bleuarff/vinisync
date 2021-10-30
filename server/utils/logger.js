@@ -28,7 +28,7 @@ function writeMessage(level, system, msg, payload){
 }
 
 function toStdout(lvl, system, ts, txt, payload){
-  let str = `[${ts.toFormat('yy-LL-dd HH:mm')}][${system}] ${txt}`
+  let str = `${ts.toFormat('yy-LL-dd HH:mm')} | ${lvl.toUpperCase().padEnd(5)} | ${system} | ${txt}`
 
   const data = payload && Object.entries(payload).map(([k, v]) => `${k}=${v.toString()}`) // TODO: go through all object tree to serialize everything right.
   if (data && data.length)

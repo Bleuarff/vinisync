@@ -20,7 +20,7 @@ class MailSrv {
       data.host = '__HOST__'
 
     try{
-      logger.log(`load template ${type} for ${to}`)
+      logger.log('load template',  {type, to})
       const mailObj = await db.collection('email_templates').findOne({type: type, lang: 'fr'})
       if (!mailObj)
         throw new Error(`No template for type '${type}'`)
@@ -33,7 +33,7 @@ class MailSrv {
         text: replacePatterns(mailObj.plain, data)
       }
 
-      logger.log(msg)
+      // logger.log(msg)
       await sgMail.send(msg)
 
     }

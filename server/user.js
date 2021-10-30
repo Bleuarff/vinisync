@@ -103,7 +103,7 @@ class UserController{
       const user = await db.collection(COLLECTION_NAME).findOne({email: req.params.email})
 
       if (!user){
-        logger.log(`Pwd retrieval: no user for email ${req.params.email}`)
+        logger.log('Pwd retrieval: no user for email.', {email: req.params.email})
         res.send(204)
         return next()
       }

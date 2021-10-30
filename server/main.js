@@ -20,8 +20,7 @@ void async function(){
     logger.log('db connection ok')
   }
   catch(ex){
-    logger.error('DB Connection error: ')
-    logger.error(ex)
+    logger.error('DB Connection error', ex)
     return
   }
 
@@ -89,7 +88,7 @@ void async function(){
   /************************ end routes ***************************/
 
   server.listen(5002, function () {
-    logger.log(`${server.name} listening at ${server.url}`);
+    logger.log('Server listening', {name: server.name, url: server.url});
   });
 
   // properly close on relevant signals
@@ -100,14 +99,14 @@ void async function(){
 // close server & db connection
 function close(code){
   try{
-    logger.log('caught: ' + code)
+    logger.log('Signal caught', {code})
     server.close(async () => {
       await db.close()
       logger.debug('db closed')
     })
   }
   catch(ex){
-    logger.error(ex)
+    logger.error('close error', ex)
     return
   }
 }

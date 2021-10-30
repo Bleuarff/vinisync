@@ -28,7 +28,7 @@ class Sync{
       // it's either a re-executed resync request or a bug. Anyway, this helps achieving idempotence. I think.
       if (ex.code === 11000){
         res.send(204)
-        logger.log('Duplicate %s ignored', req.params.id)
+        logger.log('Duplicate ignored', {id: req.params.id})
         return next()
       }
 

@@ -73,7 +73,7 @@ class Security{
       }
     }
     catch(ex){
-      logger.error(ex)
+      logger.error('Verification error', ex, {uid: req.params.userid})
       res.send(500, {reason: 'SIGNATURE_VERIFICATION_ERROR'})
       return next(false)
     }

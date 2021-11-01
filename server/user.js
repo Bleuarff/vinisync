@@ -49,7 +49,7 @@ class UserController{
       return next()
     }
     catch(ex){
-      logger.error(ex)
+      logger.error('Creation error', ex)
       res.send(500)
       return next(false)
     }
@@ -86,7 +86,7 @@ class UserController{
       return next()
     }
     catch(ex){
-      logger.error(ex)
+      logger.error('Signin error', ex)
       res.send(500)
       return next(false)
     }
@@ -120,7 +120,7 @@ class UserController{
       return next()
     }
     catch(ex){
-      logger.error(ex)
+      logger.error('Pwd reset request error', ex)
       res.send(500)
       return next(false)
     }
@@ -146,7 +146,7 @@ class UserController{
       return next()
     }
     catch(ex){
-      logger.error(ex)
+      logger.error('Pwd get reset request error', ex)
       res.send(500)
       return next(false)
     }
@@ -200,7 +200,7 @@ class UserController{
       return next()
     }
     catch(ex){
-      logger.error(ex)
+      logger.error('Pwd reset error', ex)
       res.send(500)
       return next(false)
     }

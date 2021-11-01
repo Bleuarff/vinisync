@@ -99,14 +99,13 @@ void async function(){
 // close server & db connection
 function close(code){
   try{
-    logger.log('Signal caught', {code})
     server.close(async () => {
       await db.close()
-      logger.debug('db closed')
+      logger.debug('db closed', {code})
     })
   }
   catch(ex){
-    logger.error('close error', ex)
+    logger.error('db close error', ex, {code})
     return
   }
 }

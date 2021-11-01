@@ -32,7 +32,7 @@ class Sync{
         return next()
       }
 
-      logger.error(ex)
+      logger.error('upate insert error', ex, {uid: req.params.userid})
       res.send(500)
       return next(false)
     }
@@ -59,7 +59,7 @@ class Sync{
       return next()
     }
     catch(ex){
-      logger.error(ex)
+      logger.error('get updates error', ex, {uid: req.params.userid})
       res.send(500)
       return next(false)
     }

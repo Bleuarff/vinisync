@@ -69,7 +69,7 @@ module.exports = exports = {
 			return next()
 		}
 		catch(ex){
-			logger.error(ex)
+			logger.error('get resyncs', ex)
 			res.send(200, { build: '__BUILD__' })
 			return next()
 		}

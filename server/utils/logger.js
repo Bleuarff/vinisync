@@ -1,6 +1,8 @@
 'use strict'
 const { DateTime } = require('luxon'),
-  config = require('./config.js')
+  config = require('./config.js'),
+  http = require('http'),
+  https = require('https')
 
 function getTime(){
   return `[${DateTime.local().toFormat('yy-LL-dd HH:mm')}] `
@@ -22,8 +24,7 @@ function writeMessage(level, system, msg, payload, error){
         toStdout(level, system, ts, msg, payload, error)
       }
       else if (target.startsWith('http')){
-        // TODO: post request logstash http plugin')
-        toHttp(level, msg, payload)
+        toHttp(target, level, system, ts, msg, payload, error)
       }
     }
     catch(ex){
@@ -46,7 +47,53 @@ function toStdout(lvl, system, ts, txt, payload, error){
   console[lvl](str)
 }
 
-function toHttp(lvl, txt, payload){
+function toHttp(url, lvl, system, ts, txt, payload, error){
+    const requestModule = url.startsWith('https') ? https: http;
+
+    const data = {
+      ...payload,
+      lvl,
+      module: system,
+      env: '__ENV__',
+      ts: ts.toISO(),
+      msg: txt || error?.message,
+    }
+
+    if (error){
+      data.error_stack = error.stack
+    }
+
+    const postData = JSON.stringify(data)
+
+    try{
+      const req = requestModule.request(url, {
+        method: 'POST',
+        auth: process.env.DACO_AUTH,
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(postData)
+        },
+        timeout: 10 * 1e3 // in ms
+      }, (res) => {
+        res.on('data', () => { /* mandatory callback for event 'end' to be sent */ })
+        res.on('end', () => {
+          // log to console if unexpected status code
+          if (![200, 201, 204].includes(res.statusCode))
+            toStdout(lvl, system, ts, 'Invalid daco response code.', {code: res.statusCode}, error)
+
+        })
+      })
+
+      req.on('error', e => {
+        console.error(`ERROR | Logger | ${e.message}`)
+      })
+      req.write(postData)
+      req.end()
+    }
+    catch(ex){
+      console.error(ex)
+    }
+
     return
 }
 

@@ -48,7 +48,8 @@ const replacements = {
   __DBCONNEXIONSTRING__: config[env].connectionString,
   __TITLE__: config[env].title,
   __CACHE_VERSION__: buildTime, // updated each time the sw is rebuilt
-  __BUILD__: buildNumber
+  __BUILD__: buildNumber,
+  __ENV__: env
 }
 
 function makeServer(){

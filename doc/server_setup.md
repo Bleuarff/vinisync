@@ -28,7 +28,7 @@ open `/etc/mongod.config`
 
 ## Node
 download version & extract to /opt, edit /usr/local/bin/(node|npm) symlinks to the new version.
-````
+````shell
 # ln -s /opt/node-v15/bin/node node15
 # ln -s /opt/node-v15/bin/npm npm15
 # mv -T node15 node

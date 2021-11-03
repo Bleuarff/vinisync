@@ -1,4 +1,4 @@
-# Server runtime configuration data --DEV--
+# Server runtime configuration data --PROD--
 
 log:
   - stdout

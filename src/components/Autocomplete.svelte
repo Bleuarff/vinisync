@@ -97,7 +97,6 @@
           value = highlightedNd.dataset.value
           // delay before emptying list, so that value update handler runs before
           setTimeout(() => {
-            // console.debug('validate')
             filteredList = []
           }, 50)
         }

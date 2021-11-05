@@ -103,7 +103,6 @@ function getJpegSize(raw, length){
       }
       else{
         const little = raw.getUint16(soff+=6, false) === 0x4949
-        // console.debug('little endian: ' + little)
 
         soff += raw.getUint32(soff + 4, little)
         const tagsCount = raw.getUint16(soff, little)

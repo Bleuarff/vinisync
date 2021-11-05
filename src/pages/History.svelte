@@ -64,7 +64,6 @@
         const prev = updates.slice(i+1).find(x => x.changes.count != null)
         if (prev){
           changes.countDiff = changes.count - prev.changes.count
-          // console.log(changes)
         }
       }
 

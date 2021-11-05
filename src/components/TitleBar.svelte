@@ -22,7 +22,6 @@
       return
 
 		const dir = window.scrollY - lastScrollY
-    // console.log(dir)
     lastScrollY = window.scrollY
     visible = dir < 0
     debouncer = ts

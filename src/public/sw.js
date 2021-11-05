@@ -38,8 +38,6 @@ self.addEventListener('fetch', e => {
   if (e.request.url.includes('/api/'))
     return
 
-  // console.log('[Service Worker] Request for ' + e.request.url)
-
   e.respondWith(new Promise(async (resolve, reject) => {
     const cachedResponse = await caches.match(e.request, {ignoreSearch: true})
     if (cachedResponse !== undefined){

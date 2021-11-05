@@ -308,7 +308,6 @@ class SyncMgr{
 
     try{
       const pendingCount = await repo.countFromIndex('updates', 'pending', 'true')
-      // console.debug(`${pendingCount} pending updates`)
       if (!pendingCount)
         return console.log('No pending updates')
 

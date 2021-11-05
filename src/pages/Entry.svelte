@@ -49,16 +49,6 @@ let edit = false,
 
 $: backUrl = backToHistory ? 'javascript:history.back()' : `/wines${backToEmptyList ? '/oldref' : ''}`
 
-// $: serialized = JSON.stringify(entry)
-// $: if (entry.wine.appellation){
-//   console.debug('appellation sanitization')
-//   let val = entry.wine.appellation
-//   val = val.replace(/\bst\b/gi, 'Saint')
-//             .replace(/Saint\b[^-]/gi, 'Saint-')
-//   if (val !== entry.wine.appellation)
-//     entry.wine.appellation = val
-// }
-
 onMount(async () => {
   await repo.open()
   load()

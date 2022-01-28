@@ -20,6 +20,7 @@
 	import syncMgr from './syncMgr.js'
 
 	import {send} from './fetch.js'
+	import Utils from './utils.js'
 
 	let page,
 			currentComponent // component instance
@@ -42,7 +43,7 @@
 				page = Home
 		}
 		catch(ex){
-			console.error(ex)
+			Utils.logError(ex, 'Auth error')
 			page = Signup
 		}
 	})

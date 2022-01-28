@@ -36,10 +36,11 @@ export default {
 	},
 	plugins: [
 		replace({
-      __ENVIRONMENT__: env,
+			__ENVIRONMENT__: env,
 			__BUILDDATE__ : DateTime.local().toFormat('yyyyMMdd_HHmmZ'),
 			__BUILD__: process.env.VINISYNC_BUILD_NUMBER,
-			__TITLE__: config[env].title
+			__TITLE__: config[env].title,
+			__DACO_AUTH__: process.env.DACO_AUTH
     }),
 
 		svelte({

@@ -1,4 +1,4 @@
-import { repo } from './storage.js'
+import { DateTime } from 'luxon'
 
 export default class Utils{
 
@@ -112,5 +112,35 @@ export default class Utils{
           hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
 
     return hashHex
+  }
+
+  static logError(error, payload){
+    if (typeof payload === 'string')
+      payload = { msg: payload }
+
+    console.error(payload.msg, error)
+
+    const params = {
+      msg: '',
+      ...payload,
+      lvl: 'error',
+      env: '__ENVIRONMENT__',
+      ts: DateTime.utc().toISO(),
+      orig: 'client',
+      error_msg: error.message,
+      error_stack: error.stack
+      
+    }
+
+    // use fetch to send data
+    const options = {
+      method: 'POST',
+      body: JSON.stringify(params),
+      headers: {
+        ['Content-Type']: 'application/json',
+        'X-Daco': '__DACO_AUTH__'
+      }
+    }
+    fetch('https:///daco.vinisync.fr/log', options)
   }
 }

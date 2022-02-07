@@ -82,7 +82,7 @@ export async function send(path, method = 'GET', data = {}, key){
     else if (ex && ex.message && ex.message.includes('NetworkError'))
       throw new Error('Erreur réseau, ressayer ultérieurement')
     else if (ex instanceof ServerError){
-      Utils.logError(ex, {html: ex.html, status: ex.status})
+      Utils.logError(ex, {msg: 'Application error', html: ex.html, status: ex.status})
       throw new Error('MAINTENANCE') // throw generic error
     }
     else

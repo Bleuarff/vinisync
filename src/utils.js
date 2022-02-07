@@ -114,7 +114,7 @@ export default class Utils{
     return hashHex
   }
 
-  static logError(error, payload){
+  static logError(error, payload = {}){
     if (typeof payload === 'string')
       payload = { msg: payload }
 

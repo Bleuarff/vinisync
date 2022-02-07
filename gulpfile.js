@@ -49,7 +49,8 @@ const replacements = {
   __TITLE__: config[env].title,
   __CACHE_VERSION__: buildTime, // updated each time the sw is rebuilt
   __BUILD__: buildNumber,
-  __ENV__: env
+  __ENV__: env,
+  __DACO_AUTH__: process.env.DACO_AUTH
 }
 
 function makeServer(){

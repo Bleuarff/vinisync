@@ -101,7 +101,7 @@
 						syncMgr.processResyncs(d.resyncs)
 					}
 				})
-				.catch(err => {}) // just swallow it
+				.catch(err => {})
 			}
 
 		}, 4e3)

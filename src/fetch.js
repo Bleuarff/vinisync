@@ -1,11 +1,20 @@
 // Wrapper around fetch
 
+import Utils from "./utils"
+
 const TIMEOUT = 8 * 1e3
 
 function LogicException(data) {
   this.status = data.status
   this.message = data.data.reason
   this.data = data.data
+  this.toString = () => { return `[${this.status}] ${this.message}` }
+}
+
+function ServerError(status, responseText){
+  this.status = status
+  this.html = responseText
+  this.message = 'Application Error'
   this.toString = () => { return `[${this.status}] ${this.message}` }
 }
 
@@ -48,13 +57,19 @@ export async function send(path, method = 'GET', data = {}, key){
     ])
     let data = null
 
+    window.postMessage({event: 'no-timeout'}, document.location.origin)
+
+    if (res.headers.get('Content-Type') === 'text/html'){
+      const text =  await res.text()
+      throw new ServerError(res.status, text)
+    }
+
     if (res.status !== 204)
       data = await res.json()
 
     if (res.status >= 400)
       throw new LogicException({status: res.status, data: data})
 
-    window.postMessage({event: 'no-timeout'}, document.location.origin)
     return data
   }
   catch(ex){
@@ -66,6 +81,10 @@ export async function send(path, method = 'GET', data = {}, key){
     }
     else if (ex && ex.message && ex.message.includes('NetworkError'))
       throw new Error('Erreur réseau, ressayer ultérieurement')
+    else if (ex instanceof ServerError){
+      Utils.logError(ex, {html: ex.html, status: ex.status})
+      throw new Error('NETWORK') // throw generic error
+    }
     else
       throw ex
   }

@@ -72,7 +72,8 @@ function toHttp(url, lvl, system, ts, txt, payload, error){
         auth: process.env.DACO_AUTH,
         headers: {
           'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(postData)
+          'Content-Length': Buffer.byteLength(postData),
+          'X-Daco': '__DACO_AUTH__'
         },
         timeout: 10 * 1e3 // in ms
       }, (res) => {

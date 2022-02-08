@@ -73,7 +73,7 @@ export async function send(path, method = 'GET', data = {}, key){
     return data
   }
   catch(ex){
-    console.error(ex)
+    // console.error(ex)
 
     if (ex === 'TIMEOUT'){
       window.postMessage({event: 'timeout'}, document.location.origin)

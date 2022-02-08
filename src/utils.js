@@ -142,5 +142,10 @@ export default class Utils{
       }
     }
     fetch('https:///daco.vinisync.fr/log', options)
+    .catch(ex => {
+      console.error('Log error', ex)
+    })
+    
+    return
   }
 }

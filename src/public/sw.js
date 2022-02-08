@@ -34,8 +34,8 @@ self.addEventListener('install', event => {
 })
 
 self.addEventListener('fetch', e => {
-  // api requests are not cached
-  if (e.request.url.includes('/api/'))
+  // api requests & logs are not cached
+  if (e.request.url.includes('/api/') || e.request.url.includes('daco.vinisync.fr'))
     return
 
   e.respondWith(new Promise(async (resolve, reject) => {

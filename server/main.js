@@ -32,7 +32,7 @@ void async function(){
 
   server.use(restify.plugins.acceptParser(server.acceptable))
   server.use((req, res, next) => {
-    console.log(`[${DateTime.local().toFormat('yy-LL-dd HH:mm:ss')}] ${req.method} ${req.getPath()}`)
+    logger.log(`${req.method} ${req.getPath()}`)
     return next()
   })
 

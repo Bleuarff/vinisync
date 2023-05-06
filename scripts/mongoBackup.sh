@@ -13,7 +13,7 @@ DEST_FOLDER="$2"
 source ./.credentials.env
 
 TS=$(date +"%Y%m%d_%H%M")
-FILENAME="vinisync-$ENV-mongo-backup-$TS.gz"
+FILENAME="vinisync-$ENV-mongo-backup-${DEST_FOLDER}-$TS.gz"
 
 mongodump --db=vinisync --username="$MONGO_USER" --password="$MONGO_PWD" --gzip --archive=$FILENAME --authenticationMechanism=SCRAM-SHA-256 --port=29817
 
@@ -45,11 +45,11 @@ b64=`openssl md5 -binary "$FILENAME" | openssl base64`
 acl="private"
 
 date=`date -u +%Y%m%dT%H%M%SZ`
-expdate_s="2022-12-30T12:00:00.000Z"
+expdate_s="2033-12-30T12:00:00.000Z"
 region="fr-par"
 
 p=$(cat <<POLICY | openssl base64 | tr -d \\n
-{ "expiration": "${expdate_s}T12:00:00.000Z",
+{ "expiration": "${expdate_s}",
   "conditions": [
     {"acl": "$acl" },
     {"bucket": "$s3Bucket" },
@@ -63,11 +63,11 @@ POLICY
 )
 
 stringToSign=$p
-echo "----------------- canonicalRequest --------------------"
-echo -e ${canonicalRequest}
-echo "----------------- stringToSign --------------------"
-echo -e ${stringToSign}
-echo "-------------------------------------------------------"
+#echo "----------------- canonicalRequest --------------------"
+#echo -e ${canonicalRequest}
+#echo "----------------- stringToSign --------------------"
+#echo -e ${stringToSign}
+#echo "-------------------------------------------------------"
 
 # calculate the signing key
 DateKey=`echo -n "${yyyymmdd}" | openssl dgst -sha256 -hex -hmac "AWS4${s3SecretKey}" | sed 's/.* //'`
@@ -80,11 +80,19 @@ signature=`echo -en ${p} | openssl dgst -sha256 -hex -mac HMAC -macopt hexkey:${
 key_and_sig_args="-F X-Amz-Credential=${s3AccessKey}/${yyyymmdd}/${region}/s3/aws4_request -F X-Amz-Algorithm=AWS4-HMAC-SHA256 -F X-Amz-Signature=$signature -F X-Amz-Date=${date}"
 #-F "X-Amz-Security-Token= ${xamztoken}" \
 
-curl -v   \
+responseCode=$(curl   \
+-w "%{http_code}" \
 -F "key=$DEST_FOLDER/$FILENAME" \
 -F acl=$acl \
 $key_and_sig_args  \
 -F "content-md5= ${b64}" \
 -F "Policy=$p" \
 -F "file=@$FILENAME" \
-https://${endpoint}
+https://${endpoint})
+
+echo "${responseCode}"
+
+if [ "$responseCode" = "204" ]; then
+  rm $FILENAME
+  echo "Success, delete local backup file"
+fi

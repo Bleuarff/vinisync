@@ -81,7 +81,7 @@ function makeClient(){
   const args = ['-c']
   if (env === 'dev')
     args.push('-w')
-  return spawn('rollup', args, {
+  return spawn('./node_modules/rollup/dist/bin/rollup', args, {
     stdio: 'inherit',
     env: Object.assign({
       VINISYNC_BUILD_ENV: env,

@@ -307,7 +307,7 @@
     .arrow{
       display: inline-block;
       transform: rotate(calc(-15deg * var(--qt, 0))) scale(1.2);
-      opacity: max(var(--qt), calc(-1 * var(--qt)));
+     /* opacity: max(var(--qt), calc(-1 * var(--qt)));*/
     }
   }
 

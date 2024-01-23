@@ -21,9 +21,11 @@ func main() {
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			fmt.Println(time.Now().UTC().Format(time.RFC3339), c.Request().Method, c.Request().URL.Path)
-			return nil
+			return next(c)
 		}
 	})
+
+	e.Use(SetDefaultHeaders)
 
 	// Routes
 	e.GET("/api/ping", Ping)
@@ -50,4 +52,14 @@ func main() {
 func Ping(c echo.Context) error {
 	fmt.Println("ping")
 	return c.String(http.StatusOK, "pong")
+}
+
+func SetDefaultHeaders(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		c.Response().Header().Set("Access-Control-Allow-Origin", "*")
+		c.Response().Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Response().Header().Set("Access-Control-Expose-Headers", "Content-Length")
+		c.Response().Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		return next(c)
+	}
 }

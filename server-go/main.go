@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -10,10 +11,26 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main() {
 	fmt.Println("Hello world")
+
+	var ctx = context.TODO()
+	clientOpts := options.Client().ApplyURI("mongodb://localhost:27017")
+	client, err := mongo.Connect(ctx, clientOpts)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = client.Ping(ctx, nil)
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		fmt.Println("MongoDb connection OK")
+	}
 
 	e := echo.New()
 
@@ -43,7 +60,13 @@ func main() {
 	<-quit
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	if err := e.Shutdown(ctx); err != nil {
+	err = client.Disconnect(context.TODO())
+	if err != nil {
+		e.Logger.Error(err)
+	} else {
+		e.Logger.Print("Mongo connection closed OK")
+	}
+	if err = e.Shutdown(ctx); err != nil {
 		e.Logger.Fatal(err)
 	}
 	fmt.Println("Server shutting down")
@@ -60,6 +83,11 @@ func SetDefaultHeaders(next echo.HandlerFunc) echo.HandlerFunc {
 		c.Response().Header().Set("Access-Control-Allow-Credentials", "true")
 		c.Response().Header().Set("Access-Control-Expose-Headers", "Content-Length")
 		c.Response().Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+
+		if c.Request().Method == "OPTIONS" {
+			c.Response().Header().Set("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, DELETE")
+			c.Response().Header().Set("Access-Control-Allow-Headers", "Date, X-Date, Authorization, Content-Type, X-Auth")
+		}
 		return next(c)
 	}
 }

@@ -7,29 +7,23 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"vinisync/server/controllers"
+	"vinisync/server/utils"
 
 	"time"
 
 	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+var client *mongo.Client
+
 func main() {
-	fmt.Println("Hello world")
+	fmt.Println("Vinisync server  - Go edition")
 
-	var ctx = context.TODO()
-	clientOpts := options.Client().ApplyURI("mongodb://localhost:27017")
-	client, err := mongo.Connect(ctx, clientOpts)
-
+	err := utils.Connect("mongodb://localhost:27018")
 	if err != nil {
 		log.Fatal(err)
-	}
-	err = client.Ping(ctx, nil)
-	if err != nil {
-		log.Fatal(err)
-	} else {
-		fmt.Println("MongoDb connection OK")
 	}
 
 	e := echo.New()
@@ -46,6 +40,7 @@ func main() {
 
 	// Routes
 	e.GET("/api/ping", Ping)
+	e.PUT("/api/user", controllers.CreateUser)
 
 	go func() {
 		if err := e.Start(":5136"); err != nil && err != http.ErrServerClosed {

@@ -4,16 +4,20 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 	"vinisync/server/models"
 	"vinisync/server/utils"
 
-	// "vinisync/server/models"
-
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/crypto/bcrypt"
 )
 
+const BCRYPT_SALT_ROUNDS = 10
+
+// Signup: create a new user account
 func CreateUser(c echo.Context) error {
 	var user models.User
 
@@ -22,46 +26,44 @@ func CreateUser(c echo.Context) error {
 		return err
 	}
 
-	fmt.Println("create user", user.Email, user.Pwd)
-
 	if user.Email == "" || user.Pwd == "" {
 		return c.JSON(http.StatusBadRequest, models.ErrorResponse{Reason: "MISSING_PARAMETER"})
 	}
 
+	// TODO: check its an email.
+
+	// Check for existing user with email
+
+	coll := utils.Db.Collection("users")
 	filter := bson.D{{Key: "email", Value: user.Email}}
+
 	var existingUser models.User
-	err = utils.Db.Collection("users").FindOne(context.TODO(), filter).Decode(&existingUser)
+	err = coll.FindOne(context.TODO(), filter).Decode(&existingUser)
 	if err == nil || err != mongo.ErrNoDocuments {
-		// fmt.Print("User exists", user.Email)
 		return c.JSON(http.StatusBadRequest, models.ErrorResponse{Reason: "EMAIL_EXISTS"})
 	}
 
-	// 	const hash = await bcrypt.hash(req.params.pwd, BCRYPT_SALT_ROUNDS),
-	// 		  now = DateTime.utc().toBSON()
+	// hash password
+	b_hashedhPwd, err := bcrypt.GenerateFromPassword([]byte(user.Pwd), BCRYPT_SALT_ROUNDS)
+	if err != nil {
+		fmt.Print(err)
+		return c.JSON(http.StatusInternalServerError, models.ErrorResponse{Reason: "BCRYPT_ERROR"})
+	}
 
-	// 	user = {
-	// 	  _id: uuid.v4(),
-	// 	  email: req.params.email,
-	// 	  pwd: hash,
-	// 	  key: uuid.v4(),
-	// 	  createDate: now,
-	// 	  lastUpdateDate: now
-	// 	}
+	// populate object to insert
+	user.Id = uuid.NewString()
+	user.Pwd = string(b_hashedhPwd)
+	user.Key = uuid.NewString()
+	user.CreateDate = time.Now().UTC()
+	user.LastUpdateDate = user.CreateDate
 
-	// 	await db.collection(COLLECTION_NAME).insertOne(user)
+	_, err = coll.InsertOne(context.TODO(), user)
+	if err != nil {
+		fmt.Println("insert error", err)
+		return c.JSON(http.StatusInternalServerError, models.ErrorResponse{Reason: "USER_CREATION_ERROR"})
 
-	// 	// prepare response object
-	// 	user.id = user._id
-	// 	delete user.pwd
-	// 	delete user._id
+	}
 
-	// 	res.send(201, user)
-	// 	return next()
-	//   }
-	//   catch(ex){
-	// 	logger.error('Creation error', ex)
-	// 	res.send(500)
-	// 	return next(false)
-	//   }
-	return c.String(http.StatusOK, "user creation... NOT OK")
+	user.Pwd = "" // set to default for removal from response
+	return c.JSON(http.StatusOK, user)
 }

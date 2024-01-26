@@ -5,10 +5,10 @@ import "time"
 
 // User represents an account on the service.
 type User struct {
-	Id             string `bson:"_id"`
-	Email          string `json:"email"`
-	Pwd            string `json:"pwd"`
-	Key            string
-	CreateDate     time.Time
-	LastUpdateDate time.Time
+	Id             string    `json:"id" bson:"_id"`
+	Email          string    `json:"email"`
+	Pwd            string    `json:"pwd,omitempty"`
+	Key            string    `json:"key"`
+	CreateDate     time.Time `json:"createDate"`
+	LastUpdateDate time.Time `json:"lastUpdateDate"`
 }

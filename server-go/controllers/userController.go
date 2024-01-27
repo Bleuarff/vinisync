@@ -61,9 +61,41 @@ func CreateUser(c echo.Context) error {
 	if err != nil {
 		fmt.Println("insert error", err)
 		return c.JSON(http.StatusInternalServerError, models.ErrorResponse{Reason: "USER_CREATION_ERROR"})
-
 	}
 
 	user.Pwd = "" // set to default for removal from response
+	return c.JSON(http.StatusOK, user)
+}
+
+// Check provided credentials match the user.
+func SigninUser(c echo.Context) error {
+	var params models.User
+
+	err := c.Bind(&params)
+	if err != nil {
+		return err
+	}
+
+	if params.Email == "" || params.Pwd == "" {
+		return c.JSON(http.StatusBadRequest, models.ErrorResponse{Reason: "MISSING_PARAMETER"})
+	}
+
+	coll := utils.Db.Collection("users")
+	filter := bson.D{{Key: "email", Value: params.Email}}
+
+	var user models.User
+	err = coll.FindOne(context.TODO(), filter).Decode(&user)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, models.ErrorResponse{Reason: "INVALID_CREDENTIALS"})
+	}
+
+	// // verify password
+	err = bcrypt.CompareHashAndPassword([]byte(user.Pwd), []byte(params.Pwd))
+
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, models.ErrorResponse{Reason: "INVALID_CREDENTIALS"})
+	}
+
+	user.Pwd = ""
 	return c.JSON(http.StatusOK, user)
 }

@@ -44,6 +44,9 @@ func main() {
 	e.POST("/api/signin", controllers.SigninUser)
 	e.POST("/api/user/pwd", controllers.SetUserPwd)
 
+	e.POST("/api/pwdreset", controllers.CreatePwdReset)
+	e.GET("/api/pwdreset/:id", controllers.GetPwdReset)
+
 	go func() {
 		if err := e.Start(":5136"); err != nil && err != http.ErrServerClosed {
 			e.Logger.Fatal("shutting down the server")

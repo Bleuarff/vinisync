@@ -164,3 +164,74 @@ func SetUserPwd(c echo.Context) error {
 
 	return c.String(http.StatusNoContent, "")
 }
+
+func CreatePwdReset(c echo.Context) error {
+
+	type Request struct {
+		Email string `query:"email"`
+	}
+
+	var req Request
+	err := c.Bind(&req)
+	if err != nil {
+		return c.String(http.StatusBadRequest, "bad request")
+	}
+
+	if req.Email == "" {
+		return c.JSON(http.StatusBadRequest, web.ErrorResponse{Reason: "MISSING_PARAMETER"})
+	}
+
+	var user models.User
+	err = utils.Db.Collection(collectionName).FindOne(context.TODO(), bson.D{{"email", req.Email}}).Decode(&user)
+	if err != nil {
+		return c.String(http.StatusNoContent, "")
+	}
+
+	//   try{
+	utils.Db.Collection(resetCollectionName).InsertOne(context.TODO(), bson.D{
+		{"_id", uuid.NewString()},
+		{"email", user.Email},
+		{"createDate", time.Now().UTC()},
+	})
+
+	// 	await MailSrv.send('PWD_RESET_REQUEST', req.params.email, {request_id: id})
+	// 	res.send(204)
+	// 	return next()
+	//   }
+	//   catch(ex){
+	// 	logger.error('Pwd reset request error', ex)
+	// 	res.send(500)
+	// 	return next(false)
+	//   }
+	return c.String(http.StatusNoContent, "")
+}
+
+func GetPwdReset(c echo.Context) error {
+	type Request struct {
+		Id string `param:"id"`
+	}
+
+	var req Request
+	err := c.Bind(&req)
+	if err != nil {
+		return c.String(http.StatusBadRequest, "bad request")
+	}
+
+	if req.Id == "" {
+		return c.JSON(http.StatusBadRequest, web.ErrorResponse{Reason: "MISSING_PARAMETER"})
+	}
+
+	// make sure reset request is still valid
+	maxAge := time.Now().UTC().Add(-time.Hour * PWD_RESET_REQUEST_MAX_AGE)
+	var resReq models.PwdResetRequest
+	err = utils.Db.Collection(resetCollectionName).FindOne(context.TODO(), bson.D{
+		{"_id", req.Id},
+		{"createDate", bson.D{{"$gte", maxAge}}},
+	}).Decode(&resReq)
+
+	if err != nil {
+		return c.JSON(http.StatusNotFound, web.ErrorResponse{Reason: "ID_NOT_FOUND"})
+	} else {
+		return c.JSON(http.StatusOK, resReq)
+	}
+}

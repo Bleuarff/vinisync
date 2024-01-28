@@ -42,6 +42,7 @@ func main() {
 	e.GET("/api/ping", Ping)
 	e.PUT("/api/user", controllers.CreateUser)
 	e.POST("/api/signin", controllers.SigninUser)
+	e.POST("/api/user/pwd", controllers.SetUserPwd)
 
 	go func() {
 		if err := e.Start(":5136"); err != nil && err != http.ErrServerClosed {

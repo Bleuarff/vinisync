@@ -1,4 +1,4 @@
-package models
+package web
 
 // ErrorResponse represents the common object returned when the server cannot satisfy the request.
 type ErrorResponse struct {

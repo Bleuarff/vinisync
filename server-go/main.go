@@ -44,6 +44,8 @@ func main() {
 	e.POST("/api/signin", controllers.SigninUser)
 	e.POST("/api/user/pwd", controllers.SetUserPwd)
 
+	e.GET("/api/updates", controllers.GetUpdates)
+
 	// mailgun account has been disabled, pwd does not work anyway
 	// e.POST("/api/pwdreset", controllers.CreatePwdReset)
 	// e.GET("/api/pwdreset/:id", controllers.GetPwdReset)

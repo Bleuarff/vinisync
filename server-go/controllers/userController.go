@@ -20,7 +20,6 @@ import (
 const BCRYPT_SALT_ROUNDS = 10
 const PWD_RESET_REQUEST_MAX_AGE = 24 // max age in hours
 
-const collectionName = "users"
 const resetCollectionName = "pwd_reset_requests"
 
 // Signup: create a new user account
@@ -40,7 +39,7 @@ func CreateUser(c echo.Context) error {
 
 	// Check for existing user with email
 
-	coll := utils.Db.Collection(collectionName)
+	coll := utils.Db.Collection(collNameUsers)
 	filter := bson.D{{Key: "email", Value: user.Email}}
 
 	var existingUser models.User
@@ -86,7 +85,7 @@ func SigninUser(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, web.ErrorResponse{Reason: "MISSING_PARAMETER"})
 	}
 
-	coll := utils.Db.Collection(collectionName)
+	coll := utils.Db.Collection(collNameUsers)
 	filter := bson.D{{Key: "email", Value: params.Email}}
 
 	var user models.User
@@ -151,7 +150,7 @@ func SetUserPwd(c echo.Context) error {
 	update := bson.D{{"$set", bson.D{{"pwd", string(newPwdHash)}}}}
 	opts := options.Update().SetUpsert(false)
 
-	_, err = utils.Db.Collection(collectionName).UpdateOne(context.TODO(), filter, update, opts)
+	_, err = utils.Db.Collection(collNameUsers).UpdateOne(context.TODO(), filter, update, opts)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, web.ErrorResponse{Reason: "USER_UPDATE_ERROR"})
 	}
@@ -182,7 +181,7 @@ func CreatePwdReset(c echo.Context) error {
 	}
 
 	var user models.User
-	err = utils.Db.Collection(collectionName).FindOne(context.TODO(), bson.D{{"email", req.Email}}).Decode(&user)
+	err = utils.Db.Collection(collNameUsers).FindOne(context.TODO(), bson.D{{"email", req.Email}}).Decode(&user)
 	if err != nil {
 		return c.String(http.StatusNoContent, "")
 	}

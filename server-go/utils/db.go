@@ -5,6 +5,7 @@ package utils
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -15,15 +16,23 @@ var Db *mongo.Database
 var client *mongo.Client
 
 // Connects to the mongo db instance at connectionString.
-func Connect(connectionString string) error {
+func Connect(connectionString string, timeout time.Duration) error {
+
+	// default timeout
+	if timeout == 0 {
+		timeout = 30 * time.Second
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
 
 	clientOpts := options.Client().ApplyURI(connectionString)
-	client, err := mongo.Connect(context.TODO(), clientOpts)
+	client, err := mongo.Connect(ctx, clientOpts)
 
 	if err != nil {
 		return err
 	}
-	err = client.Ping(context.TODO(), nil)
+	err = client.Ping(ctx, nil)
 	if err != nil {
 		return err
 	} else {

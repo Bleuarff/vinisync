@@ -18,7 +18,7 @@ import (
 func main() {
 	fmt.Println("Vinisync server  - Go edition")
 
-	err := utils.Connect("mongodb://localhost:27018")
+	err := utils.Connect("mongodb://localhost:27018", 30*time.Second)
 	if err != nil {
 		log.Fatal(err)
 	}

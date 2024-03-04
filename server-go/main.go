@@ -13,10 +13,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"go.mongodb.org/mongo-driver/mongo"
 )
-
-var client *mongo.Client
 
 func main() {
 	fmt.Println("Vinisync server  - Go edition")
@@ -63,7 +60,7 @@ func main() {
 	<-quit
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	err = client.Disconnect(context.TODO())
+	err = utils.Disconnect()
 	if err != nil {
 		e.Logger.Error(err)
 	} else {

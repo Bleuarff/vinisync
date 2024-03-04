@@ -12,6 +12,7 @@ import (
 
 // Proxy for mongo vinisync db access
 var Db *mongo.Database
+var client *mongo.Client
 
 // Connects to the mongo db instance at connectionString.
 func Connect(connectionString string) error {
@@ -30,4 +31,13 @@ func Connect(connectionString string) error {
 		Db = client.Database("vinisync")
 		return nil
 	}
+}
+
+func Disconnect() error {
+	if client == nil {
+		return nil
+	}
+
+	err := client.Disconnect(context.TODO())
+	return err
 }

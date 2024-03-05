@@ -24,6 +24,7 @@ func TestMain(m *testing.M) {
 
 	exitVal := m.Run()
 
+	log.Println("exitval", exitVal)
 	// delete db if all tests pass
 	if exitVal == 0 {
 		utils.Db.Drop(context.TODO())
@@ -31,8 +32,17 @@ func TestMain(m *testing.M) {
 
 	utils.Disconnect()
 
-	log.Println("exitval", exitVal)
 	os.Exit(exitVal)
+}
+
+// Creates dummy user user_test_1
+func createUser(username string, pwd string) {
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPut, "/api/user", strings.NewReader(`{"email":"`+username+`", "pwd":"`+pwd+`"}`))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	CreateUser(c)
 }
 
 func TestCreateUser(t *testing.T) {
@@ -57,6 +67,37 @@ func TestCreateUser(t *testing.T) {
 			c := e.NewContext(req, rec)
 
 			CreateUser(c)
+
+			assert.Equal(t, tt.code, rec.Code)
+		})
+	}
+}
+
+func TestSigninUser(t *testing.T) {
+	tests := []struct {
+		name string
+		json string
+		code int
+	}{
+		{"ok", `{"email":"test-signin-user", "pwd":"coincoin"}`, 200},
+		{"no email", `{"pwd":"coin"}`, 400},
+		{"no pwd", `{"email":"test-signin-user"}`, 400},
+		{"wrong pwd", `{"email":"test-signin-user", "pwd":"wrong_password"}`, 401},
+		{"invalid email", `{"email":"invalid_email", "pwd":"random"}`, 401},
+	}
+
+	createUser("test-signin-user", "coincoin")
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := echo.New()
+			req := httptest.NewRequest(http.MethodPost, "/api/signin", strings.NewReader(tt.json))
+			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+			rec := httptest.NewRecorder()
+			c := e.NewContext(req, rec)
+
+			SigninUser(c)
 
 			assert.Equal(t, tt.code, rec.Code)
 		})

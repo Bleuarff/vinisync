@@ -16,7 +16,7 @@ var Db *mongo.Database
 var client *mongo.Client
 
 // Connects to the mongo db instance at connectionString.
-func Connect(connectionString string, timeout time.Duration) error {
+func Connect(connectionString string, dbName string, timeout time.Duration) error {
 
 	// default timeout
 	if timeout == 0 {
@@ -37,7 +37,7 @@ func Connect(connectionString string, timeout time.Duration) error {
 		return err
 	} else {
 		fmt.Println("MongoDb connection OK")
-		Db = client.Database("vinisync")
+		Db = client.Database(dbName)
 		return nil
 	}
 }

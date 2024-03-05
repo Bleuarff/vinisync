@@ -21,7 +21,7 @@ func TestConnect(t *testing.T) {
 
 		t.Run(tt.connString, func(t *testing.T) {
 
-			err := Connect(tt.connString, time.Duration(tt.timeout)*time.Second)
+			err := Connect(tt.connString, "vinisync", time.Duration(tt.timeout)*time.Second)
 
 			if !tt.expectError && err != nil {
 				t.Errorf("Cannot connect to DB '%s'", tt.connString)

@@ -15,10 +15,12 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+const DB_NAME = "vinisync"
+
 func main() {
 	fmt.Println("Vinisync server  - Go edition")
 
-	err := utils.Connect("mongodb://localhost:27018", 30*time.Second)
+	err := utils.Connect("mongodb://localhost:27018", DB_NAME, 30*time.Second)
 	if err != nil {
 		log.Fatal(err)
 	}

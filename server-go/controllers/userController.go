@@ -69,7 +69,7 @@ func CreateUser(c echo.Context) error {
 	}
 
 	user.Pwd = "" // set to default for removal from response
-	return c.JSON(http.StatusOK, user)
+	return c.JSON(http.StatusCreated, user)
 }
 
 // Check provided credentials match the user.

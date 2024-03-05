@@ -42,7 +42,7 @@ func TestCreateUser(t *testing.T) {
 		json string
 		code int
 	}{
-		{"New User", `{"email":"test_user_1", "pwd":"gabuzomeu"}`, 200},
+		{"New User", `{"email":"test_user_1", "pwd":"gabuzomeu"}`, 201},
 		{"Missing password", `{"email":"test"}`, 400},
 		{"Missing email", `{"pwd":"test"}`, 400},
 		{"Duplicate email", `{"email":"test_user_1", "pwd":"gaboue"}`, 400},
